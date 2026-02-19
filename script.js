@@ -48,22 +48,23 @@ function mostrarFicha(p) {
     badge.innerText = p.avance > 70 ? 'Óptimo' : (p.avance > 40 ? 'En Proceso' : 'Crítico');
 }
 
-// LÓGICA DE PANORAMA REGIONAL
 function actualizarResumenRegional(data) {
-    // Agrupamos por departamento
-    const resumen = {};
-    data.forEach(p => {
-        if (!resumen[p.DEPARTAMENTO]) resumen[p.DEPARTAMENTO] = { pim: 0, dev: 0 };
-        resumen[p.DEPARTAMENTO].pim += p.pim;
-        resumen[p.DEPARTAMENTO].dev += p.devengado;
-    });
+    // 1. Agrupamos y sumamos proyectos por Departamento
+    const departamentosMap = data.reduce((acc, proyecto) => {
+        const depto = proyecto.DEPARTAMENTO || 'OTROS';
+        if (!acc[depto]) {
+            acc[depto] = { nombre: depto, pim: 0, dev: 0 };
+        }
+        acc[depto].pim += parseFloat(proyecto.pim) || 0;
+        acc[depto].dev += parseFloat(proyecto.devengado) || 0;
+        return acc;
+    }, {});
 
-    const listaDeptos = Object.keys(resumen).map(d => ({
-        nombre: d,
-        pim: resumen[d].pim,
-        dev: resumen[d].dev,
-        avance: ((resumen[d].dev / resumen[d].pim) * 100).toFixed(1)
-    })).sort((a, b) => b.pim - a.pim);
+    // 2. Convertimos el objeto en un Array y calculamos el % de avance
+    const listaDeptos = Object.values(departamentosMap).map(d => ({
+        ...d,
+        avance: d.pim > 0 ? ((d.dev / d.pim) * 100).toFixed(1) : 0
+    })).sort((a, b) => b.pim - a.pim); // Ordenamos por presupuesto (PIM) de mayor a menor
 
     renderizarTabla(listaDeptos);
     renderizarGrafico(listaDeptos);
@@ -71,28 +72,65 @@ function actualizarResumenRegional(data) {
 
 function renderizarTabla(deptos) {
     const tbody = document.querySelector('#mefTable tbody');
-    tbody.innerHTML = deptos.map(d => `
-        <tr>
-            <td><strong>${d.nombre}</strong></td>
-            <td style="text-align: right;">${d.pim.toLocaleString()}</td>
-            <td style="text-align: right;">${d.dev.toLocaleString()}</td>
-            <td style="text-align: center;"><span class="badge ${d.avance > 40 ? 'bg-success' : 'bg-danger'}">${d.avance}%</span></td>
-        </tr>
-    `).join('');
+    tbody.innerHTML = deptos.map(d => {
+        // Semáforo de avance regional
+        const claseBadge = d.avance > 75 ? 'bg-success' : (d.avance > 40 ? 'bg-warning' : 'bg-danger');
+        
+        return `
+            <tr>
+                <td><strong>${d.nombre}</strong></td>
+                <td style="text-align: right;">S/ ${Number(d.pim).toLocaleString('es-PE', {minimumFractionDigits: 2})}</td>
+                <td style="text-align: right;">S/ ${Number(d.dev).toLocaleString('es-PE', {minimumFractionDigits: 2})}</td>
+                <td style="text-align: center;">
+                    <span class="badge ${claseBadge}">${d.avance}%</span>
+                </td>
+            </tr>
+        `;
+    }).join('');
 }
 
 function renderizarGrafico(deptos) {
     const ctx = document.getElementById('mefChart').getContext('2d');
     if (miGrafico) miGrafico.destroy();
+
+    // Mostramos solo los 10 departamentos con más presupuesto para no amontonar el gráfico
+    const top10 = deptos.slice(0, 10);
+
     miGrafico = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: deptos.slice(0, 10).map(d => d.nombre),
-            datasets: [{ label: '% Avance', data: deptos.slice(0, 10).map(d => d.avance), backgroundColor: '#3b82f6' }]
+            labels: top10.map(d => d.nombre),
+            datasets: [
+                {
+                    label: 'PIM (Presupuesto)',
+                    data: top10.map(d => d.pim),
+                    backgroundColor: '#cbd5e1',
+                    order: 2
+                },
+                {
+                    label: 'Devengado (Gasto)',
+                    data: top10.map(d => d.dev),
+                    backgroundColor: '#3b82f6',
+                    order: 1
+                }
+            ]
         },
-        options: { responsive: true, maintainAspectRatio: false }
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { callback: (value) => 'S/ ' + value.toLocaleString() }
+                }
+            },
+            plugins: {
+                title: { display: true, text: 'Top 10 Departamentos por Presupuesto y Gasto' }
+            }
+        }
     });
 }
+
 
 function actualizarTarjetas(data) {
     const tp = data.reduce((a, b) => a + b.pim, 0);
@@ -103,3 +141,4 @@ function actualizarTarjetas(data) {
 }
 
 window.onload = cargarDatos;
+
