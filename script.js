@@ -1,66 +1,66 @@
 const resource_id = "749cb9b6-604f-485b-bb06-4b906b44034f";
 
 async function consultarMEF() {
-    const contenedor = document.getElementById('contenedor-proyectos');
     const estado = document.getElementById('estado');
+    const contenedor = document.getElementById('contenedor-proyectos');
     
-    // SQL: Traemos proyectos con presupuesto real
-    const sql = `SELECT "DEPARTAMENTO_META_NOMBRE", "PRODUCTO_PROYECTO_NOMBRE", "MONTO_PIM", "MONTO_DEVENGADO_ANO_EJE" FROM "${resource_id}" WHERE "SECTOR_NOMBRE" LIKE 'GOBIERNOS REGIONALES' AND "MONTO_PIM" > 0 LIMIT 100`;
+    // Cambiamos a datastore_search (más estable) con un filtro de texto para Lambayeque
+    const apiUrl = `https://api.datosabiertos.mef.gob.pe/DatosAbiertos/v1/datastore_search?resource_id=${resource_id}&q=LAMBAYEQUE&limit=50`;
     
-    const mefUrl = `https://api.datosabiertos.mef.gob.pe/DatosAbiertos/v1/datastore_search_sql?sql=${encodeURIComponent(sql)}`;
-    
-    // TÚNEL PARA SALTAR EL BLOQUEO (CORS)
-    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(mefUrl)}`;
+    // Usamos el Proxy de Cloudflare (muy potente)
+    const finalUrl = `https://corsproxy.io/?${encodeURIComponent(apiUrl)}`;
 
     try {
-        estado.innerHTML = "⏳ Cruzando el firewall del MEF...";
+        estado.innerHTML = "⏳ Intentando conexión de alta prioridad...";
         
-        const response = await fetch(proxyUrl);
-        if (!response.ok) throw new Error("Error en el túnel de conexión");
+        const response = await fetch(finalUrl);
         
-        const wrapper = await response.json();
-        // AllOrigins devuelve la respuesta dentro de .contents como un string
-        const data = JSON.parse(wrapper.contents);
+        if (!response.ok) throw new Error(`Error del servidor: ${response.status}`);
         
+        const data = await response.json();
+        
+        // Estructura para datastore_search
         const records = data.result?.records || [];
 
         if (records.length === 0) {
-            estado.innerHTML = "⚠️ El servidor respondió, pero no hay datos actuales.";
+            estado.innerHTML = "⚠️ Conexión establecida, pero no hay datos para LAMBAYEQUE.";
             return;
         }
 
-        estado.innerHTML = `✅ Conexión Exitosa: ${records.length} proyectos detectados.`;
+        estado.innerHTML = `✅ ¡Conectado! Mostrando proyectos de la región.`;
         
         window.datosMEF = records.map(r => ({
-            depto: r.DEPARTAMENTO_META_NOMBRE,
-            nombre: r.PRODUCTO_PROYECTO_NOMBRE,
+            depto: r.DEPARTAMENTO_META_NOMBRE || "REGIONAL",
+            nombre: r.PRODUCTO_PROYECTO_NOMBRE || "PROYECTO SIN NOMBRE",
             pim: parseFloat(r.MONTO_PIM) || 0,
             dev: parseFloat(r.MONTO_DEVENGADO_ANO_EJE) || 0,
-            avance: r.MONTO_PIM > 0 ? ((parseFloat(r.MONTO_DEVENGADO_ANO_EJE) / parseFloat(r.MONTO_PIM)) * 100).toFixed(1) : 0
+            avance: parseFloat(r.MONTO_PIM) > 0 ? ((parseFloat(r.MONTO_DEVENGADO_ANO_EJE) / parseFloat(r.MONTO_PIM)) * 100).toFixed(1) : 0
         }));
 
         renderizar(window.datosMEF);
 
     } catch (error) {
-        console.error(error);
-        estado.innerHTML = "🚨 Error persistente. El servidor del MEF está en mantenimiento o bloqueado.";
+        console.error("Detalle del error:", error);
+        estado.innerHTML = `🚨 Error de Red: ${error.message}. El MEF ha bloqueado el acceso temporalmente.`;
     }
 }
 
 function renderizar(lista) {
     const contenedor = document.getElementById('contenedor-proyectos');
+    if (!lista.length) return;
+    
     contenedor.innerHTML = lista.map(p => `
         <div class="col-md-6 mb-3">
-            <div class="card h-100 shadow-sm border-start border-4 ${p.avance > 40 ? 'border-success' : 'border-warning'}">
-                <div class="card-body">
-                    <small class="fw-bold text-primary">${p.depto}</small>
-                    <h6 class="card-title mt-1" style="font-size: 0.85rem;">${p.nombre}</h6>
-                    <div class="d-flex justify-content-between small text-muted mb-2">
-                        <span>PIM: S/ ${p.pim.toLocaleString()}</span>
-                        <span class="fw-bold">${p.avance}%</span>
+            <div class="card h-100 shadow-sm border-start border-4 ${p.avance > 40 ? 'border-success' : 'border-danger'}">
+                <div class="card-body p-3">
+                    <div class="d-flex justify-content-between">
+                        <small class="fw-bold text-primary">${p.depto}</small>
+                        <span class="badge ${p.avance > 40 ? 'bg-success' : 'bg-danger'}">${p.avance}%</span>
                     </div>
-                    <div class="progress" style="height: 8px;">
-                        <div class="progress-bar ${p.avance > 40 ? 'bg-success' : 'bg-danger'}" style="width: ${p.avance}%"></div>
+                    <h6 class="card-title mt-2 mb-3" style="font-size: 0.85rem; line-height: 1.2;">${p.nombre}</h6>
+                    <div class="small text-muted mb-1">PIM: S/ ${p.pim.toLocaleString()}</div>
+                    <div class="progress" style="height: 6px;">
+                        <div class="progress-bar ${p.avance > 40 ? 'bg-success' : 'bg-warning'}" style="width: ${p.avance}%"></div>
                     </div>
                 </div>
             </div>
@@ -68,14 +68,5 @@ function renderizar(lista) {
     `).join('');
 }
 
-// Buscador activo
-document.getElementById('buscador').addEventListener('input', (e) => {
-    const term = e.target.value.toLowerCase();
-    if (!window.datosMEF) return;
-    const filtrados = window.datosMEF.filter(p => 
-        p.nombre.toLowerCase().includes(term) || p.depto.toLowerCase().includes(term)
-    );
-    renderizar(filtrados);
-});
-
-consultarMEF();
+// Inicializar
+document.addEventListener('DOMContentLoaded', consultarMEF);
