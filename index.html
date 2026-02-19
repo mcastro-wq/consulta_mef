@@ -8,28 +8,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-
-<div class="search-container">
-    <h3>Consultar Proyecto Específico</h3>
-    <div class="combobox-wrapper">
-        <input type="text" id="projectSearch" placeholder="Escriba el nombre del proyecto u obra..." oninput="buscarProyectos(this.value)">
-        <div id="resultsList" class="results-list"></div>
-    </div>
-</div>
-
-<section id="projectDetail" class="project-card" style="display: none;">
-    <div class="card-header">
-        <h2 id="detNombre">Nombre del Proyecto</h2>
-        <span id="detBadge" class="badge">Estado</span>
-    </div>
-    <div class="card-grid">
-        <div class="data-item"><strong>PIM:</strong> <span id="detPim"></span></div>
-        <div class="data-item"><strong>Devengado:</strong> <span id="detDev"></span></div>
-        <div class="data-item"><strong>Avance:</strong> <span id="detAvance"></span></div>
-        <div class="data-item"><strong>Departamento:</strong> <span id="detDepto"></span></div>
-    </div>
-</section>
-
     
 <body>
     <header>
@@ -59,6 +37,32 @@
             <input type="text" id="searchInput" placeholder="Filtrar por Departamento o Región..." onkeyup="filtrarDatos()">
         </div>
 
+
+        <div class="search-container">
+    <h3>Consultar Proyecto Específico</h3>
+    <div class="combobox-wrapper">
+        <input type="text" id="projectSearch" placeholder="Escriba el nombre del proyecto u obra..." oninput="buscarProyectos(this.value)">
+        <div id="resultsList" class="results-list"></div>
+    </div>
+</div>
+
+<section id="projectDetail" class="project-card" style="display: none;">
+    <div class="card-header">
+        <h2 id="detNombre">Nombre del Proyecto</h2>
+        <span id="detBadge" class="badge">Estado</span>
+    </div>
+    <div class="card-grid">
+        <div class="data-item"><strong>PIM:</strong> <span id="detPim"></span></div>
+        <div class="data-item"><strong>Devengado:</strong> <span id="detDev"></span></div>
+        <div class="data-item"><strong>Avance:</strong> <span id="detAvance"></span></div>
+        <div class="data-item"><strong>Departamento:</strong> <span id="detDepto"></span></div>
+    </div>
+</section>
+
+
+
+        
+
         <section class="chart-section">
             <h3>Comparativo de Ejecución por Departamento</h3>
             <div class="chart-container">
@@ -87,4 +91,5 @@
     <script src="script.js"></script>
 </body>
 </html>
+
 
