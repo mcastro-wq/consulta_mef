@@ -1,23 +1,9 @@
 [
   {
-    "NOMBRE": "MEJORAMIENTO DEL SERVICIO EDUCATIVO - LAMBAYEQUE",
-    "DEPARTAMENTO": "LAMBAYEQUE",
-    "pim": 15000000,
-    "devengado": 8000000,
-    "avance": 53.3
-  },
-  {
-    "NOMBRE": "CONSTRUCCIÓN DE CARRETERA REGIONAL",
-    "DEPARTAMENTO": "LAMBAYEQUE",
-    "pim": 25000000,
-    "devengado": 5000000,
-    "avance": 20.0
-  },
-  {
-    "NOMBRE": "PROYECTO DE IRRIGACIÓN OLMOS",
-    "DEPARTAMENTO": "LAMBAYEQUE",
-    "pim": 100000000,
-    "devengado": 75000000,
-    "avance": 75.0
+    "NOMBRE": "ERROR DE CONEXIÓN MEF",
+    "DEPARTAMENTO": "SISTEMA",
+    "pim": 0,
+    "dev": 0,
+    "avance": 0
   }
 ]
