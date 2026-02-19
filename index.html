@@ -3,31 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MEF - Ejecución Presupuestal</title>
+    <title>Tablero de Control - Ejecución Presupuestal MEF</title>
     <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <header>
-        <h1>Ejecución Presupuestal por Departamento</h1>
-        <p id="status">Sincronizando con el portal del MEF...</p>
+        <div class="header-content">
+            <h1>Panel de Seguimiento de Inversiones (MEF)</h1>
+            <p id="status">Sincronizando datos de ejecución 2025-2026...</p>
+        </div>
     </header>
 
     <main class="container">
+        <div class="summary-cards">
+            <div class="card">
+                <h3>PIM Total</h3>
+                <p id="totalPim">S/ 0.00</p>
+            </div>
+            <div class="card">
+                <h3>Devengado Total</h3>
+                <p id="totalDevengado">S/ 0.00</p>
+            </div>
+            <div class="card">
+                <h3>% Ejecución Global</h3>
+                <p id="globalAvance">0%</p>
+            </div>
+        </div>
+
         <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Buscar departamento (ej: Lima, Cusco...)" onkeyup="filtrarDatos()">
+            <input type="text" id="searchInput" placeholder="Filtrar por Departamento o Región..." onkeyup="filtrarDatos()">
         </div>
 
         <section class="chart-section">
-            <canvas id="mefChart"></canvas>
+            <h3>Comparativo de Ejecución por Departamento</h3>
+            <div class="chart-container">
+                <canvas id="mefChart"></canvas>
+            </div>
         </section>
 
         <section class="table-section">
+            <h3>Detalle de Presupuesto e Inversión</h3>
             <table id="mefTable">
                 <thead>
                     <tr>
                         <th>Departamento</th>
-                        <th style="text-align: right;">Total Ejecutado (S/.)</th>
+                        <th style="text-align: right;">Presupuesto (PIM)</th>
+                        <th style="text-align: right;">Ejecutado (Devengado)</th>
+                        <th style="text-align: center;">Avance %</th>
+                        <th style="text-align: center;">Estado</th>
                     </tr>
                 </thead>
                 <tbody>
