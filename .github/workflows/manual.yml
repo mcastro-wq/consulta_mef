@@ -1,5 +1,8 @@
 name: Actualizacion Automatizada MEF
 
+permissions:
+  contents: write
+  
 on:
   schedule:
     # Se ejecuta cada 6 horas (00:00, 06:00, 12:00, 18:00 UTC)
