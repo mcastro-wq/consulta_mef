@@ -1,68 +1,49 @@
-const URL_DATA = 'https://raw.githubusercontent.com/mcastro-wq/consulta_mef/main/data_mef.json';
-let datosGlobales = []; // Para guardar los datos y poder filtrarlos
+import requests
+import json
+import urllib.parse
 
-async function cargarDatos() {
-    try {
-        const response = await fetch(URL_DATA);
-        datosGlobales = await response.json();
-        
-        // Ordenar de mayor a menor
-        datosGlobales.sort((a, b) => b.total - a.total);
+# 1. Configuración con los nombres del Diccionario de Datos
+resource_id = "49d960a8-54cf-4a45-8ebe-d8074ac88877"
 
-        document.getElementById('status').innerText = "Última actualización: Hoy (Sincronizado cada 6h)";
-        
-        actualizarUI(datosGlobales);
-    } catch (error) {
-        document.getElementById('status').innerText = "Error al conectar con los datos.";
-        console.error(error);
+# Usamos DEPARTAMENTO_META_NOMBRE para la ubicación y MONTO_DEVENGADO_ANO_EJE para el gasto
+sql_query = f'''
+SELECT 
+    "DEPARTAMENTO_META_NOMBRE", 
+    SUM("MONTO_DEVENGADO_ANO_EJE") as total 
+FROM "{resource_id}" 
+GROUP BY "DEPARTAMENTO_META_NOMBRE"
+'''
+
+encoded_sql = urllib.parse.quote(sql_query)
+url = f"https://api.datosabiertos.mef.gob.pe/DatosAbiertos/v1/datastore_search_sql?sql={encoded_sql}"
+
+def update_data():
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0 Safari/537.36'
     }
-}
+    
+    try:
+        print("Iniciando extracción desde el MEF...")
+        response = requests.get(url, headers=headers, timeout=60)
+        
+        if response.status_code == 200:
+            res_json = response.json()
+            if res_json.get('success'):
+                records = res_json['result']['records']
+                
+                if records:
+                    with open('data_mef.json', 'w', encoding='utf-8') as f:
+                        json.dump(records, f, ensure_ascii=False, indent=2)
+                    print(f"✅ ¡Logrado! Se guardaron {len(records)} departamentos en data_mef.json")
+                else:
+                    print("⚠️ La API no devolvió registros. Verifica si el resource_id es para el año actual.")
+            else:
+                print(f"❌ Error en Query: {res_json.get('error')}")
+        else:
+            print(f"❌ Error de Conexión HTTP: {response.status_code}")
 
-function actualizarUI(data) {
-    renderizarGrafico(data);
-    renderizarTabla(data);
-}
+    except Exception as e:
+        print(f"⚠️ Error: {e}")
 
-function renderizarGrafico(data) {
-    const ctx = document.getElementById('mefChart').getContext('2d');
-    if (window.miGrafico) window.miGrafico.destroy();
-
-    window.miGrafico = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: data.map(i => i.DEPARTAMENTO_NOMBRE),
-            datasets: [{
-                label: 'Soles (S/.)',
-                data: data.map(i => i.total),
-                backgroundColor: '#3b82f6'
-            }]
-        },
-        options: {
-            indexAxis: 'y',
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } }
-        }
-    });
-}
-
-function renderizarTabla(data) {
-    const tbody = document.querySelector('#mefTable tbody');
-    tbody.innerHTML = data.map(item => `
-        <tr>
-            <td>${item.DEPARTAMENTO_NOMBRE}</td>
-            <td style="text-align: right;" class="monto">
-                S/. ${Number(item.total).toLocaleString('es-PE', {minimumFractionDigits: 2})}
-            </td>
-        </tr>
-    `).join('');
-}
-
-function filtrarDatos() {
-    const termino = document.getElementById('searchInput').value.toLowerCase();
-    const filtrados = datosGlobales.filter(item => 
-        item.DEPARTAMENTO_NOMBRE.toLowerCase().includes(termino)
-    );
-    actualizarUI(filtrados);
-}
-
-cargarDatos();
+if __name__ == "__main__":
+    update_data()
