@@ -47,20 +47,21 @@ function renderizarGrafico(data) {
 
 function renderizarTabla(data) {
     const tbody = document.querySelector('#mefTable tbody');
-    // Ordenamos por total antes de mostrar
-    data.sort((a, b) => b.total - a.total);
-    
-    tbody.innerHTML = data.map(item => `
+    // Actualizamos las cabeceras de la tabla en tu index.html para que coincidan
+    tbody.innerHTML = data.map(item => {
+        // Lógica de semáforo para el avance
+        const colorClase = item.avance < 40 ? 'text-red' : (item.avance < 75 ? 'text-orange' : 'text-green');
+        
+        return `
         <tr>
-            <td><strong>${item.DEPARTAMENTO_META_NOMBRE}</strong></td>
-            <td style="text-align: right;" class="monto">
-                S/ ${Number(item.total).toLocaleString('es-PE', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                })}
+            <td><strong>${item.DEPARTAMENTO}</strong></td>
+            <td style="text-align: right;">S/ ${item.pim.toLocaleString()}</td>
+            <td style="text-align: right;">S/ ${item.devengado.toLocaleString()}</td>
+            <td style="text-align: right; font-weight: bold;" class="${colorClase}">
+                ${item.avance}%
             </td>
         </tr>
-    `).join('');
+    `}).join('');
 }
 
 function filtrarDatos() {
@@ -72,5 +73,6 @@ function filtrarDatos() {
 }
 
 cargarDatos();
+
 
 
