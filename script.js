@@ -4,32 +4,34 @@ async function consultarMEF() {
     const contenedor = document.getElementById('contenedor-proyectos');
     const estado = document.getElementById('estado');
     
-    // Consulta SQL para traer datos reales de Gobiernos Regionales
+    // SQL: Traemos proyectos con presupuesto real
     const sql = `SELECT "DEPARTAMENTO_META_NOMBRE", "PRODUCTO_PROYECTO_NOMBRE", "MONTO_PIM", "MONTO_DEVENGADO_ANO_EJE" FROM "${resource_id}" WHERE "SECTOR_NOMBRE" LIKE 'GOBIERNOS REGIONALES' AND "MONTO_PIM" > 0 LIMIT 100`;
     
     const mefUrl = `https://api.datosabiertos.mef.gob.pe/DatosAbiertos/v1/datastore_search_sql?sql=${encodeURIComponent(sql)}`;
     
-    // Usamos un proxy público para saltar el bloqueo de seguridad (CORS)
-    const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(mefUrl);
+    // TÚNEL PARA SALTAR EL BLOQUEO (CORS)
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(mefUrl)}`;
 
     try {
-        estado.innerHTML = "⏳ Conectando de forma segura con el MEF...";
+        estado.innerHTML = "⏳ Cruzando el firewall del MEF...";
         
         const response = await fetch(proxyUrl);
-        if (!response.ok) throw new Error("Error en servidor MEF");
+        if (!response.ok) throw new Error("Error en el túnel de conexión");
         
-        const data = await response.json();
+        const wrapper = await response.json();
+        // AllOrigins devuelve la respuesta dentro de .contents como un string
+        const data = JSON.parse(wrapper.contents);
+        
         const records = data.result?.records || [];
 
         if (records.length === 0) {
-            estado.innerHTML = "⚠️ No se encontraron datos para esta consulta.";
+            estado.innerHTML = "⚠️ El servidor respondió, pero no hay datos actuales.";
             return;
         }
 
-        estado.innerHTML = `✅ Datos en vivo: ${records.length} proyectos encontrados.`;
+        estado.innerHTML = `✅ Conexión Exitosa: ${records.length} proyectos detectados.`;
         
-        // Procesamos los datos
-        const proyectos = records.map(r => ({
+        window.datosMEF = records.map(r => ({
             depto: r.DEPARTAMENTO_META_NOMBRE,
             nombre: r.PRODUCTO_PROYECTO_NOMBRE,
             pim: parseFloat(r.MONTO_PIM) || 0,
@@ -37,13 +39,11 @@ async function consultarMEF() {
             avance: r.MONTO_PIM > 0 ? ((parseFloat(r.MONTO_DEVENGADO_ANO_EJE) / parseFloat(r.MONTO_PIM)) * 100).toFixed(1) : 0
         }));
 
-        // Guardamos para el buscador y mostramos
-        window.datosMEF = proyectos;
-        renderizar(proyectos);
+        renderizar(window.datosMEF);
 
     } catch (error) {
         console.error(error);
-        estado.innerHTML = "❌ El servidor del MEF no responde. Intente en unos minutos.";
+        estado.innerHTML = "🚨 Error persistente. El servidor del MEF está en mantenimiento o bloqueado.";
     }
 }
 
@@ -51,16 +51,16 @@ function renderizar(lista) {
     const contenedor = document.getElementById('contenedor-proyectos');
     contenedor.innerHTML = lista.map(p => `
         <div class="col-md-6 mb-3">
-            <div class="card h-100 shadow-sm border-start border-4 ${p.avance > 50 ? 'border-success' : 'border-warning'}">
+            <div class="card h-100 shadow-sm border-start border-4 ${p.avance > 40 ? 'border-success' : 'border-warning'}">
                 <div class="card-body">
                     <small class="fw-bold text-primary">${p.depto}</small>
-                    <h6 class="card-title mt-1">${p.nombre}</h6>
+                    <h6 class="card-title mt-1" style="font-size: 0.85rem;">${p.nombre}</h6>
                     <div class="d-flex justify-content-between small text-muted mb-2">
                         <span>PIM: S/ ${p.pim.toLocaleString()}</span>
                         <span class="fw-bold">${p.avance}%</span>
                     </div>
                     <div class="progress" style="height: 8px;">
-                        <div class="progress-bar ${p.avance > 50 ? 'bg-success' : 'bg-danger'}" style="width: ${p.avance}%"></div>
+                        <div class="progress-bar ${p.avance > 40 ? 'bg-success' : 'bg-danger'}" style="width: ${p.avance}%"></div>
                     </div>
                 </div>
             </div>
@@ -68,7 +68,7 @@ function renderizar(lista) {
     `).join('');
 }
 
-// Filtro de búsqueda
+// Buscador activo
 document.getElementById('buscador').addEventListener('input', (e) => {
     const term = e.target.value.toLowerCase();
     if (!window.datosMEF) return;
