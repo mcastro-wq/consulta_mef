@@ -3,26 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tablero de Gestión - MEF</title>
+    <title>Monitor Regional MEF</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .card-proyecto { border-left: 5px solid #0d6efd; transition: 0.3s; }
+        .card-proyecto:hover { transform: scale(1.01); }
+        .avance-alto { border-left-color: #198754; }
+        .avance-bajo { border-left-color: #dc3545; }
+    </style>
 </head>
 <body class="bg-light">
-    <div class="container py-4">
-        <header class="text-center mb-4">
-            <h1 class="display-6 fw-bold text-dark">Monitor Presupuestal Regional</h1>
-            <p class="text-muted">Actualización automática vía Datos Abiertos MEF</p>
-        </header>
+    <nav class="navbar navbar-dark bg-dark mb-4">
+        <div class="container">
+            <span class="navbar-brand">SISTEMA DE MONITOREO REGIONAL (DATOS EN VIVO)</span>
+        </div>
+    </nav>
 
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <input type="text" id="buscador" class="form-control form-control-lg mb-4 shadow-sm" 
-                       placeholder="Buscar proyecto o región (Ej: Lambayeque)...">
-                
-                <div id="lista-proyectos">
-                    </div>
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <input type="text" id="buscador" class="form-control form-control-lg" placeholder="🔎 Buscar región o proyecto (ej: Lambayeque)...">
             </div>
         </div>
+        
+        <div id="estado" class="text-center my-3 text-muted">Conectando con el servidor del MEF...</div>
+
+        <div class="row" id="contenedor-proyectos">
+            </div>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>
