@@ -14,12 +14,16 @@ async function cargarDatos() {
 }
 
 function actualizarTarjetas(data) {
-    const totalPim = data.reduce((acc, i) => acc + i.pim, 0);
-    const totalDev = data.reduce((acc, i) => acc + i.devengado, 0);
-    const avanceGlobal = (totalDev / totalPim * 100).toFixed(1);
+    // Sumamos todos los valores del array
+    const totalPim = data.reduce((acc, i) => acc + (parseFloat(i.pim) || 0), 0);
+    const totalDev = data.reduce((acc, i) => acc + (parseFloat(i.devengado) || 0), 0);
+    
+    // Calculamos el avance evitando divisiones por cero
+    const avanceGlobal = totalPim > 0 ? ((totalDev / totalPim) * 100).toFixed(1) : 0;
 
-    document.getElementById('totalPim').innerText = `S/ ${totalPim.toLocaleString()}`;
-    document.getElementById('totalDevengado').innerText = `S/ ${totalDev.toLocaleString()}`;
+    // Actualizamos el HTML
+    document.getElementById('totalPim').innerText = `S/ ${totalPim.toLocaleString('es-PE', {minimumFractionDigits: 2})}`;
+    document.getElementById('totalDevengado').innerText = `S/ ${totalDev.toLocaleString('es-PE', {minimumFractionDigits: 2})}`;
     document.getElementById('globalAvance').innerText = `${avanceGlobal}%`;
 }
 
@@ -77,5 +81,6 @@ function filtrarDatos() {
 }
 
 window.onload = cargarDatos;
+
 
 
