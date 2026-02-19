@@ -2,10 +2,10 @@ import requests
 import json
 import urllib.parse
 
-# 1. Configuración con los nombres del Diccionario de Datos
+
 resource_id = "49d960a8-54cf-4a45-8ebe-d8074ac88877"
 
-# Usamos DEPARTAMENTO_META_NOMBRE para la ubicación y MONTO_DEVENGADO_ANO_EJE para el gasto
+
 sql_query = f'''
 SELECT 
     "DEPARTAMENTO_META_NOMBRE", 
@@ -47,3 +47,4 @@ def update_data():
 
 if __name__ == "__main__":
     update_data()
+
