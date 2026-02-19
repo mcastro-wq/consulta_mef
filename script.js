@@ -27,40 +27,36 @@ function actualizarTarjetas(data) {
 function renderizarTabla(data) {
     const tbody = document.querySelector('#mefTable tbody');
     tbody.innerHTML = data.map(item => {
-        let clase = 'bg-danger';
-        let texto = 'Crítico';
-        if (item.avance > 70) { clase = 'bg-success'; texto = 'Óptimo'; }
-        else if (item.avance > 40) { clase = 'bg-warning'; texto = 'En Proceso'; }
-
+        let clase = item.avance > 70 ? 'bg-success' : (item.avance > 40 ? 'bg-warning' : 'bg-danger');
         return `
             <tr>
-                <td><strong>${item.DEPARTAMENTO}</strong></td>
+                <td><small>${item.NOMBRE}</small><br><strong>${item.DEPARTAMENTO}</strong></td>
                 <td style="text-align: right;">${item.pim.toLocaleString()}</td>
                 <td style="text-align: right;">${item.devengado.toLocaleString()}</td>
-                <td style="text-align: center;"><strong>${item.avance}%</strong></td>
-                <td style="text-align: center;"><span class="badge ${clase}">${texto}</span></td>
+                <td style="text-align: center;">${item.avance}%</td>
+                <td style="text-align: center;"><span class="badge ${clase}">${item.avance}%</span></td>
             </tr>
         `;
     }).join('');
 }
 
 function renderizarGrafico(data) {
-    const canvas = document.getElementById('mefChart');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    
+    const ctx = document.getElementById('mefChart');
+    if (!ctx) return; // Seguridad si el elemento no existe
+
     if (window.miGrafico) window.miGrafico.destroy();
 
-    // Filtramos solo los 10 mejores para que el gráfico no se amontone
-    const topData = data.sort((a, b) => b.avance - a.avance).slice(0, 10);
+    // Filtramos los 10 proyectos con mayor PIM para que el gráfico no se sature
+    const topProyectos = data.sort((a, b) => b.pim - a.pim).slice(0, 10);
 
     window.miGrafico = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: topData.map(i => i.DEPARTAMENTO),
+            // Usamos los nombres de los proyectos en las etiquetas
+            labels: topProyectos.map(i => i.NOMBRE.substring(0, 30) + "..."), 
             datasets: [{
-                label: '% de Avance (Ejecución vs PIM)',
-                data: topData.map(i => i.avance),
+                label: '% de Avance por Proyecto',
+                data: topProyectos.map(i => i.avance),
                 backgroundColor: '#3b82f6',
                 borderRadius: 5
             }]
@@ -70,10 +66,22 @@ function renderizarGrafico(data) {
             maintainAspectRatio: false,
             scales: {
                 y: { beginAtZero: true, max: 100 }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `Avance: ${context.raw}%`;
+                        }
+                    }
+                }
             }
         }
     });
 }
+
+// En renderizarTabla, ahora mostramos el nombre del proyecto
+
 
 function actualizarUI(data) {
     renderizarTabla(data);
@@ -89,6 +97,7 @@ function filtrarDatos() {
 }
 
 window.onload = cargarDatos;
+
 
 
 
