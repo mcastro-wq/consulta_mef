@@ -102,3 +102,31 @@ td {
     margin-bottom: 30px;
     box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
 }
+
+/* Mejora del buscador */
+.search-box {
+    margin-bottom: 25px;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    font-size: 1rem;
+    box-sizing: border-box; /* Evita que el input se salga del contenedor */
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.search-box input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Contenedor del gráfico para que no crezca infinitamente */
+.chart-container {
+    position: relative;
+    height: 400px;
+    width: 100%;
+}
