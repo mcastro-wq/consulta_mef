@@ -1,42 +1,36 @@
-async function cargarTablero() {
+document.addEventListener('DOMContentLoaded', async () => {
+    const lista = document.getElementById('lista-proyectos');
+    const buscador = document.getElementById('buscador');
+
     try {
-        const response = await fetch('data_mef.json');
-        const datos = await response.json();
+        const res = await fetch('data_mef.json');
+        const datos = await res.json();
 
-        // 1. Filtrar solo Lambayeque para los KPIs principales
-        const dataLambayeque = datos.filter(d => d.DEPARTAMENTO === 'LAMBAYEQUE');
-        
-        const totalPim = dataLambayeque.reduce((acc, curr) => acc + curr.pim, 0);
-        const totalDev = dataLambayeque.reduce((acc, curr) => acc + curr.devengado, 0);
-        const avanceGlobal = totalPim > 0 ? (totalDev / totalPim * 100).toFixed(1) : 0;
+        const mostrar = (filtro = "") => {
+            const filtrados = datos.filter(p => 
+                p.NOMBRE.toLowerCase().includes(filtro.toLowerCase()) || 
+                p.DEPARTAMENTO.toLowerCase().includes(filtro.toLowerCase())
+            ).slice(0, 50); // Mostramos los primeros 50 para no saturar
 
-        // Actualizar números en el HTML
-        document.getElementById('pim-total').innerText = `S/ ${totalPim.toLocaleString()}`;
-        document.getElementById('avance-percent').innerText = `${avanceGlobal}%`;
-
-        // 2. Configurar Buscador
-        const inputBusqueda = document.getElementById('buscar-proyecto');
-        const listaResultados = document.getElementById('lista-proyectos');
-
-        inputBusqueda.addEventListener('input', () => {
-            const busqueda = inputBusqueda.value.toLowerCase();
-            const filtrados = datos.filter(p => p.NOMBRE.toLowerCase().includes(busqueda)).slice(0, 10);
-            
-            listaResultados.innerHTML = filtrados.map(p => `
-                <div class="card mb-2 p-2">
-                    <h6>${p.NOMBRE}</h6>
-                    <p class="mb-0">Región: ${p.DEPARTAMENTO} | Avance: <strong>${p.avance}%</strong></p>
-                    <div class="progress" style="height: 10px;">
-                        <div class="progress-bar ${p.avance < 40 ? 'bg-danger' : 'bg-success'}" 
-                             style="width: ${p.avance}%"></div>
+            lista.innerHTML = filtrados.map(p => `
+                <div class="proyecto-card">
+                    <div class="regiao">${p.DEPARTAMENTO}</div>
+                    <h3>${p.NOMBRE}</h3>
+                    <div class="metricas">
+                        <span>PIM: S/ ${p.pim.toLocaleString()}</span>
+                        <span>Avance: ${p.avance}%</span>
+                    </div>
+                    <div class="barra-fondo">
+                        <div class="barra-progreso" style="width: ${p.avance}%"></div>
                     </div>
                 </div>
             `).join('');
-        });
+        };
 
-    } catch (error) {
-        console.error("Error cargando datos:", error);
+        buscador.addEventListener('input', (e) => mostrar(e.target.value));
+        mostrar(); // Carga inicial
+
+    } catch (e) {
+        lista.innerHTML = `<p style="color:red">Error cargando datos: ${e.message}</p>`;
     }
-}
-
-document.addEventListener('DOMContentLoaded', cargarTablero);
+});
