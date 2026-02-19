@@ -30,7 +30,7 @@ function renderizarGrafico(data) {
     window.miGrafico = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: data.map(i => i.DEPARTAMENTO_NOMBRE),
+            labels: data.map(i => i.DEPARTAMENTO_META_NOMBRE),
             datasets: [{
                 label: 'Soles (S/.)',
                 data: data.map(i => i.total),
@@ -49,7 +49,7 @@ function renderizarTabla(data) {
     const tbody = document.querySelector('#mefTable tbody');
     tbody.innerHTML = data.map(item => `
         <tr>
-            <td>${item.DEPARTAMENTO_NOMBRE}</td>
+            <td>${item.DEPARTAMENTO_META_NOMBRE}</td>
             <td style="text-align: right;" class="monto">
                 S/. ${Number(item.total).toLocaleString('es-PE', {minimumFractionDigits: 2})}
             </td>
@@ -60,9 +60,10 @@ function renderizarTabla(data) {
 function filtrarDatos() {
     const termino = document.getElementById('searchInput').value.toLowerCase();
     const filtrados = datosGlobales.filter(item => 
-        item.DEPARTAMENTO_NOMBRE.toLowerCase().includes(termino)
+        item.DEPARTAMENTO_META_NOMBRE.toLowerCase().includes(termino)
     );
     actualizarUI(filtrados);
 }
 
 cargarDatos();
+
