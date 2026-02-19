@@ -47,11 +47,17 @@ function renderizarGrafico(data) {
 
 function renderizarTabla(data) {
     const tbody = document.querySelector('#mefTable tbody');
+    // Ordenamos por total antes de mostrar
+    data.sort((a, b) => b.total - a.total);
+    
     tbody.innerHTML = data.map(item => `
         <tr>
-            <td>${item.DEPARTAMENTO_META_NOMBRE}</td>
+            <td><strong>${item.DEPARTAMENTO_META_NOMBRE}</strong></td>
             <td style="text-align: right;" class="monto">
-                S/. ${Number(item.total).toLocaleString('es-PE', {minimumFractionDigits: 2})}
+                S/ ${Number(item.total).toLocaleString('es-PE', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                })}
             </td>
         </tr>
     `).join('');
@@ -66,4 +72,5 @@ function filtrarDatos() {
 }
 
 cargarDatos();
+
 
