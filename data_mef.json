@@ -1,9 +1,23 @@
 [
   {
-    "NOMBRE": "OBRA EJEMPLO LAMBAYEQUE",
+    "NOMBRE": "MEJORAMIENTO DEL SERVICIO EDUCATIVO - LAMBAYEQUE",
     "DEPARTAMENTO": "LAMBAYEQUE",
-    "pim": 500000,
-    "devengado": 100000,
+    "pim": 15000000,
+    "devengado": 8000000,
+    "avance": 53.3
+  },
+  {
+    "NOMBRE": "CONSTRUCCIÓN DE CARRETERA REGIONAL",
+    "DEPARTAMENTO": "LAMBAYEQUE",
+    "pim": 25000000,
+    "devengado": 5000000,
     "avance": 20.0
+  },
+  {
+    "NOMBRE": "PROYECTO DE IRRIGACIÓN OLMOS",
+    "DEPARTAMENTO": "LAMBAYEQUE",
+    "pim": 100000000,
+    "devengado": 75000000,
+    "avance": 75.0
   }
 ]
