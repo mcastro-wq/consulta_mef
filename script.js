@@ -1,36 +1,37 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    const lista = document.getElementById('lista-proyectos');
+    const contenedor = document.getElementById('lista-proyectos');
     const buscador = document.getElementById('buscador');
 
     try {
         const res = await fetch('data_mef.json');
         const datos = await res.json();
 
-        const mostrar = (filtro = "") => {
+        const render = (filtro = "") => {
             const filtrados = datos.filter(p => 
                 p.NOMBRE.toLowerCase().includes(filtro.toLowerCase()) || 
                 p.DEPARTAMENTO.toLowerCase().includes(filtro.toLowerCase())
-            ).slice(0, 50); // Mostramos los primeros 50 para no saturar
+            );
 
-            lista.innerHTML = filtrados.map(p => `
-                <div class="proyecto-card">
-                    <div class="regiao">${p.DEPARTAMENTO}</div>
-                    <h3>${p.NOMBRE}</h3>
-                    <div class="metricas">
+            contenedor.innerHTML = filtrados.map(p => `
+                <div class="card mb-3 p-3 shadow-sm">
+                    <span class="badge bg-primary mb-2" style="width: fit-content;">${p.DEPARTAMENTO}</span>
+                    <h5 class="h6">${p.NOMBRE}</h5>
+                    <div class="d-flex justify-content-between small mb-1">
                         <span>PIM: S/ ${p.pim.toLocaleString()}</span>
                         <span>Avance: ${p.avance}%</span>
                     </div>
-                    <div class="barra-fondo">
-                        <div class="barra-progreso" style="width: ${p.avance}%"></div>
+                    <div class="progress" style="height: 8px;">
+                        <div class="progress-bar ${p.avance > 70 ? 'bg-success' : 'bg-warning'}" 
+                             style="width: ${p.avance}%"></div>
                     </div>
                 </div>
             `).join('');
         };
 
-        buscador.addEventListener('input', (e) => mostrar(e.target.value));
-        mostrar(); // Carga inicial
+        buscador.addEventListener('input', (e) => render(e.target.value));
+        render();
 
     } catch (e) {
-        lista.innerHTML = `<p style="color:red">Error cargando datos: ${e.message}</p>`;
+        contenedor.innerHTML = "<p class='text-danger'>Error al cargar el tablero.</p>";
     }
 });
