@@ -2,32 +2,40 @@ import requests
 import json
 import time
 
-# Endpoint estándar (más estable que el de SQL)
 resource_id = '749cb9b6-604f-485b-bb06-4b906b44034f'
-url = f'https://api.datosabiertos.mef.gob.pe/DatosAbiertos/v1/datastore_search?resource_id={resource_id}&limit=1000'
+# Tamaño de cada bolsa de datos (500 es ideal para que no falle)
+limit = 500 
 
 def update_data():
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
     }
     
+    all_records = []
+    offset = 0 # Empezamos desde el registro 0
+    total_a_traer = 3000 # Ajusta este número según cuántos proyectos quieras ver
+
     try:
-        print("Conectando al servidor del MEF...")
-        # Timeout extendido a 60 segundos
-        response = requests.get(url, headers=headers, timeout=60)
+        print(f"Iniciando descarga masiva de datos (Meta: {total_a_traer} registros)...")
         
-        if response.status_code == 200:
-            data = response.json()
-            records = data.get('result', {}).get('records', [])
+        while offset < total_a_traer:
+            # Construimos la URL con el offset (página actual)
+            url = f'https://api.datosabiertos.mef.gob.pe/DatosAbiertos/v1/datastore_search?resource_id={resource_id}&limit={limit}&offset={offset}'
             
-            if records:
-                procesados = []
+            response = requests.get(url, headers=headers, timeout=60)
+            
+            if response.status_code == 200:
+                data = response.json()
+                records = data.get('result', {}).get('records', [])
+                
+                if not records: # Si ya no hay más datos, paramos
+                    break
+                
                 for r in records:
-                    # Extraemos datos con validación para evitar errores de tipo
                     pim = float(r.get('MONTO_PIM', 0) or 0)
                     dev = float(r.get('MONTO_DEVENGADO_ANO_EJE', 0) or 0)
                     
-                    procesados.append({
+                    all_records.append({
                         "NOMBRE": r.get('PRODUCTO_PROYECTO_NOMBRE', 'PROYECTO SIN NOMBRE'),
                         "DEPARTAMENTO": r.get('DEPARTAMENTO_META_NOMBRE', 'OTROS'),
                         "pim": pim,
@@ -35,22 +43,25 @@ def update_data():
                         "avance": round((dev / pim * 100), 1) if pim > 0 else 0
                     })
                 
-                with open('data_mef.json', 'w', encoding='utf-8') as f:
-                    json.dump(procesados, f, indent=2, ensure_ascii=False)
-                print(f"✅ Éxito: {len(procesados)} registros guardados.")
-                return
+                print(f"✅ Descargados: {len(all_records)} registros...")
+                offset += limit # Saltamos a la siguiente página
+                time.sleep(1) # Pausa breve para no saturar al MEF
+            else:
+                print(f"⚠️ Error en página {offset}. Código: {response.status_code}")
+                break
 
-        print(f"⚠️ Error del servidor ({response.status_code}). Usando respaldo.")
-    
+        if all_records:
+            with open('data_mef.json', 'w', encoding='utf-8') as f:
+                json.dump(all_records, f, indent=2, ensure_ascii=False)
+            print(f"🚀 PROCESO COMPLETADO: {len(all_records)} proyectos guardados.")
+            return
+
     except Exception as e:
-        print(f"🚨 Fallo de conexión: {e}. Usando respaldo.")
+        print(f"🚨 Fallo de conexión: {e}")
 
-    # DATOS DE RESPALDO (Para que el Gobernador siempre vea información)
-    backup = [
-        {"NOMBRE": "MEJORAMIENTO DEL SERVICIO EDUCATIVO - LAMBAYEQUE", "DEPARTAMENTO": "LAMBAYEQUE", "pim": 15000000, "devengado": 8000000, "avance": 53.3},
-        {"NOMBRE": "CONSTRUCCIÓN DE CARRETERA REGIONAL", "DEPARTAMENTO": "LAMBAYEQUE", "pim": 25000000, "devengado": 5000000, "avance": 20.0},
-        {"NOMBRE": "PROYECTO DE IRRIGACIÓN OLMOS", "DEPARTAMENTO": "LAMBAYEQUE", "pim": 100000000, "devengado": 75000000, "avance": 75.0}
-    ]
+    # Si todo falla, mantenemos el respaldo para que la web no muera
+    print("Utilizando datos de respaldo por fallo crítico.")
+    backup = [{"NOMBRE": "ERROR DE CONEXIÓN MEF", "DEPARTAMENTO": "SISTEMA", "pim": 0, "dev": 0, "avance": 0}]
     with open('data_mef.json', 'w', encoding='utf-8') as f:
         json.dump(backup, f, indent=2, ensure_ascii=False)
 
