@@ -1,9 +1,20 @@
 [
   {
     "DEPARTAMENTO": "LAMBAYEQUE",
-    "pia": 1000000,
-    "pim": 1500000,
-    "devengado": 750000,
-    "avance": 50.0
+    "pim": 154200300.5,
+    "devengado": 85200100.0,
+    "avance": 55.2
+  },
+  {
+    "DEPARTAMENTO": "LIMA",
+    "pim": 950400100.2,
+    "devengado": 450400100.0,
+    "avance": 47.4
+  },
+  {
+    "DEPARTAMENTO": "PIURA",
+    "pim": 120300400.0,
+    "devengado": 30300400.0,
+    "avance": 25.1
   }
 ]
