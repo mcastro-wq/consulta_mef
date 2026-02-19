@@ -4,73 +4,74 @@ async function consultarMEF() {
     const contenedor = document.getElementById('contenedor-proyectos');
     const estado = document.getElementById('estado');
     
-    const sql = `SELECT "DEPARTAMENTO_META_NOMBRE", "PRODUCTO_PROYECTO_NOMBRE", "MONTO_PIM", "MONTO_DEVENGADO_ANO_EJE" FROM "${resource_id}" WHERE "SECTOR_NOMBRE" LIKE 'GOBIERNOS REGIONALES' AND "MONTO_PIM" > 0 LIMIT 500`;
+    // Consulta SQL para traer datos reales de Gobiernos Regionales
+    const sql = `SELECT "DEPARTAMENTO_META_NOMBRE", "PRODUCTO_PROYECTO_NOMBRE", "MONTO_PIM", "MONTO_DEVENGADO_ANO_EJE" FROM "${resource_id}" WHERE "SECTOR_NOMBRE" LIKE 'GOBIERNOS REGIONALES' AND "MONTO_PIM" > 0 LIMIT 100`;
     
-    // URL original del MEF
     const mefUrl = `https://api.datosabiertos.mef.gob.pe/DatosAbiertos/v1/datastore_search_sql?sql=${encodeURIComponent(sql)}`;
     
-    // Usamos un proxy para saltar el bloqueo de CORS
+    // Usamos un proxy público para saltar el bloqueo de seguridad (CORS)
     const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(mefUrl);
 
     try {
-        estado.innerHTML = "⏳ Conectando con el servidor central...";
+        estado.innerHTML = "⏳ Conectando de forma segura con el MEF...";
         
         const response = await fetch(proxyUrl);
-        
-        if (!response.ok) throw new Error("Respuesta del servidor no válida");
+        if (!response.ok) throw new Error("Error en servidor MEF");
         
         const data = await response.json();
-        
-        // El formato SQL del MEF a veces pone los datos en data.result.records 
-        // o en data.records dependiendo de la versión
-        const records = data.result?.records || data.records || [];
+        const records = data.result?.records || [];
 
         if (records.length === 0) {
-            estado.innerHTML = "⚠️ No se encontraron registros para el año actual.";
+            estado.innerHTML = "⚠️ No se encontraron datos para esta consulta.";
             return;
         }
 
-        estado.innerHTML = `✅ Datos actualizados: ${records.length} proyectos encontrados.`;
+        estado.innerHTML = `✅ Datos en vivo: ${records.length} proyectos encontrados.`;
         
-        window.datosMEF = records.map(r => ({
+        // Procesamos los datos
+        const proyectos = records.map(r => ({
             depto: r.DEPARTAMENTO_META_NOMBRE,
             nombre: r.PRODUCTO_PROYECTO_NOMBRE,
             pim: parseFloat(r.MONTO_PIM) || 0,
             dev: parseFloat(r.MONTO_DEVENGADO_ANO_EJE) || 0,
-            avance: r.MONTO_PIM > 0 ? ((r.MONTO_DEVENGADO_ANO_EJE / r.MONTO_PIM) * 100).toFixed(1) : 0
+            avance: r.MONTO_PIM > 0 ? ((parseFloat(r.MONTO_DEVENGADO_ANO_EJE) / parseFloat(r.MONTO_PIM)) * 100).toFixed(1) : 0
         }));
 
-        renderizar(window.datosMEF);
+        // Guardamos para el buscador y mostramos
+        window.datosMEF = proyectos;
+        renderizar(proyectos);
 
     } catch (error) {
-        console.error("Error detallado:", error);
-        estado.innerHTML = "❌ Error de seguridad (CORS) o servidor caído. Intentando conexión alternativa...";
-        // Aquí podrías intentar una segunda ruta si fallara la primera
+        console.error(error);
+        estado.innerHTML = "❌ El servidor del MEF no responde. Intente en unos minutos.";
     }
 }
 
-function renderizar(proyectos) {
+function renderizar(lista) {
     const contenedor = document.getElementById('contenedor-proyectos');
-    contenedor.innerHTML = proyectos.map(p => `
-        <div class="col-md-6 col-lg-4 mb-3">
-            <div class="card h-100 shadow-sm p-3 border-start border-4 ${p.avance > 40 ? 'border-success' : 'border-danger'}">
-                <small class="text-uppercase fw-bold text-muted">${p.depto}</small>
-                <h6 class="my-2" style="font-size: 0.9rem;">${p.nombre}</h6>
-                <div class="d-flex justify-content-between small">
-                    <span>PIM: S/ ${p.pim.toLocaleString()}</span>
-                    <span class="fw-bold">${p.avance}%</span>
-                </div>
-                <div class="progress mt-2" style="height: 6px;">
-                    <div class="progress-bar ${p.avance > 40 ? 'bg-success' : 'bg-warning'}" style="width: ${p.avance}%"></div>
+    contenedor.innerHTML = lista.map(p => `
+        <div class="col-md-6 mb-3">
+            <div class="card h-100 shadow-sm border-start border-4 ${p.avance > 50 ? 'border-success' : 'border-warning'}">
+                <div class="card-body">
+                    <small class="fw-bold text-primary">${p.depto}</small>
+                    <h6 class="card-title mt-1">${p.nombre}</h6>
+                    <div class="d-flex justify-content-between small text-muted mb-2">
+                        <span>PIM: S/ ${p.pim.toLocaleString()}</span>
+                        <span class="fw-bold">${p.avance}%</span>
+                    </div>
+                    <div class="progress" style="height: 8px;">
+                        <div class="progress-bar ${p.avance > 50 ? 'bg-success' : 'bg-danger'}" style="width: ${p.avance}%"></div>
+                    </div>
                 </div>
             </div>
         </div>
     `).join('');
 }
 
-// Filtro buscador
+// Filtro de búsqueda
 document.getElementById('buscador').addEventListener('input', (e) => {
     const term = e.target.value.toLowerCase();
+    if (!window.datosMEF) return;
     const filtrados = window.datosMEF.filter(p => 
         p.nombre.toLowerCase().includes(term) || p.depto.toLowerCase().includes(term)
     );
