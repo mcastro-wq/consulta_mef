@@ -1,26 +1,46 @@
 const URL_DATA = 'https://raw.githubusercontent.com/mcastro-wq/consulta_mef/main/data_mef.json';
-let datosGlobales = []; // Para guardar los datos y poder filtrarlos
+let datosGlobales = [];
 
 async function cargarDatos() {
     try {
-        const response = await fetch(URL_DATA);
+        const response = await fetch('data_mef.json');
         datosGlobales = await response.json();
-        
-        // Ordenar de mayor a menor
-        datosGlobales.sort((a, b) => b.total - a.total);
-
-        document.getElementById('status').innerText = "Última actualización: Hoy (Sincronizado cada 6h)";
-        
         actualizarUI(datosGlobales);
+        actualizarTarjetas(datosGlobales);
+        document.getElementById('status').innerText = "Datos actualizados del MEF";
     } catch (error) {
-        document.getElementById('status').innerText = "Error al conectar con los datos.";
-        console.error(error);
+        document.getElementById('status').innerText = "Error cargando datos";
     }
 }
 
-function actualizarUI(data) {
-    renderizarGrafico(data);
-    renderizarTabla(data);
+function actualizarTarjetas(data) {
+    const totalPim = data.reduce((acc, i) => acc + i.pim, 0);
+    const totalDev = data.reduce((acc, i) => acc + i.devengado, 0);
+    const avanceGlobal = (totalDev / totalPim * 100).toFixed(1);
+
+    document.getElementById('totalPim').innerText = `S/ ${totalPim.toLocaleString()}`;
+    document.getElementById('totalDevengado').innerText = `S/ ${totalDev.toLocaleString()}`;
+    document.getElementById('globalAvance').innerText = `${avanceGlobal}%`;
+}
+
+function renderizarTabla(data) {
+    const tbody = document.querySelector('#mefTable tbody');
+    tbody.innerHTML = data.map(item => {
+        let clase = 'bg-danger';
+        let texto = 'Crítico';
+        if (item.avance > 70) { clase = 'bg-success'; texto = 'Óptimo'; }
+        else if (item.avance > 40) { clase = 'bg-warning'; texto = 'En Proceso'; }
+
+        return `
+            <tr>
+                <td><strong>${item.DEPARTAMENTO}</strong></td>
+                <td style="text-align: right;">${item.pim.toLocaleString()}</td>
+                <td style="text-align: right;">${item.devengado.toLocaleString()}</td>
+                <td style="text-align: center;"><strong>${item.avance}%</strong></td>
+                <td style="text-align: center;"><span class="badge ${clase}">${texto}</span></td>
+            </tr>
+        `;
+    }).join('');
 }
 
 function renderizarGrafico(data) {
@@ -30,49 +50,32 @@ function renderizarGrafico(data) {
     window.miGrafico = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: data.map(i => i.DEPARTAMENTO_META_NOMBRE),
+            labels: data.map(i => i.DEPARTAMENTO),
             datasets: [{
-                label: 'Soles (S/.)',
-                data: data.map(i => i.total),
+                label: '% de Avance Presupuestal',
+                data: data.map(i => i.avance),
                 backgroundColor: '#3b82f6'
             }]
         },
         options: {
-            indexAxis: 'y',
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } }
+            scales: { y: { beginAtZero: true, max: 100 } }
         }
     });
 }
 
-function renderizarTabla(data) {
-    const tbody = document.querySelector('#mefTable tbody');
-    // Actualizamos las cabeceras de la tabla en tu index.html para que coincidan
-    tbody.innerHTML = data.map(item => {
-        // Lógica de semáforo para el avance
-        const colorClase = item.avance < 40 ? 'text-red' : (item.avance < 75 ? 'text-orange' : 'text-green');
-        
-        return `
-        <tr>
-            <td><strong>${item.DEPARTAMENTO}</strong></td>
-            <td style="text-align: right;">S/ ${item.pim.toLocaleString()}</td>
-            <td style="text-align: right;">S/ ${item.devengado.toLocaleString()}</td>
-            <td style="text-align: right; font-weight: bold;" class="${colorClase}">
-                ${item.avance}%
-            </td>
-        </tr>
-    `}).join('');
+function actualizarUI(data) {
+    renderizarTabla(data);
+    renderizarGrafico(data);
 }
 
 function filtrarDatos() {
     const termino = document.getElementById('searchInput').value.toLowerCase();
     const filtrados = datosGlobales.filter(item => 
-        item.DEPARTAMENTO_META_NOMBRE.toLowerCase().includes(termino)
+        item.DEPARTAMENTO.toLowerCase().includes(termino)
     );
     actualizarUI(filtrados);
 }
 
-cargarDatos();
-
+window.onload = cargarDatos;
 
 
