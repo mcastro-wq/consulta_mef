@@ -130,3 +130,37 @@ td {
     height: 400px;
     width: 100%;
 }
+
+.combobox-wrapper { position: relative; width: 100%; }
+.results-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    z-index: 1000;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+.result-item {
+    padding: 10px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+.result-item:hover { background: #f0f7ff; color: var(--accent); }
+
+.project-card {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    border-left: 5px solid var(--accent);
+    margin-top: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+.card-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-top: 15px;
+}
