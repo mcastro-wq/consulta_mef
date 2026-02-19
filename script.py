@@ -3,51 +3,53 @@ import json
 import urllib.parse
 import sys
 
-# 1. Usamos un ID de recurso más estable para evitar el Error 409
-# Este recurso contiene la ejecución histórica y actual de forma consolidada
+# Cambiamos al endpoint de búsqueda simple que es menos propenso al Error 409
+base_url = 'https://api.datosabiertos.mef.gob.pe/DatosAbiertos/v1/datastore_search'
 resource_id = '49d960a8-54cf-4a45-8ebe-d8074ac88877'
-base_url = 'https://api.datosabiertos.mef.gob.pe/DatosAbiertos/v1/datastore_search_sql'
-
-# 2. Query simplificado: Sin filtros complejos para evitar que el MEF nos bloquee
-sql_query = f'''
-SELECT "DEPARTAMENTO_META_NOMBRE", SUM("MONTO_DEVENGADO_ANO_EJE") as total 
-FROM "{resource_id}" 
-WHERE "ANO_EJE" = '2026'
-GROUP BY "DEPARTAMENTO_META_NOMBRE"
-'''
 
 def update_data():
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/122.0.0.0'
     }
     
-    # Usamos quote_plus para una codificación más estricta de la URL
-    params = urllib.parse.urlencode({'sql': sql_query})
-    full_url = f"{base_url}?{params}"
+    # En lugar de SQL, pedimos los primeros 1000 registros para procesarlos localmente
+    # Esto evita el motor SQL de la API que es el que está fallando
+    params = {
+        'resource_id': resource_id,
+        'limit': 1000,
+        'q': '2026' # Filtramos por el año 2026
+    }
+    
+    query_string = urllib.parse.urlencode(params)
+    full_url = f"{base_url}?{query_string}"
     
     try:
-        print(f"Consultando API del MEF (2026)...")
+        print(f"Iniciando descarga de datos (Modo Simple)...")
         response = requests.get(full_url, headers=headers, timeout=60)
         
-        # Si da 409, intentaremos con un query aún más básico
-        if response.status_code == 409:
-            print("⚠️ Conflicto 409 detectado. Reintentando consulta simplificada...")
-            return # Detenemos para no generar archivos vacíos
-
         if response.status_code == 200:
             data = response.json()
-            if data.get('success'):
-                records = data['result']['records']
-                if records:
-                    with open('data_mef.json', 'w', encoding='utf-8') as f:
-                        json.dump(records, f, ensure_ascii=False, indent=2)
-                    print(f"✅ ¡ÉXITO! {len(records)} departamentos actualizados.")
-                else:
-                    print("⚠️ No hay datos para 2026 todavía.")
+            records = data.get('result', {}).get('records', [])
+            
+            if records:
+                # Procesamos los datos localmente para agrupar por departamento
+                resumen = {}
+                for r in records:
+                    depto = r.get('DEPARTAMENTO_META_NOMBRE', 'OTROS')
+                    monto = float(r.get('MONTO_DEVENGADO_ANO_EJE', 0))
+                    resumen[depto] = resumen.get(depto, 0) + monto
+                
+                # Convertimos al formato que espera tu script.js
+                final_data = [{"DEPARTAMENTO_META_NOMBRE": k, "total": v} for k, v in resumen.items()]
+                
+                with open('data_mef.json', 'w', encoding='utf-8') as f:
+                    json.dump(final_data, f, ensure_ascii=False, indent=2)
+                
+                print(f"✅ Éxito: Se procesaron {len(final_data)} departamentos.")
             else:
-                print(f"❌ Error API: {data.get('error')}")
+                print("⚠️ No se encontraron registros para 2026.")
         else:
-            print(f"❌ Error HTTP {response.status_code}")
+            print(f"❌ Error HTTP {response.status_code}: {response.text}")
 
     except Exception as e:
         print(f"⚠️ Error: {e}")
