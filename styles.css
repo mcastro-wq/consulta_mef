@@ -242,3 +242,34 @@ td {
     border-radius: 8px;
 }
 
+.section-box {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+}
+
+.separator {
+    border: 0;
+    height: 2px;
+    background: #e2e8f0;
+    margin: 40px 0;
+}
+
+.combobox-wrapper { position: relative; margin: 15px 0; }
+.results-list {
+    position: absolute; width: 100%; background: white; border: 1px solid #ddd;
+    z-index: 100; display: none; max-height: 200px; overflow-y: auto;
+}
+.result-item { padding: 10px; cursor: pointer; border-bottom: 1px solid #eee; }
+.result-item:hover { background: #f0f9ff; }
+
+.project-card {
+    border-left: 6px solid #3b82f6;
+    padding: 20px; background: #f8fafc; margin-top: 20px;
+}
+.card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; }
+.data-item p { font-weight: bold; font-size: 1.1rem; margin: 5px 0; }
+
+
