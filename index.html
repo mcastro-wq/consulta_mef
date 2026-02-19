@@ -39,25 +39,29 @@
 
 
         <div class="search-container">
-    <h3>Consultar Proyecto Específico</h3>
+    <h3>Buscar Obra o Proyecto</h3>
     <div class="combobox-wrapper">
-        <input type="text" id="projectSearch" placeholder="Escriba el nombre del proyecto u obra..." oninput="buscarProyectos(this.value)">
+        <input type="text" id="projectSearch" placeholder="Ej: Olmos, Carretera, Colegio..." oninput="buscarProyectos(this.value)">
         <div id="resultsList" class="results-list"></div>
     </div>
 </div>
 
 <section id="projectDetail" class="project-card" style="display: none;">
     <div class="card-header">
-        <h2 id="detNombre">Nombre del Proyecto</h2>
         <span id="detBadge" class="badge">Estado</span>
+        <h2 id="detNombre" style="margin-top:10px;">Nombre</h2>
     </div>
     <div class="card-grid">
-        <div class="data-item"><strong>PIM:</strong> <span id="detPim"></span></div>
-        <div class="data-item"><strong>Devengado:</strong> <span id="detDev"></span></div>
-        <div class="data-item"><strong>Avance:</strong> <span id="detAvance"></span></div>
-        <div class="data-item"><strong>Departamento:</strong> <span id="detDepto"></span></div>
+        <div class="data-item"><strong>Presupuesto (PIM):</strong> <br><span id="detPim"></span></div>
+        <div class="data-item"><strong>Ejecutado:</strong> <br><span id="detDev"></span></div>
+        <div class="data-item"><strong>% Avance:</strong> <br><span id="detAvance" style="font-size: 1.5rem; font-weight: bold;"></span></div>
+        <div class="data-item"><strong>Ubicación:</strong> <br><span id="detDepto"></span></div>
     </div>
 </section>
+
+        
+
+     
 
 
 
@@ -91,5 +95,6 @@
     <script src="script.js"></script>
 </body>
 </html>
+
 
 
