@@ -14,16 +14,13 @@ async function cargarDatos() {
 }
 
 function actualizarTarjetas(data) {
-    // Sumamos todos los valores del array
+    // Importante: usamos item.pim y item.devengado (nombres en minúscula como en el JSON)
     const totalPim = data.reduce((acc, i) => acc + (parseFloat(i.pim) || 0), 0);
     const totalDev = data.reduce((acc, i) => acc + (parseFloat(i.devengado) || 0), 0);
-    
-    // Calculamos el avance evitando divisiones por cero
     const avanceGlobal = totalPim > 0 ? ((totalDev / totalPim) * 100).toFixed(1) : 0;
 
-    // Actualizamos el HTML
-    document.getElementById('totalPim').innerText = `S/ ${totalPim.toLocaleString('es-PE', {minimumFractionDigits: 2})}`;
-    document.getElementById('totalDevengado').innerText = `S/ ${totalDev.toLocaleString('es-PE', {minimumFractionDigits: 2})}`;
+    document.getElementById('totalPim').innerText = `S/ ${totalPim.toLocaleString('es-PE')}`;
+    document.getElementById('totalDevengado').innerText = `S/ ${totalDev.toLocaleString('es-PE')}`;
     document.getElementById('globalAvance').innerText = `${avanceGlobal}%`;
 }
 
@@ -81,6 +78,7 @@ function filtrarDatos() {
 }
 
 window.onload = cargarDatos;
+
 
 
 
