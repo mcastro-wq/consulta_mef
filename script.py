@@ -7,13 +7,12 @@ import sys
 resource_id = '49d960a8-54cf-4a45-8ebe-d8074ac88877'
 base_url = 'https://api.datosabiertos.mef.gob.pe/DatosAbiertos/v1/datastore_search_sql'
 
-# Query optimizado: Filtramos para que no traiga nulos y sumamos el devengado
+# QUERY DEFINITIVO: Nota el uso de comillas dobles para columnas
 sql_query = f'''
 SELECT "DEPARTAMENTO_META_NOMBRE", SUM("MONTO_DEVENGADO_ANO_EJE") as total 
 FROM "{resource_id}" 
 WHERE "DEPARTAMENTO_META_NOMBRE" IS NOT NULL 
 GROUP BY "DEPARTAMENTO_META_NOMBRE"
-ORDER BY total DESC
 '''
 
 def update_data():
@@ -25,29 +24,31 @@ def update_data():
     full_url = f"{base_url}?{params}"
     
     try:
-        print(f"Conectando al MEF...")
+        print("Consultando API del MEF...")
         response = requests.get(full_url, headers=headers, timeout=60)
         
-        if response.status_code != 200:
-            print(f"❌ Error HTTP {response.status_code}: {response.text}")
-            return
-
-        data = response.json()
-        if data.get('success'):
-            records = data['result']['records']
-            
-            if records:
-                # IMPORTANTE: Asegúrate de que el archivo se escriba bien
-                with open('data_mef.json', 'w', encoding='utf-8') as f:
-                    json.dump(records, f, ensure_ascii=False, indent=2)
-                print(f"✅ ¡ÉXITO! Se guardaron {len(records)} registros.")
+        if response.status_code == 200:
+            data = response.json()
+            if data.get('success'):
+                records = data['result']['records']
+                
+                if records:
+                    with open('data_mef.json', 'w', encoding='utf-8') as f:
+                        json.dump(records, f, ensure_ascii=False, indent=2)
+                    print(f"✅ ¡ÉXITO! Se guardaron {len(records)} registros.")
+                else:
+                    # Si no hay datos, escribimos el error en el JSON para forzar el commit
+                    error_msg = [{"error": "La consulta no devolvio datos", "status": "vacio"}]
+                    with open('data_mef.json', 'w', encoding='utf-8') as f:
+                        json.dump(error_msg, f)
+                    print("⚠️ API respondió éxito pero sin registros.")
             else:
-                print("⚠️ La API respondió pero no hay datos. Es posible que el resource_id deba actualizarse para 2026.")
+                print(f"❌ Error API: {data.get('error')}")
         else:
-            print(f"❌ Error en SQL: {data.get('error')}")
+            print(f"❌ Error HTTP {response.status_code}")
 
     except Exception as e:
-        print(f"⚠️ Error inesperado: {e}")
+        print(f"⚠️ Error: {e}")
         sys.exit(1)
 
 if __name__ == "__main__":
