@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEF - Ejecución Presupuestal</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Ejecución Presupuestal por Departamento</h1>
+        <p id="status">Sincronizando con el portal del MEF...</p>
+    </header>
+
+    <main class="container">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Buscar departamento (ej: Lima, Cusco...)" onkeyup="filtrarDatos()">
+        </div>
+
+        <section class="chart-section">
+            <canvas id="mefChart"></canvas>
+        </section>
+
+        <section class="table-section">
+            <table id="mefTable">
+                <thead>
+                    <tr>
+                        <th>Departamento</th>
+                        <th style="text-align: right;">Total Ejecutado (S/.)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
