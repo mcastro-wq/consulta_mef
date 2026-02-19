@@ -39,3 +39,4 @@ jobs:
           git add data_mef.json # <--- EL NOMBRE DEL ARCHIVO QUE GENERA TU SCRIPT
           git commit -m "Datos actualizados: $(date)" || echo "Sin cambios para commitear"
           git push
+
