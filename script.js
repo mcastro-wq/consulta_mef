@@ -45,21 +45,32 @@ function renderizarTabla(data) {
 }
 
 function renderizarGrafico(data) {
-    const ctx = document.getElementById('mefChart').getContext('2d');
+    const canvas = document.getElementById('mefChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    
     if (window.miGrafico) window.miGrafico.destroy();
+
+    // Filtramos solo los 10 mejores para que el gráfico no se amontone
+    const topData = data.sort((a, b) => b.avance - a.avance).slice(0, 10);
 
     window.miGrafico = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: data.map(i => i.DEPARTAMENTO),
+            labels: topData.map(i => i.DEPARTAMENTO),
             datasets: [{
-                label: '% de Avance Presupuestal',
-                data: data.map(i => i.avance),
-                backgroundColor: '#3b82f6'
+                label: '% de Avance (Ejecución vs PIM)',
+                data: topData.map(i => i.avance),
+                backgroundColor: '#3b82f6',
+                borderRadius: 5
             }]
         },
         options: {
-            scales: { y: { beginAtZero: true, max: 100 } }
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: { beginAtZero: true, max: 100 }
+            }
         }
     });
 }
@@ -78,6 +89,7 @@ function filtrarDatos() {
 }
 
 window.onload = cargarDatos;
+
 
 
 
