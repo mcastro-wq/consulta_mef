@@ -3,98 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tablero de Control - Ejecución Presupuestal MEF</title>
+    <title>Tablero de Gestión - Inversiones MEF</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-    
 <body>
     <header>
         <div class="header-content">
-            <h1>Panel de Seguimiento de Inversiones (MEF)</h1>
-            <p id="status">Sincronizando datos de ejecución 2025-2026...</p>
+            <h1>Panel de Control Presupuestal</h1>
+            <p id="status">Sincronizando con Datos Abiertos MEF...</p>
         </div>
     </header>
 
     <main class="container">
-        <div class="summary-cards">
-            <div class="card">
-                <h3>PIM Total</h3>
-                <p id="totalPim">S/ 0.00</p>
+        <section class="section-box">
+            <h2>🔎 Consulta Individual de Proyectos</h2>
+            <div class="combobox-wrapper">
+                <input type="text" id="projectSearch" placeholder="Escriba nombre de la obra (Ej: Hospital, Colegio, Olmos...)" oninput="buscarProyectos(this.value)">
+                <div id="resultsList" class="results-list"></div>
             </div>
-            <div class="card">
-                <h3>Devengado Total</h3>
-                <p id="totalDevengado">S/ 0.00</p>
-            </div>
-            <div class="card">
-                <h3>% Ejecución Global</h3>
-                <p id="globalAvance">0%</p>
-            </div>
-        </div>
 
-        <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Filtrar por Departamento o Región..." onkeyup="filtrarDatos()">
-        </div>
-
-
-        <div class="search-container">
-    <h3>Buscar Obra o Proyecto</h3>
-    <div class="combobox-wrapper">
-        <input type="text" id="projectSearch" placeholder="Ej: Olmos, Carretera, Colegio..." oninput="buscarProyectos(this.value)">
-        <div id="resultsList" class="results-list"></div>
-    </div>
-</div>
-
-<section id="projectDetail" class="project-card" style="display: none;">
-    <div class="card-header">
-        <span id="detBadge" class="badge">Estado</span>
-        <h2 id="detNombre" style="margin-top:10px;">Nombre</h2>
-    </div>
-    <div class="card-grid">
-        <div class="data-item"><strong>Presupuesto (PIM):</strong> <br><span id="detPim"></span></div>
-        <div class="data-item"><strong>Ejecutado:</strong> <br><span id="detDev"></span></div>
-        <div class="data-item"><strong>% Avance:</strong> <br><span id="detAvance" style="font-size: 1.5rem; font-weight: bold;"></span></div>
-        <div class="data-item"><strong>Ubicación:</strong> <br><span id="detDepto"></span></div>
-    </div>
-</section>
-
-        
-
-     
-
-
-
-        
-
-        <section class="chart-section">
-            <h3>Comparativo de Ejecución por Departamento</h3>
-            <div class="chart-container">
-                <canvas id="mefChart"></canvas>
+            <div id="projectDetail" class="project-card" style="display: none;">
+                <div class="card-header">
+                    <h3 id="detNombre">Nombre de la Obra</h3>
+                    <span id="detBadge" class="badge">Estado</span>
+                </div>
+                <div class="card-grid">
+                    <div class="data-item"><strong>PIM:</strong> <p id="detPim">-</p></div>
+                    <div class="data-item"><strong>Devengado:</strong> <p id="detDev">-</p></div>
+                    <div class="data-item"><strong>Avance:</strong> <p id="detAvance" class="monto">-</p></div>
+                    <div class="data-item"><strong>Ubicación:</strong> <p id="detDepto">-</p></div>
+                </div>
             </div>
         </section>
 
-        <section class="table-section">
-            <h3>Detalle de Presupuesto e Inversión</h3>
-            <table id="mefTable">
-                <thead>
-                    <tr>
-                        <th>Departamento</th>
-                        <th style="text-align: right;">Presupuesto (PIM)</th>
-                        <th style="text-align: right;">Ejecutado (Devengado)</th>
-                        <th style="text-align: center;">Avance %</th>
-                        <th style="text-align: center;">Estado</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    </tbody>
-            </table>
+        <hr class="separator">
+        <section class="section-box">
+            <h2>📊 Panorama por Departamento</h2>
+            
+            <div class="summary-cards">
+                <div class="card"><h3>PIM Total</h3><p id="totalPim">S/ 0</p></div>
+                <div class="card"><h3>Devengado Total</h3><p id="totalDevengado">S/ 0</p></div>
+                <div class="card"><h3>% Avance Global</h3><p id="globalAvance">0%</p></div>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="mefChart"></canvas>
+            </div>
+
+            <div class="table-section">
+                <table id="mefTable">
+                    <thead>
+                        <tr>
+                            <th>Departamento</th>
+                            <th style="text-align: right;">PIM</th>
+                            <th style="text-align: right;">Devengado</th>
+                            <th style="text-align: center;">Avance %</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
         </section>
     </main>
 
     <script src="script.js"></script>
 </body>
 </html>
-
-
-
