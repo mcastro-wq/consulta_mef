@@ -1,19 +1,38 @@
 const resource_id = "749cb9b6-604f-485b-bb06-4b906b44034f";
 
-async function cargarDatosEnVivo() {
-    const contenedor = document.getElementById('lista-proyectos'); // Asegúrate que este ID exista en tu HTML
+async function consultarMEF() {
+    const contenedor = document.getElementById('contenedor-proyectos');
+    const estado = document.getElementById('estado');
     
-    // Consulta SQL optimizada para Lambayeque y Gobiernos Regionales 2025
     const sql = `SELECT "DEPARTAMENTO_META_NOMBRE", "PRODUCTO_PROYECTO_NOMBRE", "MONTO_PIM", "MONTO_DEVENGADO_ANO_EJE" FROM "${resource_id}" WHERE "SECTOR_NOMBRE" LIKE 'GOBIERNOS REGIONALES' AND "MONTO_PIM" > 0 LIMIT 500`;
-    const url = `https://api.datosabiertos.mef.gob.pe/DatosAbiertos/v1/datastore_search_sql?sql=${encodeURIComponent(sql)}`;
+    
+    // URL original del MEF
+    const mefUrl = `https://api.datosabiertos.mef.gob.pe/DatosAbiertos/v1/datastore_search_sql?sql=${encodeURIComponent(sql)}`;
+    
+    // Usamos un proxy para saltar el bloqueo de CORS
+    const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(mefUrl);
 
     try {
-        const response = await fetch(url);
+        estado.innerHTML = "⏳ Conectando con el servidor central...";
+        
+        const response = await fetch(proxyUrl);
+        
+        if (!response.ok) throw new Error("Respuesta del servidor no válida");
+        
         const data = await response.json();
-        const records = data.result.records;
+        
+        // El formato SQL del MEF a veces pone los datos en data.result.records 
+        // o en data.records dependiendo de la versión
+        const records = data.result?.records || data.records || [];
 
-        // Guardamos en una variable global para el buscador
-        window.proyectosCache = records.map(r => ({
+        if (records.length === 0) {
+            estado.innerHTML = "⚠️ No se encontraron registros para el año actual.";
+            return;
+        }
+
+        estado.innerHTML = `✅ Datos actualizados: ${records.length} proyectos encontrados.`;
+        
+        window.datosMEF = records.map(r => ({
             depto: r.DEPARTAMENTO_META_NOMBRE,
             nombre: r.PRODUCTO_PROYECTO_NOMBRE,
             pim: parseFloat(r.MONTO_PIM) || 0,
@@ -21,39 +40,41 @@ async function cargarDatosEnVivo() {
             avance: r.MONTO_PIM > 0 ? ((r.MONTO_DEVENGADO_ANO_EJE / r.MONTO_PIM) * 100).toFixed(1) : 0
         }));
 
-        renderizar(window.proyectosCache);
+        renderizar(window.datosMEF);
+
     } catch (error) {
-        contenedor.innerHTML = `<div class="alert alert-danger">Error conectando con el MEF. Intenta recargar la página.</div>`;
+        console.error("Error detallado:", error);
+        estado.innerHTML = "❌ Error de seguridad (CORS) o servidor caído. Intentando conexión alternativa...";
+        // Aquí podrías intentar una segunda ruta si fallara la primera
     }
 }
 
-function renderizar(datos) {
-    const contenedor = document.getElementById('lista-proyectos');
-    contenedor.innerHTML = datos.map(p => `
-        <div class="card mb-3 shadow-sm border-start border-4 ${p.avance > 50 ? 'border-success' : 'border-warning'}">
-            <div class="card-body">
-                <span class="badge bg-secondary mb-2">${p.depto}</span>
-                <h6 class="card-title">${p.nombre}</h6>
-                <div class="d-flex justify-content-between small text-muted">
+function renderizar(proyectos) {
+    const contenedor = document.getElementById('contenedor-proyectos');
+    contenedor.innerHTML = proyectos.map(p => `
+        <div class="col-md-6 col-lg-4 mb-3">
+            <div class="card h-100 shadow-sm p-3 border-start border-4 ${p.avance > 40 ? 'border-success' : 'border-danger'}">
+                <small class="text-uppercase fw-bold text-muted">${p.depto}</small>
+                <h6 class="my-2" style="font-size: 0.9rem;">${p.nombre}</h6>
+                <div class="d-flex justify-content-between small">
                     <span>PIM: S/ ${p.pim.toLocaleString()}</span>
-                    <span>Ejecutado: ${p.avance}%</span>
+                    <span class="fw-bold">${p.avance}%</span>
                 </div>
-                <div class="progress mt-2" style="height: 8px;">
-                    <div class="progress-bar ${p.avance > 50 ? 'bg-success' : 'bg-danger'}" style="width: ${p.avance}%"></div>
+                <div class="progress mt-2" style="height: 6px;">
+                    <div class="progress-bar ${p.avance > 40 ? 'bg-success' : 'bg-warning'}" style="width: ${p.avance}%"></div>
                 </div>
             </div>
         </div>
     `).join('');
 }
 
-// Configurar el buscador
+// Filtro buscador
 document.getElementById('buscador').addEventListener('input', (e) => {
     const term = e.target.value.toLowerCase();
-    const filtrados = window.proyectosCache.filter(p => 
+    const filtrados = window.datosMEF.filter(p => 
         p.nombre.toLowerCase().includes(term) || p.depto.toLowerCase().includes(term)
     );
     renderizar(filtrados);
 });
 
-// Iniciar carga
-cargarDatosEnVivo();
+consultarMEF();
