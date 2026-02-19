@@ -1,22 +1,9 @@
 [
   {
-    "DEPARTAMENTO_META_NOMBRE": "LAMBAYEQUE",
-    "total": 154200300.5
-  },
-  {
-    "DEPARTAMENTO_META_NOMBRE": "LIMA",
-    "total": 850400100.2
-  },
-  {
-    "DEPARTAMENTO_META_NOMBRE": "PIURA",
-    "total": 120300400.0
-  },
-  {
-    "DEPARTAMENTO_META_NOMBRE": "CUSCO",
-    "total": 98400200.0
-  },
-  {
-    "DEPARTAMENTO_META_NOMBRE": "AREQUIPA",
-    "total": 112000500.0
+    "DEPARTAMENTO": "LAMBAYEQUE",
+    "pia": 1000000,
+    "pim": 1500000,
+    "devengado": 750000,
+    "avance": 50.0
   }
 ]
