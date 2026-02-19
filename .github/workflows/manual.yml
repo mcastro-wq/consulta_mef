@@ -1,0 +1,38 @@
+name: Actualizacion Automatizada MEF
+
+on:
+  schedule:
+    # Se ejecuta cada 6 horas (00:00, 06:00, 12:00, 18:00 UTC)
+    - cron: '0 */6 * * *'
+  workflow_dispatch: # Esto mantiene el botón de "Run workflow" manual
+
+jobs:
+  extract_data:
+    runs-on: ubuntu-latest
+    # Permisos necesarios para que la Action pueda escribir el JSON en tu repo
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Instalar dependencias
+        run: |
+          pip install requests pandas
+
+      - name: Ejecutar script de extraccion
+        run: python script.py  # <--- ASEGÚRATE QUE TU ARCHIVO SE LLAME ASÍ
+
+      - name: Commit y Push de los datos
+        run: |
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+          git add data_mef.json # <--- EL NOMBRE DEL ARCHIVO QUE GENERA TU SCRIPT
+          git commit -m "Datos actualizados: $(date)" || echo "Sin cambios para commitear"
+          git push
