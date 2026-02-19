@@ -96,7 +96,56 @@ function filtrarDatos() {
     actualizarUI(filtrados);
 }
 
+// Variable para guardar todos los proyectos cargados
+let proyectosFull = [];
+
+async function cargarDatos() {
+    try {
+        const response = await fetch('data_mef.json');
+        proyectosFull = await response.json();
+        // Llenamos los totales de las tarjetas como antes
+        actualizarTarjetas(proyectosFull); 
+    } catch (e) { console.error("Error cargando JSON", e); }
+}
+
+function buscarProyectos(query) {
+    const list = document.getElementById('resultsList');
+    list.innerHTML = '';
+    if (query.length < 3) return; // Solo buscar si hay más de 3 letras
+
+    const filtrados = proyectosFull.filter(p => 
+        p.NOMBRE.toLowerCase().includes(query.toLowerCase())
+    ).slice(0, 5); // Mostrar solo top 5 sugerencias
+
+    filtrados.forEach(p => {
+        const div = document.createElement('div');
+        div.className = 'result-item';
+        div.innerText = p.NOMBRE;
+        div.onclick = () => mostrarFicha(p);
+        list.appendChild(div);
+    });
+}
+
+function mostrarFicha(p) {
+    document.getElementById('resultsList').innerHTML = '';
+    document.getElementById('projectSearch').value = p.NOMBRE;
+    document.getElementById('projectDetail').style.display = 'block';
+
+    // Llenar datos
+    document.getElementById('detNombre').innerText = p.NOMBRE;
+    document.getElementById('detPim').innerText = `S/ ${p.pim.toLocaleString()}`;
+    document.getElementById('detDev').innerText = `S/ ${p.devengado.toLocaleString()}`;
+    document.getElementById('detAvance').innerText = `${p.avance}%`;
+    document.getElementById('detDepto').innerText = p.DEPARTAMENTO;
+
+    // Actualizar Badge
+    const badge = document.getElementById('detBadge');
+    badge.className = 'badge ' + (p.avance > 70 ? 'bg-success' : (p.avance > 40 ? 'bg-warning' : 'bg-danger'));
+    badge.innerText = p.avance > 70 ? 'Óptimo' : (p.avance > 40 ? 'En Proceso' : 'Crítico');
+}
+
 window.onload = cargarDatos;
+
 
 
 
