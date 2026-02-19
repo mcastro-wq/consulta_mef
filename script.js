@@ -1,55 +1,68 @@
-import requests
-import json
-import urllib.parse
+const URL_DATA = 'https://raw.githubusercontent.com/mcastro-wq/consulta_mef/main/data_mef.json';
+let datosGlobales = []; // Para guardar los datos y poder filtrarlos
 
-# 1. Configuración de la API según documentación
-# Endpoint para consultas SQL
-base_url = 'https://api.datosabiertos.mef.gob.pe/DatosAbiertos/v1/datastore_search_sql'
-resource_id = '49d960a8-54cf-4a45-8ebe-d8074ac88877'
-
-# 2. Construcción del Query SQL con los nombres exactos de tu Diccionario de Datos
-# Nota: Los nombres de columnas con mayúsculas DEBEN ir en comillas dobles
-sql_query = f'''
-SELECT "DEPARTAMENTO_META_NOMBRE", SUM("MONTO_DEVENGADO_ANO_EJE") as total 
-FROM "{resource_id}" 
-GROUP BY "DEPARTAMENTO_META_NOMBRE"
-'''
-
-# Codificamos el query para la URL
-params = {'sql': sql_query}
-full_url = f"{base_url}?{urllib.parse.urlencode(params)}"
-
-def update_data():
-    # El User-Agent es vital para evitar el bloqueo 403 en GitHub Actions
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/121.0.0.0 Safari/537.36'
-    }
-    
-    try:
-        print(f"Iniciando consulta al MEF...")
-        response = requests.get(full_url, headers=headers, timeout=60)
+async function cargarDatos() {
+    try {
+        const response = await fetch(URL_DATA);
+        datosGlobales = await response.json();
         
-        if response.status_code == 200:
-            data = response.json()
-            
-            # Según CKAN, si 'success' es True, los datos están en result['records']
-            if data.get('success'):
-                records = data['result']['records']
-                
-                if records:
-                    with open('data_mef.json', 'w', encoding='utf-8') as f:
-                        json.dump(records, f, ensure_ascii=False, indent=2)
-                    print(f"✅ Éxito: Se guardaron {len(records)} registros en data_mef.json")
-                else:
-                    print("⚠️ La consulta no devolvió registros (vacío).")
-            else:
-                print(f"❌ Error devuelto por la API: {data.get('error')}")
-        else:
-            print(f"❌ Error de conexión: Código {response.status_code}")
-            print(f"Detalle: {response.text[:200]}")
+        // Ordenar de mayor a menor
+        datosGlobales.sort((a, b) => b.total - a.total);
 
-    except Exception as e:
-        print(f"⚠️ Ocurrió un error inesperado: {e}")
+        document.getElementById('status').innerText = "Última actualización: Hoy (Sincronizado cada 6h)";
+        
+        actualizarUI(datosGlobales);
+    } catch (error) {
+        document.getElementById('status').innerText = "Error al conectar con los datos.";
+        console.error(error);
+    }
+}
 
-if __name__ == "__main__":
-    update_data()
+function actualizarUI(data) {
+    renderizarGrafico(data);
+    renderizarTabla(data);
+}
+
+function renderizarGrafico(data) {
+    const ctx = document.getElementById('mefChart').getContext('2d');
+    if (window.miGrafico) window.miGrafico.destroy();
+
+    window.miGrafico = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: data.map(i => i.DEPARTAMENTO_NOMBRE),
+            datasets: [{
+                label: 'Soles (S/.)',
+                data: data.map(i => i.total),
+                backgroundColor: '#3b82f6'
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } }
+        }
+    });
+}
+
+function renderizarTabla(data) {
+    const tbody = document.querySelector('#mefTable tbody');
+    tbody.innerHTML = data.map(item => `
+        <tr>
+            <td>${item.DEPARTAMENTO_NOMBRE}</td>
+            <td style="text-align: right;" class="monto">
+                S/. ${Number(item.total).toLocaleString('es-PE', {minimumFractionDigits: 2})}
+            </td>
+        </tr>
+    `).join('');
+}
+
+function filtrarDatos() {
+    const termino = document.getElementById('searchInput').value.toLowerCase();
+    const filtrados = datosGlobales.filter(item => 
+        item.DEPARTAMENTO_NOMBRE.toLowerCase().includes(termino)
+    );
+    actualizarUI(filtrados);
+}
+
+cargarDatos();
