@@ -5,7 +5,7 @@ import urllib.parse
 # 1. Configuración de la consulta
 # El ID del recurso es el dataset de ejecución presupuestal del MEF
 resource_id = "49d960a8-54cf-4a45-8ebe-d8074ac88877"
-sql_query = f'SELECT "DEPARTAMENTO_NOMBRE", SUM("EJECUCION") as total FROM "{resource_id}" GROUP BY "DEPARTAMENTO_NOMBRE"'
+sql_query = f'SELECT "PLIEGO_NOMBRE", SUM("EJECUCION") as total FROM "{resource_id}" WHERE "PLIEGO_NOMBRE" = \'GOBIERNO REGIONAL DEL DEPARTAMENTO DE LAMBAYEQUE\' GROUP BY "PLIEGO_NOMBRE"'
 encoded_sql = urllib.parse.quote(sql_query)
 url = f"https://api.datosabiertos.mef.gob.pe/DatosAbiertos/v1/datastore_search_sql?sql={encoded_sql}"
 
