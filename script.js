@@ -2,7 +2,6 @@ let todosLosProyectos = [];
 let filtroRango = 'todos';
 let chartSectores = null;
 let chartTorta = null;
-let todosLosProyectos = []; // Siempre inicializa así arriba del todo
 
 document.addEventListener('DOMContentLoaded', () => {
     consultarMEF();
@@ -12,11 +11,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function consultarMEF() {
     try {
-        // El random evita que la caché te muestre el formato antiguo
         const response = await fetch('data_mef.json?v=' + Math.random());
         const dataTotal = await response.json();
         
-        console.log("Datos recibidos:", dataTotal); // Para que revises en la consola (F12)
+        console.log("Datos recibidos:", dataTotal);
 
         // 1. Actualizar la fecha en el banner
         if (dataTotal.ultima_actualizacion) {
@@ -24,8 +22,7 @@ async function consultarMEF() {
             if (elFecha) elFecha.innerText = dataTotal.ultima_actualizacion;
         }
 
-        // 2. IMPORTANTE: Extraer la lista correctamente
-        // Si dataTotal es el objeto nuevo, usamos .proyectos. Si fuera el viejo, usamos dataTotal.
+        // 2. Extraer la lista correctamente (Soporta formato viejo y nuevo)
         todosLosProyectos = dataTotal.proyectos || dataTotal; 
 
         if (!Array.isArray(todosLosProyectos)) {
@@ -33,18 +30,20 @@ async function consultarMEF() {
             return;
         }
 
-        // 3. Cargar años y mostrar datos
+        // 3. Cargar años
         const anios = [...new Set(todosLosProyectos.map(p => p.anio))].sort((a,b) => b-a);
         const selectAnio = document.getElementById('select-anio');
         if (selectAnio && anios.length > 0) {
             selectAnio.innerHTML = anios.map(a => `<option value="${a}">${a}</option>`).join('');
         }
         
-        filtrarTodo(); // Esta función se encarga de quitar el mensaje "Cargando..."
+        // 4. Renderizar todo
+        filtrarTodo(); 
 
     } catch (e) {
         console.error("Error crítico en carga:", e);
-        document.getElementById('contenedor-proyectos').innerHTML = "Error al procesar los datos.";
+        const cont = document.getElementById('contenedor-proyectos');
+        if (cont) cont.innerHTML = `<div class="col-12 text-center">Error al cargar datos.</div>`;
     }
 }
 
@@ -70,16 +69,21 @@ function filtrarTodo() {
 function actualizarKPIs(lista) {
     const tPim = lista.reduce((a, p) => a + (Number(p.pim) || 0), 0);
     const tDev = lista.reduce((a, p) => a + (Number(p.devengado) || 0), 0);
-    document.getElementById('total-pim').innerText = "S/ " + tPim.toLocaleString('es-PE');
-    document.getElementById('total-ejecutado').innerText = "S/ " + tDev.toLocaleString('es-PE');
+    
+    const elPim = document.getElementById('total-pim');
+    const elEjec = document.getElementById('total-ejecutado');
+    const elAvance = document.getElementById('avance-global');
+
+    if (elPim) elPim.innerText = "S/ " + tPim.toLocaleString('es-PE');
+    if (elEjec) elEjec.innerText = "S/ " + tDev.toLocaleString('es-PE');
+    
     const avanceGlobal = tPim > 0 ? ((tDev / tPim) * 100).toFixed(1) : 0;
-    document.getElementById('avance-global').innerText = avanceGlobal + "%";
+    if (elAvance) elAvance.innerText = avanceGlobal + "%";
 }
 
 function actualizarGraficos(lista) {
     const sectoresMap = {};
     lista.forEach(p => { 
-        // Si el sector es nulo, indefinido o cadena vacía, forzamos "OTROS"
         let s = (p.sector && String(p.sector).trim() !== "") ? p.sector.trim().toUpperCase() : "OTROS";
         sectoresMap[s] = (sectoresMap[s] || 0) + (Number(p.pim) || 0); 
     });
@@ -87,38 +91,47 @@ function actualizarGraficos(lista) {
     const sorted = Object.entries(sectoresMap).sort((a, b) => b[1] - a[1]).slice(0, 8);
 
     if (chartSectores) chartSectores.destroy();
-    chartSectores = new Chart(document.getElementById('chartSectores'), {
-        type: 'bar',
-        data: {
-            labels: sorted.map(s => s[0]),
-            datasets: [{ label: 'PIM', data: sorted.map(s => s[1]), backgroundColor: '#0d47a1', borderRadius: 5 }]
-        },
-        options: { 
-            responsive: true, 
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: { x: { ticks: { autoSkip: false, maxRotation: 45, minRotation: 45, font: { size: 9 } } } }
-        }
-    });
+    const ctxSectores = document.getElementById('chartSectores');
+    if (ctxSectores) {
+        chartSectores = new Chart(ctxSectores, {
+            type: 'bar',
+            data: {
+                labels: sorted.map(s => s[0]),
+                // Usamos el color granate solicitado: #801616
+                datasets: [{ label: 'PIM', data: sorted.map(s => s[1]), backgroundColor: '#801616', borderRadius: 5 }]
+            },
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { x: { ticks: { autoSkip: false, maxRotation: 45, minRotation: 45, font: { size: 9 } } } }
+            }
+        });
+    }
 
     const counts = [
         lista.filter(p => p.avance <= 30).length, 
         lista.filter(p => p.avance > 30 && p.avance <= 70).length, 
         lista.filter(p => p.avance > 70).length
     ];
+    
     if (chartTorta) chartTorta.destroy();
-    chartTorta = new Chart(document.getElementById('chartTorta'), {
-        type: 'doughnut',
-        data: { labels: ['Crítico', 'Medio', 'Óptimo'], datasets: [{ data: counts, backgroundColor: ['#dc3545', '#ffc107', '#198754'] }] },
-        options: { responsive: true, maintainAspectRatio: false }
-    });
+    const ctxTorta = document.getElementById('chartTorta');
+    if (ctxTorta) {
+        chartTorta = new Chart(ctxTorta, {
+            type: 'doughnut',
+            data: { labels: ['Crítico', 'Medio', 'Óptimo'], datasets: [{ data: counts, backgroundColor: ['#dc3545', '#ffc107', '#198754'] }] },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+    }
 }
 
 function renderizarCards(lista) {
     const contenedor = document.getElementById('contenedor-proyectos');
     if (!contenedor) return;
     
-    document.getElementById('estado').innerHTML = `📍 Lambayeque: <b>${lista.length}</b> proyectos encontrados.`;
+    const elEstado = document.getElementById('estado');
+    if (elEstado) elEstado.innerHTML = `📍 Lambayeque: <b>${lista.length}</b> proyectos encontrados.`;
 
     let html = '';
     lista.forEach(p => {
@@ -129,7 +142,6 @@ function renderizarCards(lista) {
         let sectorLimpio = String(valSector).replace(/[´`']/g, '').trim();
         const sectorTexto = (sectorLimpio !== "") ? sectorLimpio.toUpperCase() : "OTROS";
 
-        // Formateamos los montos para que tengan comas y decimales
         const pimStr = (Number(p.pim) || 0).toLocaleString('es-PE');
         const devStr = (Number(p.devengado) || 0).toLocaleString('es-PE');
 
@@ -145,12 +157,10 @@ function renderizarCards(lista) {
                         <span class="text-muted small">PIM:</span>
                         <span class="fw-bold">S/ ${pimStr}</span>
                     </div>
-                    
                     <div class="d-flex justify-content-between mb-1">
                         <span class="text-muted small">DEVENGADO:</span>
                         <span class="text-primary fw-bold">S/ ${devStr}</span>
                     </div>
-
                     <div class="d-flex justify-content-between mt-2">
                         <span class="text-muted small">Avance:</span>
                         <span style="color:${color}; font-weight:800;">${avanceNum}%</span>
@@ -166,9 +176,3 @@ function renderizarCards(lista) {
 }
 
 function setRango(r) { filtroRango = r; filtrarTodo(); }
-
-
-
-
-
-
