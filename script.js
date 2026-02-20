@@ -96,3 +96,4 @@ function setRango(r) { filtroRango = r; filtrarTodo(); }
 document.addEventListener('DOMContentLoaded', consultarMEF);
 document.getElementById('buscador').addEventListener('input', filtrarTodo);
 document.getElementById('select-anio').addEventListener('change', filtrarTodo);
+
