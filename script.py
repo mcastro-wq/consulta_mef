@@ -5,14 +5,15 @@ import json
 def update_data():
     resource_id = "749cb9b6-604f-485b-bb06-4b906b44034f"
     
-    # Consulta SQL: Traemos proyectos con presupuesto (PIM > 0) del 2025 o 2026
-    # Filtramos por Gobiernos Regionales para no saturar
+    # Consulta SQL específica: GORE Lambayeque con proyectos activos
     sql = f"""
-    SELECT "DEPARTAMENTO_META_NOMBRE", "PRODUCTO_PROYECTO_NOMBRE", "MONTO_PIM", "MONTO_DEVENGADO_ANO_EJE"
+    SELECT "DEPARTAMENTO_EJECUTORA_NOMBRE", "PRODUCTO_PROYECTO_NOMBRE", "MONTO_PIM", "MONTO_DEVENGADO_ANO_EJE", "FUNCION_NOMBRE"
     FROM "{resource_id}" 
     WHERE "SECTOR_NOMBRE" LIKE 'GOBIERNOS REGIONALES' 
+    AND "DEPARTAMENTO_EJECUTORA_NOMBRE" = 'LAMBAYEQUE'
     AND "MONTO_PIM" > 0 
-    LIMIT 1000
+    ORDER BY "MONTO_PIM" DESC
+    LIMIT 500
     """
     
     params = urllib.parse.urlencode({'sql': sql})
@@ -21,12 +22,13 @@ def update_data():
     headers = {'User-Agent': 'Mozilla/5.0'}
     
     try:
+        print("🛰️ Conectando con la API del MEF...")
         req = urllib.request.Request(url, headers=headers)
-        with urllib.request.urlopen(req, timeout=30) as response:
+        with urllib.request.urlopen(req, timeout=45) as response:
             res_data = json.loads(response.read().decode())
             
-            # El SQL del MEF pone los datos en la raíz 'records'
-            records = res_data.get('records', [])
+            # La respuesta de la API del MEF viene dentro de result -> records
+            records = res_data.get('result', {}).get('records', [])
             
             processed = []
             for r in records:
@@ -35,23 +37,23 @@ def update_data():
                 
                 processed.append({
                     "NOMBRE": r.get('PRODUCTO_PROYECTO_NOMBRE', 'SIN NOMBRE'),
-                    "DEPARTAMENTO": r.get('DEPARTAMENTO_META_NOMBRE', 'OTROS'),
+                    "DEPARTAMENTO": r.get('DEPARTAMENTO_EJECUTORA_NOMBRE', 'LAMBAYEQUE'),
+                    "FUNCION": r.get('FUNCION_NOMBRE', 'OTROS'),
                     "pim": pim,
                     "devengado": dev,
                     "avance": round((dev / pim * 100), 1) if pim > 0 else 0
                 })
 
+            # Guardamos el JSON que consumirá tu Dashboard
             with open('data_mef.json', 'w', encoding='utf-8') as f:
                 json.dump(processed, f, indent=2, ensure_ascii=False)
             
-            print(f"✅ Éxito: {len(processed)} proyectos guardados.")
+            print(f"✅ Éxito: {len(processed)} proyectos de Lambayeque actualizados.")
 
     except Exception as e:
-        # Si falla, creamos un archivo de error para que la web avise
-        error_data = [{"NOMBRE": "ERROR DE CONEXIÓN MEF", "DEPARTAMENTO": "SISTEMA", "pim": 0, "devengado": 0, "avance": 0}]
-        with open('data_mef.json', 'w', encoding='utf-8') as f:
-            json.dump(error_data, f, indent=2)
         print(f"🚨 Fallo crítico: {e}")
+        # No sobreescribimos con error para no borrar la última data buena en GitHub
+        raise e 
 
 if __name__ == "__main__":
     update_data()
