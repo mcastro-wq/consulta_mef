@@ -1,28 +1,30 @@
 import urllib.request
+import csv
 import json
-import time
+import io
 
 def update_data():
-    resource_id = "749cb9b6-604f-485b-bb06-4b906b44034f"
-    # Pedimos los datos sin SQL pesado para que el servidor no nos bloquee (Error 500)
-    # Traemos 5000 registros para asegurar que Lambayeque esté incluido
-    url = f"https://api.datosabiertos.mef.gob.pe/DatosAbiertos/v1/datastore_search?resource_id={resource_id}&limit=5000"
+    # URL de descarga directa que se ve en tu captura (CSV es más ligero para descargar)
+    url_directa = "https://fs.datosabiertos.mef.gob.pe/datastorefiles/2025-Seguimiento-PI.csv"
     
     headers = {'User-Agent': 'Mozilla/5.0'}
     
-    for intento in range(3):
-        try:
-            print(f"📡 Intento {intento+1}: Recolectando datos reales del MEF...")
-            req = urllib.request.Request(url, headers=headers)
-            with urllib.request.urlopen(req, timeout=60) as response:
-                res_data = json.loads(response.read().decode())
-                records = res_data.get('result', {}).get('records', [])
-                
-                # FILTRO REAL: Solo Lambayeque (Código 14) y Gobiernos Regionales
-                processed = []
-                for r in records:
-                    # Usamos el código 14 que viste en la tabla (ID Lambayeque)
-                    if str(r.get('DEPARTAMENTO_EJECUTORA')) == '14' and r.get('SECTOR_NOMBRE') == 'GOBIERNOS REGIONALES':
+    try:
+        print("📥 Iniciando descarga del archivo completo (esto puede tardar)...")
+        req = urllib.request.Request(url_directa, headers=headers)
+        
+        with urllib.request.urlopen(req, timeout=300) as response:
+            # Leemos el contenido como texto
+            content = response.read().decode('utf-8-sig')
+            reader = csv.DictReader(io.StringIO(content))
+            
+            processed = []
+            print("🔍 Filtrando datos de Lambayeque (Código 14)...")
+            
+            for r in reader:
+                # Usamos el código 14 que identificaste correctamente
+                if str(r.get('DEPARTAMENTO_EJECUTORA')) == '14' and r.get('SECTOR_NOMBRE') == 'GOBIERNOS REGIONALES':
+                    try:
                         pim = float(r.get('MONTO_PIM', 0) or 0)
                         dev = float(r.get('MONTO_DEVENGADO_ANO_EJE', 0) or 0)
                         
@@ -33,19 +35,19 @@ def update_data():
                             "devengado": dev,
                             "avance": round((dev / pim * 100), 1) if pim > 0 else 0
                         })
+                    except:
+                        continue
 
-                if processed:
-                    with open('data_mef.json', 'w', encoding='utf-8') as f:
-                        json.dump(processed, f, indent=2, ensure_ascii=False)
-                    print(f"✅ Éxito: {len(processed)} proyectos reales de Lambayeque actualizados.")
-                    return
-                else:
-                    print("⚠️ Datos recibidos pero no se encontró Lambayeque en este bloque.")
-        
-        except Exception as e:
-            print(f"❌ Error en el servidor del MEF: {e}. Reintentando...")
-            time.sleep(10)
-    exit(1)
+            if processed:
+                with open('data_mef.json', 'w', encoding='utf-8') as f:
+                    json.dump(processed, f, indent=2, ensure_ascii=False)
+                print(f"✅ ¡Éxito! Se procesaron {len(processed)} proyectos reales.")
+            else:
+                print("⚠️ No se encontraron datos para los filtros aplicados.")
+
+    except Exception as e:
+        print(f"🚨 Error crítico: {e}")
+        exit(1)
 
 if __name__ == "__main__":
     update_data()
