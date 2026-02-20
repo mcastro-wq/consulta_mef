@@ -128,12 +128,15 @@ function renderizarCards(lista) {
         let sectorTexto = String(valSector).replace(/[´`']/g, '').trim().toUpperCase();
         if (sectorTexto === "") sectorTexto = "OTROS";
 
+        // Limpiamos el nombre para el atributo title (evita errores con comillas)
+        const nombreCompleto = (p.NOMBRE || 'SIN NOMBRE').replace(/"/g, '&quot;');
+
         html += `
         <div class="col">
-            <div class="proyecto-card">
+            <div class="proyecto-card" title="${nombreCompleto}">
                 <div>
                     <span class="regiao">${sectorTexto}</span>
-                    <h3>${p.NOMBRE || 'SIN NOMBRE'}</h3>
+                    <h3 style="cursor: help;">${nombreCompleto}</h3>
                 </div>
                 <div class="metricas-box">
                     <div class="d-flex justify-content-between mb-1">
@@ -159,3 +162,4 @@ function renderizarCards(lista) {
 }
 
 function setRango(r) { filtroRango = r; filtrarTodo(); }
+
