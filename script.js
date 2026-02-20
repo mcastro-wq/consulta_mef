@@ -10,25 +10,28 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function consultarMEF() {
-    const estadoMsg = document.getElementById('estado');
     try {
-        estadoMsg.innerText = "⏳ Cargando datos...";
-        const response = await fetch('data_mef.json');
-        todosLosProyectos = await response.json();
-
-        // --- CÓDIGO NUEVO PARA LA HORA ---
-        const ahora = new Date();
-        const opciones = { hour: '2-digit', minute: '2-digit' };
-        const horaCarga = ahora.toLocaleTimeString('es-PE', opciones);
+        const response = await fetch('data_mef.json?v=' + Math.random());
+        const dataTotal = await response.json();
         
+        // 1. Pintar la fecha en el banner (si el id existe en tu HTML)
+        if (dataTotal.ultima_actualizacion) {
+            const elFecha = document.getElementById('fecha-actualizacion');
+            if (elFecha) elFecha.innerText = dataTotal.ultima_actualizacion;
+        }
+
+        // 2. Extraer la lista de proyectos para los cálculos
+        todosLosProyectos = dataTotal.proyectos; 
+        
+        // Continuar con el resto del script...
         const anios = [...new Set(todosLosProyectos.map(p => p.anio))].sort((a,b) => b-a);
         const selectAnio = document.getElementById('select-anio');
-        if (anios.length > 0) {
+        if (selectAnio && anios.length > 0) {
             selectAnio.innerHTML = anios.map(a => `<option value="${a}">${a}</option>`).join('');
         }
         filtrarTodo();
     } catch (e) {
-        estadoMsg.innerHTML = `<span class="text-danger">Error al cargar datos</span>`;
+        console.error("Error:", e);
     }
 }
 
@@ -150,6 +153,7 @@ function renderizarCards(lista) {
 }
 
 function setRango(r) { filtroRango = r; filtrarTodo(); }
+
 
 
 
