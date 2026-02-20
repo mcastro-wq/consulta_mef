@@ -134,19 +134,28 @@ function actualizarGraficos(lista) {
 
 function renderizar(lista) {
     const contenedor = document.getElementById('contenedor-proyectos');
+    // Añadimos la clase 'row' de Bootstrap
+    contenedor.className = "row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4"; 
+    
     contenedor.innerHTML = lista.map(p => {
-        let clase = p.avance > 70 ? "avance-alto" : (p.avance > 30 ? "avance-medio" : "avance-bajo");
+        // Determinamos el color según el avance
+        let colorBarra = p.avance > 70 ? "#10b981" : (p.avance > 30 ? "#f59e0b" : "#ef4444");
+        
         return `
         <div class="col">
-            <div class="card h-100 card-proyecto ${clase}">
-                <div class="card-body p-3">
-                    <div class="d-flex justify-content-between mb-2">
-                        <span class="badge ${p.avance > 50 ? 'bg-success' : 'bg-danger'}">${p.avance}%</span>
-                        <small class="text-muted fw-bold">AÑO ${p.anio}</small>
+            <div class="proyecto-card">
+                <div>
+                    <span class="regiao">${p.sector || 'GOBIERNO REGIONAL'}</span>
+                    <h3>${p.NOMBRE}</h3>
+                </div>
+                <div>
+                    <div class="metricas">
+                        <span>S/ ${p.devengado.toLocaleString()}</span>
+                        <span style="color: ${colorBarra}">${p.avance}%</span>
                     </div>
-                    <h6 class="card-title text-uppercase fw-bold mb-3" style="font-size: 0.7rem; height: 3.2em; overflow: hidden;">${p.NOMBRE}</h6>
-                    <div class="small">PIM: <b>S/ ${p.pim.toLocaleString('es-PE')}</b></div>
-                    <div class="progress mt-2" style="height: 5px;"><div class="progress-bar" style="width: ${p.avance}%"></div></div>
+                    <div class="barra-fondo">
+                        <div class="barra-progreso" style="width: ${p.avance}%; background: ${colorBarra}"></div>
+                    </div>
                 </div>
             </div>
         </div>`;
@@ -160,5 +169,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('buscador').addEventListener('input', filtrarTodo);
     document.getElementById('select-anio').addEventListener('change', filtrarTodo);
 });
+
 
 
