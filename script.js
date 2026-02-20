@@ -3,7 +3,6 @@ let filtroRango = 'todos';
 let chartSectores = null;
 let chartTorta = null;
 
-// INICIO
 document.addEventListener('DOMContentLoaded', () => {
     consultarMEF();
     document.getElementById('buscador').addEventListener('input', filtrarTodo);
@@ -13,23 +12,18 @@ document.addEventListener('DOMContentLoaded', () => {
 async function consultarMEF() {
     const estadoMsg = document.getElementById('estado');
     try {
-        estadoMsg.innerText = "⏳ Cargando datos oficiales...";
+        estadoMsg.innerText = "⏳ Cargando datos...";
         const response = await fetch('data_mef.json');
-        if (!response.ok) throw new Error("No se encontró data_mef.json");
-        
         todosLosProyectos = await response.json();
         
-        // Cargar años
         const anios = [...new Set(todosLosProyectos.map(p => p.anio))].sort((a,b) => b-a);
         const selectAnio = document.getElementById('select-anio');
         if (anios.length > 0) {
             selectAnio.innerHTML = anios.map(a => `<option value="${a}">${a}</option>`).join('');
         }
-
         filtrarTodo();
     } catch (e) {
-        console.error("ERROR CRÍTICO:", e);
-        estadoMsg.innerHTML = `<span class="text-danger">🚨 Error: ${e.message}. Asegúrate de haber ejecutado el script.py</span>`;
+        estadoMsg.innerHTML = `<span class="text-danger">Error al cargar datos</span>`;
     }
 }
 
@@ -49,13 +43,12 @@ function filtrarTodo() {
 
     actualizarKPIs(filtrados);
     actualizarGraficos(filtrados);
-    renderizarCards(filtrados); // USAMOS UN NOMBRE DISTINTO PARA EVITAR CONFLICTOS
+    renderizarCards(filtrados);
 }
 
 function actualizarKPIs(lista) {
     const tPim = lista.reduce((a, p) => a + (Number(p.pim) || 0), 0);
     const tDev = lista.reduce((a, p) => a + (Number(p.devengado) || 0), 0);
-    
     document.getElementById('total-pim').innerText = "S/ " + tPim.toLocaleString('es-PE');
     document.getElementById('total-ejecutado').innerText = "S/ " + tDev.toLocaleString('es-PE');
     const avanceGlobal = tPim > 0 ? ((tDev / tPim) * 100).toFixed(1) : 0;
@@ -65,24 +58,28 @@ function actualizarKPIs(lista) {
 function actualizarGraficos(lista) {
     const sectoresMap = {};
     lista.forEach(p => { 
-        let s = (p.sector && p.sector !== "undefined") ? p.sector.trim().toUpperCase() : "OTROS";
+        // Si el sector es nulo, indefinido o cadena vacía, forzamos "OTROS"
+        let s = (p.sector && String(p.sector).trim() !== "") ? p.sector.trim().toUpperCase() : "OTROS";
         sectoresMap[s] = (sectoresMap[s] || 0) + (Number(p.pim) || 0); 
     });
     
-    const sorted = Object.entries(sectoresMap).sort((a, b) => b[1] - a[1]).slice(0, 6);
+    const sorted = Object.entries(sectoresMap).sort((a, b) => b[1] - a[1]).slice(0, 8);
 
-    // Gráfico de Barras
     if (chartSectores) chartSectores.destroy();
     chartSectores = new Chart(document.getElementById('chartSectores'), {
         type: 'bar',
         data: {
             labels: sorted.map(s => s[0]),
-            datasets: [{ label: 'PIM', data: sorted.map(s => s[1]), backgroundColor: '#0d47a1' }]
+            datasets: [{ label: 'PIM', data: sorted.map(s => s[1]), backgroundColor: '#0d47a1', borderRadius: 5 }]
         },
-        options: { responsive: true, maintainAspectRatio: false }
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { x: { ticks: { autoSkip: false, maxRotation: 45, minRotation: 45, font: { size: 9 } } } }
+        }
     });
 
-    // Gráfico de Torta
     const counts = [
         lista.filter(p => p.avance <= 30).length, 
         lista.filter(p => p.avance > 30 && p.avance <= 70).length, 
@@ -91,49 +88,38 @@ function actualizarGraficos(lista) {
     if (chartTorta) chartTorta.destroy();
     chartTorta = new Chart(document.getElementById('chartTorta'), {
         type: 'doughnut',
-        data: { 
-            labels: ['Crítico', 'Medio', 'Óptimo'], 
-            datasets: [{ data: counts, backgroundColor: ['#dc3545', '#ffc107', '#198754'] }] 
-        },
+        data: { labels: ['Crítico', 'Medio', 'Óptimo'], datasets: [{ data: counts, backgroundColor: ['#dc3545', '#ffc107', '#198754'] }] },
         options: { responsive: true, maintainAspectRatio: false }
     });
 }
 
 function renderizarCards(lista) {
     const contenedor = document.getElementById('contenedor-proyectos');
-    const estadoMsg = document.getElementById('estado');
-    
-    if (!contenedor) return;
-    
-    estadoMsg.innerHTML = `📍 Lambayeque: <b>${lista.length}</b> proyectos encontrados.`;
-
-    if (lista.length === 0) {
-        contenedor.innerHTML = '<div class="col-12 text-center p-5"><h5>No se encontraron proyectos con estos filtros.</h5></div>';
-        return;
-    }
+    document.getElementById('estado').innerHTML = `📍 Lambayeque: <b>${lista.length}</b> proyectos encontrados.`;
 
     let html = '';
     lista.forEach(p => {
         const avanceNum = Number(p.avance) || 0;
         const color = avanceNum > 70 ? "#198754" : (avanceNum > 30 ? "#ffc107" : "#dc3545");
-        const pimStr = (Number(p.pim) || 0).toLocaleString('es-PE');
-        const devStr = (Number(p.devengado) || 0).toLocaleString('es-PE');
+        
+        // VALIDACIÓN PARA TARJETAS: Si sector está vacío, mostrar "OTROS"
+        const sectorCard = (p.sector && String(p.sector).trim() !== "") ? p.sector.trim().toUpperCase() : "OTROS";
 
         html += `
         <div class="col">
             <div class="proyecto-card">
                 <div>
-                    <span class="regiao">${p.sector || 'OTROS'}</span>
-                    <h3>${p.NOMBRE || 'PROYECTO SIN NOMBRE'}</h3>
+                    <span class="regiao">${sectorCard}</span>
+                    <h3>${p.NOMBRE || 'SIN NOMBRE'}</h3>
                 </div>
                 <div class="metricas-box">
                     <div class="d-flex justify-content-between mb-1">
                         <span class="text-muted small">PIM:</span>
-                        <span class="fw-bold">S/ ${pimStr}</span>
+                        <span class="fw-bold">S/ ${(Number(p.pim) || 0).toLocaleString('es-PE')}</span>
                     </div>
                     <div class="d-flex justify-content-between mb-1">
                         <span class="text-muted small">EJECUTADO:</span>
-                        <span class="text-primary fw-bold">S/ ${devStr}</span>
+                        <span class="text-primary fw-bold">S/ ${(Number(p.devengado) || 0).toLocaleString('es-PE')}</span>
                     </div>
                     <div class="d-flex justify-content-between mt-2">
                         <span class="text-muted small">Avance:</span>
