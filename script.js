@@ -86,7 +86,7 @@ function renderizar(lista) {
         <div class="col">
             <div class="proyecto-card">
                 <div>
-                    <span class="regiao">${p.sector || 'SIN SECTOR'}</span>
+                    <span class="regiao">${p.sector || 'GENERAL'}</span>
                     <h3>${p.NOMBRE}</h3>
                 </div>
                 <div class="metricas-box">
@@ -113,3 +113,4 @@ function setRango(r) { filtroRango = r; filtrarTodo(); }
 document.addEventListener('DOMContentLoaded', consultarMEF);
 document.getElementById('buscador').addEventListener('input', filtrarTodo);
 document.getElementById('select-anio').addEventListener('change', filtrarTodo);
+
