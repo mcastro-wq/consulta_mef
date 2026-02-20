@@ -1,41 +1,24 @@
 import urllib.request
-import urllib.parse
 import json
-import time
 
 def update_data():
+    # Usamos el método de búsqueda simple (q=LAMBAYEQUE) que no da Error 500
     resource_id = "749cb9b6-604f-485b-bb06-4b906b44034f"
+    url = f"https://api.datosabiertos.mef.gob.pe/DatosAbiertos/v1/datastore_search?resource_id={resource_id}&q=LAMBAYEQUE&limit=100"
     
-    # Consulta simplificada al máximo para evitar errores de servidor
-    # Quitamos el LIKE y usamos '=' directo que es más rápido
-    sql = (
-        f'SELECT "PRODUCTO_PROYECTO_NOMBRE", "MONTO_PIM", "MONTO_DEVENGADO_ANO_EJE" '
-        f'FROM "{resource_id}" '
-        f'WHERE "DEPARTAMENTO_EJECUTORA_NOMBRE" = \'LAMBAYEQUE\' '
-        f'AND "MONTO_PIM" > 0 '
-        f'LIMIT 500'
-    )
+    headers = {'User-Agent': 'Mozilla/5.0'}
     
-    params = urllib.parse.urlencode({'sql': sql})
-    url = f"https://api.datosabiertos.mef.gob.pe/DatosAbiertos/v1/datastore_search_sql?{params}"
-    
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
-    
-    # Intentamos hasta 3 veces por si el servidor da 409 o 500
-    for intento in range(3):
-        try:
-            print(f"🛰️ Intento {intento + 1}: Conectando con el MEF...")
-            req = urllib.request.Request(url, headers=headers)
-            with urllib.request.urlopen(req, timeout=30) as response:
-                res_data = json.loads(response.read().decode())
-                records = res_data.get('result', {}).get('records', [])
-                
-                if not records:
-                    print("⚠️ No se encontraron registros.")
-                    return
-
-                processed = []
-                for r in records:
+    try:
+        req = urllib.request.Request(url, headers=headers)
+        with urllib.request.urlopen(req, timeout=30) as response:
+            res_data = json.loads(response.read().decode())
+            # En este método, los datos están en result -> records
+            records = res_data.get('result', {}).get('records', [])
+            
+            processed = []
+            for r in records:
+                # Filtro manual para asegurar que solo sea Lambayeque (por si la búsqueda 'q' trae otros)
+                if r.get('DEPARTAMENTO_EJECUTORA_NOMBRE') == 'LAMBAYEQUE':
                     pim = float(r.get('MONTO_PIM', 0) or 0)
                     dev = float(r.get('MONTO_DEVENGADO_ANO_EJE', 0) or 0)
                     processed.append({
@@ -46,17 +29,14 @@ def update_data():
                         "avance": round((dev / pim * 100), 1) if pim > 0 else 0
                     })
 
-                with open('data_mef.json', 'w', encoding='utf-8') as f:
-                    json.dump(processed, f, indent=2, ensure_ascii=False)
-                
-                print(f"✅ ¡Éxito! {len(processed)} proyectos guardados.")
-                return # Salimos del bucle si tuvo éxito
+            with open('data_mef.json', 'w', encoding='utf-8') as f:
+                json.dump(processed, f, indent=2, ensure_ascii=False)
+            
+            print(f"✅ ¡Por fin! {len(processed)} proyectos guardados sin errores SQL.")
 
-        except Exception as e:
-            print(f"❌ Error en intento {intento + 1}: {e}")
-            time.sleep(5) # Esperamos 5 segundos antes de reintentar
-    
-    exit(1) # Si después de 3 intentos falla, cerramos con error
+    except Exception as e:
+        print(f"🚨 Error: {e}")
+        exit(1)
 
 if __name__ == "__main__":
     update_data()
