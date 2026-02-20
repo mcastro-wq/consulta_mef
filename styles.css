@@ -5,6 +5,17 @@ body {
     background-color: #f1f3f7; 
     padding-bottom: 50px; 
 }
+
+.proyecto-card h3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* Número de líneas antes de cortar */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: help; /* Cambia el cursor para indicar que hay más info */
+}
+
+
 @keyframes blink {
     0% { opacity: 1; }
     50% { opacity: 0.3; }
@@ -79,6 +90,7 @@ h3 {
 .barra-fondo { background: #eee; height: 8px; border-radius: 10px; overflow: hidden; margin-top: 8px; }
 
 .barra-progreso { height: 100%; border-radius: 10px; transition: width 0.5s; }
+
 
 
 
