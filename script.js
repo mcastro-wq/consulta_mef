@@ -61,43 +61,72 @@ function actualizarKPIs(lista) {
 }
 
 function actualizarGraficos(lista) {
-    // 1. Datos por Sector
+    if (lista.length === 0) return;
+
+    // 1. Agrupar PIM por Sector
     const sectores = {};
     lista.forEach(p => {
         const s = p.sector || 'OTROS';
-        sectores[s] = (sectores[s] || 0) + p.pim;
+        // Solo sumamos si el PIM es mayor a 0, si no, le damos un valor mínimo 
+        // para que la barra exista en el gráfico (opcional)
+        sectores[s] = (sectores[s] || 0) + (p.pim || 0);
     });
 
-    const sortSectores = Object.entries(sectores).sort((a,b) => b[1] - a[1]).slice(0, 7);
+    const sortSectores = Object.entries(sectores).sort((a,b) => b[1] - a[1]).slice(0, 8);
     const labelsSector = sortSectores.map(s => s[0]);
     const dataSector = sortSectores.map(s => s[1]);
+
+    // Verificación en consola (Presiona F12 en tu navegador para ver esto)
+    console.log("Datos para gráfico de barras:", dataSector);
 
     // 2. Datos por Avance (Torta)
     const bajos = lista.filter(p => p.avance <= 30).length;
     const medios = lista.filter(p => p.avance > 30 && p.avance <= 70).length;
     const altos = lista.filter(p => p.avance > 70).length;
 
-    // Dibujar Barra
-    if (chartSectores) chartSectores.destroy();
-    chartSectores = new Chart(document.getElementById('chartSectores'), {
-        type: 'bar',
-        data: {
-            labels: labelsSector,
-            datasets: [{ label: 'PIM por Sector', data: dataSector, backgroundColor: '#0d47a1' }]
-        },
-        options: { responsive: true, plugins: { legend: { display: false } } }
-    });
+    // --- GRÁFICO DE BARRAS ---
+    const ctxBar = document.getElementById('chartSectores');
+    if (ctxBar) {
+        if (chartSectores) chartSectores.destroy();
+        chartSectores = new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: labelsSector,
+                datasets: [{
+                    label: 'Presupuesto PIM (Soles)',
+                    data: dataSector,
+                    backgroundColor: '#0d47a1',
+                    borderRadius: 5
+                }]
+            },
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } } 
+            }
+        });
+    }
 
-    // Dibujar Torta
-    if (chartTorta) chartTorta.destroy();
-    chartTorta = new Chart(document.getElementById('chartTorta'), {
-        type: 'doughnut',
-        data: {
-            labels: ['Crítico', 'Medio', 'Óptimo'],
-            datasets: [{ data: [bajos, medios, altos], backgroundColor: ['#dc3545', '#ffc107', '#198754'] }]
-        },
-        options: { responsive: true, cutout: '70%' }
-    });
+    // --- GRÁFICO DE TORTA ---
+    const ctxPie = document.getElementById('chartTorta');
+    if (ctxPie) {
+        if (chartTorta) chartTorta.destroy();
+        chartTorta = new Chart(ctxPie, {
+            type: 'doughnut',
+            data: {
+                labels: ['Crítico (0-30%)', 'Medio (30-70%)', 'Óptimo (>70%)'],
+                datasets: [{
+                    data: [bajos, medios, altos],
+                    backgroundColor: ['#dc3545', '#ffc107', '#198754']
+                }]
+            },
+            options: { 
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%' 
+            }
+        });
+    }
 }
 
 function renderizar(lista) {
@@ -128,3 +157,4 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('buscador').addEventListener('input', filtrarTodo);
     document.getElementById('select-anio').addEventListener('change', filtrarTodo);
 });
+
