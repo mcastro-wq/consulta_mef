@@ -1,5 +1,6 @@
 import urllib.request, csv, json, io
 from datetime import datetime
+from datetime import timedelta
 
 def update_data():
     url = "https://fs.datosabiertos.mef.gob.pe/datastorefiles/2025-Seguimiento-PI.csv"
