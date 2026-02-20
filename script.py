@@ -15,14 +15,15 @@ def update_data():
                     try:
                         pim = float(r.get('MONTO_PIM', 0) or 0)
                         dev = float(r.get('MONTO_DEVENGADO_ANO_EJE', 0) or 0)
-                        processed.append({
-                            "NOMBRE": r.get('PRODUCTO_PROYECTO_NOMBRE', 'SIN NOMBRE'),
-                            "anio": r.get('ANO_EJE', '2025'),
-                            "sector": r.get('SECTOR_NOMBRE', 'OTROS'),
-                            "pim": pim,
-                            "devengado": dev,
-                            "avance": round((dev / pim * 100), 1) if pim > 0 else 0
-                        })
+
+                    processed.append({
+    "NOMBRE": r.get('PRODUCTO_PROYECTO_NOMBRE', 'SIN NOMBRE'),
+    "anio": r.get('ANO_EJE', '2025'),
+    "sector": r.get('SECTOR_NOMBRE', 'OTROS'), # <--- ESTA LÍNEA ES LA CLAVE
+    "pim": pim,
+    "devengado": dev,
+    "avance": round((dev / pim * 100), 1) if pim > 0 else 0
+})
                     except: continue
             with open('data_mef.json', 'w', encoding='utf-8') as f:
                 json.dump(processed, f, indent=2, ensure_ascii=False)
