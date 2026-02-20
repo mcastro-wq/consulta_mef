@@ -109,13 +109,13 @@ function renderizarCards(lista) {
         const avanceNum = Number(p.avance) || 0;
         const color = avanceNum > 70 ? "#198754" : (avanceNum > 30 ? "#ffc107" : "#dc3545");
         
-        // --- LÓGICA DE LIMPIEZA PARA EL SECTOR ---
         let valSector = p.sector || p.SECTOR || p.Sector || "";
-        // Eliminamos espacios, tildes raras (´) y verificamos si quedó vacío
         let sectorLimpio = String(valSector).replace(/[´`']/g, '').trim();
-        
         const sectorTexto = (sectorLimpio !== "") ? sectorLimpio.toUpperCase() : "OTROS";
-        // -----------------------------------------
+
+        // Formateamos los montos para que tengan comas y decimales
+        const pimStr = (Number(p.pim) || 0).toLocaleString('es-PE');
+        const devStr = (Number(p.devengado) || 0).toLocaleString('es-PE');
 
         html += `
         <div class="col">
@@ -127,8 +127,14 @@ function renderizarCards(lista) {
                 <div class="metricas-box">
                     <div class="d-flex justify-content-between mb-1">
                         <span class="text-muted small">PIM:</span>
-                        <span class="fw-bold">S/ ${(Number(p.pim) || 0).toLocaleString('es-PE')}</span>
+                        <span class="fw-bold">S/ ${pimStr}</span>
                     </div>
+                    
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="text-muted small">DEVENGADO:</span>
+                        <span class="text-primary fw-bold">S/ ${devStr}</span>
+                    </div>
+
                     <div class="d-flex justify-content-between mt-2">
                         <span class="text-muted small">Avance:</span>
                         <span style="color:${color}; font-weight:800;">${avanceNum}%</span>
@@ -144,5 +150,6 @@ function renderizarCards(lista) {
 }
 
 function setRango(r) { filtroRango = r; filtrarTodo(); }
+
 
 
