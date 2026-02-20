@@ -1,9 +1,97 @@
-body { font-family: sans-serif; background: #f4f4f4; padding: 20px; }
-.container { max-width: 800px; margin: auto; }
-#buscador { width: 100%; padding: 12px; margin-bottom: 20px; border-radius: 8px; border: 1px solid #ccc; }
-.proyecto-card { background: white; padding: 15px; border-radius: 8px; margin-bottom: 10px; shadow: 0 2px 4px rgba(0,0,0,0.1); }
-.regiao { font-size: 0.8em; color: #666; font-weight: bold; }
-h3 { margin: 5px 0; font-size: 1.1em; color: #333; }
-.metricas { display: flex; justify-content: space-between; font-size: 0.9em; margin: 10px 0; }
-.barra-fondo { background: #eee; height: 10px; border-radius: 5px; overflow: hidden; }
-.barra-progreso { background: #2ecc71; height: 100%; }
+/* Importar la fuente Inter */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+
+:root {
+    --mef-blue: #0d47a1;
+    --mef-gold: #ffd600;
+    --bg-body: #f1f3f7;
+    --text-main: #1a202c;
+    --text-muted: #718096;
+}
+
+body { 
+    font-family: 'Inter', sans-serif; 
+    background-color: var(--bg-body); 
+    padding: 20px; 
+    color: var(--text-main);
+    line-height: 1.5;
+}
+
+.container { 
+    max-width: 1100px; /* Un poco más ancho para los gráficos */
+    margin: auto; 
+}
+
+/* Buscador Estilizado */
+#buscador { 
+    width: 100%; 
+    padding: 14px 20px; 
+    margin-bottom: 25px; 
+    border-radius: 12px; 
+    border: 2px solid #e2e8f0; 
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+#buscador:focus {
+    outline: none;
+    border-color: var(--mef-blue);
+    box-shadow: 0 0 0 4px rgba(13, 71, 161, 0.1);
+}
+
+/* Tarjetas de Proyectos */
+.proyecto-card { 
+    background: white; 
+    padding: 20px; 
+    border-radius: 16px; 
+    margin-bottom: 15px; 
+    border: none;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.proyecto-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* Etiquetas y Textos */
+.regiao { 
+    font-size: 0.75rem; 
+    color: var(--text-muted); 
+    font-weight: 700; 
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+    display: block;
+}
+
+h3 { 
+    margin: 8px 0; 
+    font-size: 1rem; 
+    font-weight: 700;
+    color: var(--text-main); 
+    line-height: 1.4;
+}
+
+.metricas { 
+    display: flex; 
+    justify-content: space-between; 
+    font-size: 0.85rem; 
+    margin: 15px 0 8px 0; 
+    font-weight: 600;
+}
+
+/* Barras de Progreso */
+.barra-fondo { 
+    background: #edf2f7; 
+    height: 8px; 
+    border-radius: 10px; 
+    overflow: hidden; 
+}
+
+.barra-progreso { 
+    background: linear-gradient(90deg, #2ecc71, #27ae60); 
+    height: 100%;
