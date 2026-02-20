@@ -95,6 +95,8 @@ function actualizarGraficos(lista) {
 
 function renderizarCards(lista) {
     const contenedor = document.getElementById('contenedor-proyectos');
+    if (!contenedor) return;
+    
     document.getElementById('estado').innerHTML = `📍 Lambayeque: <b>${lista.length}</b> proyectos encontrados.`;
 
     let html = '';
@@ -102,24 +104,25 @@ function renderizarCards(lista) {
         const avanceNum = Number(p.avance) || 0;
         const color = avanceNum > 70 ? "#198754" : (avanceNum > 30 ? "#ffc107" : "#dc3545");
         
-        // VALIDACIÓN PARA TARJETAS: Si sector está vacío, mostrar "OTROS"
-        const sectorCard = (p.sector && String(p.sector).trim() !== "") ? p.sector.trim().toUpperCase() : "OTROS";
+        // --- LÓGICA DE LIMPIEZA PARA EL SECTOR ---
+        let valSector = p.sector || p.SECTOR || p.Sector || "";
+        // Eliminamos espacios, tildes raras (´) y verificamos si quedó vacío
+        let sectorLimpio = String(valSector).replace(/[´`']/g, '').trim();
+        
+        const sectorTexto = (sectorLimpio !== "") ? sectorLimpio.toUpperCase() : "OTROS";
+        // -----------------------------------------
 
         html += `
         <div class="col">
             <div class="proyecto-card">
                 <div>
-                    <span class="regiao">${sectorCard}</span>
+                    <span class="regiao">${sectorTexto}</span>
                     <h3>${p.NOMBRE || 'SIN NOMBRE'}</h3>
                 </div>
                 <div class="metricas-box">
                     <div class="d-flex justify-content-between mb-1">
                         <span class="text-muted small">PIM:</span>
                         <span class="fw-bold">S/ ${(Number(p.pim) || 0).toLocaleString('es-PE')}</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-1">
-                        <span class="text-muted small">EJECUTADO:</span>
-                        <span class="text-primary fw-bold">S/ ${(Number(p.devengado) || 0).toLocaleString('es-PE')}</span>
                     </div>
                     <div class="d-flex justify-content-between mt-2">
                         <span class="text-muted small">Avance:</span>
@@ -136,3 +139,4 @@ function renderizarCards(lista) {
 }
 
 function setRango(r) { filtroRango = r; filtrarTodo(); }
+
