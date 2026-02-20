@@ -4,94 +4,107 @@
 :root {
     --mef-blue: #0d47a1;
     --mef-gold: #ffd600;
-    --bg-body: #f1f3f7;
-    --text-main: #1a202c;
-    --text-muted: #718096;
+    --bg-body: #f8fafc;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
 }
 
 body { 
     font-family: 'Inter', sans-serif; 
     background-color: var(--bg-body); 
-    padding: 20px; 
     color: var(--text-main);
-    line-height: 1.5;
 }
 
+/* Contenedor principal */
 .container { 
-    max-width: 1100px; /* Un poco más ancho para los gráficos */
-    margin: auto; 
+    max-width: 1200px; 
+    padding-top: 30px;
 }
 
 /* Buscador Estilizado */
 #buscador { 
-    width: 100%; 
-    padding: 14px 20px; 
-    margin-bottom: 25px; 
     border-radius: 12px; 
     border: 2px solid #e2e8f0; 
+    padding: 12px 20px;
     font-size: 1rem;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s;
 }
 
 #buscador:focus {
-    outline: none;
     border-color: var(--mef-blue);
     box-shadow: 0 0 0 4px rgba(13, 71, 161, 0.1);
+    outline: none;
 }
 
-/* Tarjetas de Proyectos */
+/* Tarjeta de Proyecto (Optimizado para nombres largos) */
 .proyecto-card { 
     background: white; 
-    padding: 20px; 
-    border-radius: 16px; 
-    margin-bottom: 15px; 
-    border: none;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    padding: 24px; 
+    border-radius: 20px; 
+    height: 100%; /* Para que todas las tarjetas de una fila midan lo mismo */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border: 1px solid rgba(0,0,0,0.05);
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .proyecto-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    transform: translateY(-5px);
+    box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
 }
 
-/* Etiquetas y Textos */
-.regiao { 
-    font-size: 0.75rem; 
-    color: var(--text-muted); 
-    font-weight: 700; 
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 8px;
-    display: block;
-}
-
+/* Ajuste del Nombre del Proyecto */
 h3 { 
-    margin: 8px 0; 
-    font-size: 1rem; 
+    font-size: 0.95rem; 
     font-weight: 700;
     color: var(--text-main); 
-    line-height: 1.4;
+    line-height: 1.5;
+    margin-bottom: 15px;
+    /* Eliminamos el 'overflow: hidden' para que el nombre se vea completo */
+    display: block; 
+}
+
+.regiao { 
+    font-size: 0.7rem; 
+    color: var(--mef-blue); 
+    font-weight: 800; 
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 10px;
 }
 
 .metricas { 
     display: flex; 
     justify-content: space-between; 
     font-size: 0.85rem; 
-    margin: 15px 0 8px 0; 
+    margin-top: auto; /* Empuja las métricas al fondo de la tarjeta */
+    padding-top: 15px;
     font-weight: 600;
 }
 
-/* Barras de Progreso */
+/* Barras de Progreso Estilo Píldora */
 .barra-fondo { 
-    background: #edf2f7; 
+    background: #f1f5f9; 
     height: 8px; 
     border-radius: 10px; 
-    overflow: hidden; 
+    margin-top: 10px;
 }
 
 .barra-progreso { 
-    background: linear-gradient(90deg, #2ecc71, #27ae60); 
-    height: 100%;
+    background: linear-gradient(90deg, #10b981, #059669); 
+    height: 100%; 
+    border-radius: 10px;
+    transition: width 1s ease-in-out;
+}
+
+/* Estilo para los KPIs superiores */
+.card-kpi {
+    border: none;
+    border-radius: 16px;
+    padding: 20px;
+    color: white;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
