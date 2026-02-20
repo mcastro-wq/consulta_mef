@@ -6,6 +6,7 @@ async function consultarMEF() {
     try {
         const response = await fetch('data_mef.json');
         todosLosProyectos = await response.json();
+        
         const anios = [...new Set(todosLosProyectos.map(p => p.anio))].sort((a,b) => b-a);
         const selectAnio = document.getElementById('select-anio');
         if (anios.length > 0) {
@@ -13,13 +14,14 @@ async function consultarMEF() {
         }
         filtrarTodo();
     } catch (e) {
-        console.error("Error al cargar JSON:", e);
+        console.error("Error cargando datos", e);
     }
 }
 
 function filtrarTodo() {
     const busqueda = document.getElementById('buscador').value.toLowerCase();
     const anioSel = document.getElementById('select-anio').value;
+
     const filtrados = todosLosProyectos.filter(p => {
         const coincideAnio = String(p.anio) === anioSel;
         const coincideTexto = p.NOMBRE.toLowerCase().includes(busqueda);
@@ -29,9 +31,10 @@ function filtrarTodo() {
         else if (filtroRango === 'alto') coincideRango = p.avance > 70;
         return coincideAnio && coincideTexto && coincideRango;
     });
+
     actualizarKPIs(filtrados);
     actualizarGraficos(filtrados);
-    renderizar(filtrados);
+    renderizar(filtrados); // ESTA ERA LA LÍNEA QUE FALTABA
 }
 
 function actualizarKPIs(lista) {
@@ -39,105 +42,59 @@ function actualizarKPIs(lista) {
     const tDev = lista.reduce((a, p) => a + (p.devengado || 0), 0);
     document.getElementById('total-pim').innerText = `S/ ${tPim.toLocaleString('es-PE')}`;
     document.getElementById('total-ejecutado').innerText = `S/ ${tDev.toLocaleString('es-PE')}`;
-    document.getElementById('avance-global').innerText = `${tPim > 0 ? ((tDev/tPim)*100).toFixed(1) : 0}%`;
+    const avance = tPim > 0 ? ((tDev / tPim) * 100).toFixed(1) : 0;
+    document.getElementById('avance-global').innerText = `${avance}%`;
 }
 
 function actualizarGraficos(lista) {
-    const sectores = {};
-    
+    const sectoresMap = {};
     lista.forEach(p => { 
-        // 1. Limpiamos espacios y manejamos vacíos o undefined
-        let s = "OTROS";
-        if (p.sector && typeof p.sector === 'string' && p.sector.trim() !== "") {
-            s = p.sector.trim().toUpperCase();
-        }
-
-        // 2. Sumamos el PIM (asegurándonos que sea número)
-        const montoPim = parseFloat(p.pim) || 0;
-        sectores[s] = (sectores[s] || 0) + montoPim; 
+        let s = (p.sector && p.sector !== "undefined" && p.sector.trim() !== "") ? p.sector.trim().toUpperCase() : "OTROS";
+        sectoresMap[s] = (sectoresMap[s] || 0) + (p.pim || 0); 
     });
     
-    // 3. Convertimos a array, filtramos los que tienen PIM 0 (opcional) y ordenamos
-    const sorted = Object.entries(sectores)
-        .filter(s => s[1] > 0) // Solo sectores con presupuesto
-        .sort((a, b) => b[1] - a[1]) // De mayor a menor
-        .slice(0, 8); // Los 8 principales para que no se amontone el gráfico
+    const sorted = Object.entries(sectoresMap)
+        .filter(s => s[1] > 0)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 8);
 
     if (chartSectores) chartSectores.destroy();
-    
-    const ctxBar = document.getElementById('chartSectores').getContext('2d');
-    chartSectores = new Chart(ctxBar, {
+    chartSectores = new Chart(document.getElementById('chartSectores'), {
         type: 'bar',
         data: {
             labels: sorted.map(s => s[0]),
-            datasets: [{ 
-                label: 'PIM (S/)',
-                data: sorted.map(s => s[1]), 
-                backgroundColor: '#0d47a1', 
-                borderRadius: 5 
-            }]
+            datasets: [{ label: 'PIM', data: sorted.map(s => s[1]), backgroundColor: '#0d47a1', borderRadius: 5 }]
         },
         options: { 
-            responsive: true,
-            maintainAspectRatio: false, // CLAVE: Evita que el gráfico crezca solo
-            plugins: { 
-                legend: { display: false },
-                tooltip: {
-                    callbacks: {
-                        label: (context) => `PIM: S/ ${context.raw.toLocaleString('es-PE')}`
-                    }
-                }
-            },
-            scales: { 
-                x: { 
-                    ticks: { 
-                        autoSkip: false, 
-                        maxRotation: 45, 
-                        minRotation: 45, 
-                        font: { size: 9, weight: 'bold' } 
-                    } 
-                },
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: (value) => 'S/ ' + value.toLocaleString('es-PE', { notation: 'compact' })
-                    }
-                }
-            }
+            responsive: true, 
+            maintainAspectRatio: false, 
+            plugins: { legend: { display: false } },
+            scales: { x: { ticks: { autoSkip: false, maxRotation: 45, minRotation: 45, font: { size: 9 } } } }
         }
     });
 
-    // Gráfico de Torta (Estado de proyectos)
     const counts = [
         lista.filter(p => p.avance <= 30).length, 
         lista.filter(p => p.avance > 30 && p.avance <= 70).length, 
         lista.filter(p => p.avance > 70).length
     ];
-
     if (chartTorta) chartTorta.destroy();
     chartTorta = new Chart(document.getElementById('chartTorta'), {
         type: 'doughnut',
         data: { 
-            labels: ['Bajo (0-30%)', 'Medio (31-70%)', 'Alto (>70%)'], 
-            datasets: [{ 
-                data: counts, 
-                backgroundColor: ['#dc3545', '#ffc107', '#198754'],
-                borderWidth: 0
-            }] 
+            labels: ['Bajo', 'Medio', 'Alto'], 
+            datasets: [{ data: counts, backgroundColor: ['#dc3545', '#ffc107', '#198754'] }] 
         },
-        options: { 
-            responsive: true, 
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
-            }
-        }
+        options: { responsive: true, maintainAspectRatio: false }
     });
 }
 
 function renderizar(lista) {
     const contenedor = document.getElementById('contenedor-proyectos');
-    document.getElementById('estado').innerText = `Lambayeque: ${lista.length} proyectos encontrados.`;
+    if (!contenedor) return;
+    
+    document.getElementById('estado').innerHTML = `📍 Lambayeque: <b>${lista.length}</b> proyectos en este filtro.`;
+    
     contenedor.innerHTML = lista.map(p => {
         const color = p.avance > 70 ? "#198754" : (p.avance > 30 ? "#ffc107" : "#dc3545");
         return `
@@ -148,9 +105,14 @@ function renderizar(lista) {
                     <h3>${p.NOMBRE}</h3>
                 </div>
                 <div class="metricas-box">
-                    <div class="d-flex justify-content-between mb-1"><span>PIM:</span><b>S/ ${p.pim.toLocaleString('es-PE')}</b></div>
-                    <div class="d-flex justify-content-between mb-1"><span>DEVENGADO:</span><b class="text-primary">S/ ${p.devengado.toLocaleString('es-PE')}</b></div>
-                    <div class="d-flex justify-content-between mt-2"><small>Avance:</small><b style="color:${color}">${p.avance}%</b></div>
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="text-muted small">PIM:</span>
+                        <span class="fw-bold">S/ ${p.pim.toLocaleString('es-PE')}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="text-muted small">AVANCE:</span>
+                        <span style="color:${color}; font-weight:800;">${p.avance}%</span>
+                    </div>
                     <div class="barra-fondo"><div class="barra-progreso" style="width:${p.avance}%; background:${color}"></div></div>
                 </div>
             </div>
@@ -162,5 +124,3 @@ function setRango(r) { filtroRango = r; filtrarTodo(); }
 document.addEventListener('DOMContentLoaded', consultarMEF);
 document.getElementById('buscador').addEventListener('input', filtrarTodo);
 document.getElementById('select-anio').addEventListener('change', filtrarTodo);
-
-
