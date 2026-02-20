@@ -18,10 +18,11 @@ def update_data():
             reader.fieldnames = [field.strip() for field in reader.fieldnames]
             
             processed = []
-            print("🛡️ Filtrando Lambayeque (14) y extrayendo Sectores...")
+            print("🛡️ Aplicando filtro estricto: DEPARTAMENTO_EJECUTORA == 14")
             
             for r in reader:
-                # Filtro estricto por Departamento 14
+                # FILTRO CLAVE: Solo Lambayeque (14)
+                # Forzamos la comparación como string para evitar errores de tipo
                 dpto_cod = str(r.get('DEPARTAMENTO_EJECUTORA', '')).strip()
                 
                 if dpto_cod == '14':
@@ -32,7 +33,6 @@ def update_data():
                         processed.append({
                             "NOMBRE": r.get('PRODUCTO_PROYECTO_NOMBRE', 'SIN NOMBRE'),
                             "anio": r.get('ANO_EJE', '2025'),
-                            "sector": r.get('SECTOR_NOMBRE', 'OTROS'), # Dato para el gráfico
                             "pim": pim,
                             "devengado": dev,
                             "avance": round((dev / pim * 100), 1) if pim > 0 else 0
@@ -43,7 +43,7 @@ def update_data():
             if processed:
                 with open('data_mef.json', 'w', encoding='utf-8') as f:
                     json.dump(processed, f, indent=2, ensure_ascii=False)
-                print(f"✅ Filtrado completado! {len(processed)} proyectos de Lambayeque con Sectores.")
+                print(f"✅ ¡Filtrado completado! {len(processed)} proyectos encontrados SOLO para Lambayeque.")
             else:
                 print("⚠️ No se encontró nada para el código 14.")
 
