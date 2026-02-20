@@ -1,88 +1,66 @@
-// 1. Variable global para mantener los datos en memoria
 let todosLosProyectos = [];
+let proyectosFiltrados = []; // Para mantener los filtros aplicados
 
 async function consultarMEF() {
     const estado = document.getElementById('estado');
-    // Forzamos descarga fresca
     const url = `data_mef.json?v=${new Date().getTime()}`;
 
     try {
-        estado.innerHTML = "⏳ Cargando base de datos de Lambayeque...";
         const response = await fetch(url);
-        if (!response.ok) throw new Error("No se pudo cargar el archivo data_mef.json");
-        
         const data = await response.json();
-        
-        // 2. Guardamos en la variable global para que el buscador pueda verlos
         todosLosProyectos = data;
-
-        estado.innerHTML = `✅ <b>${todosLosProyectos.length}</b> proyectos detectados.`;
-        renderizar(todosLosProyectos);
+        
+        // Cargar los años disponibles en el SELECT dinámicamente
+        configurarSelectorAnios();
+        
+        // Iniciar con el año más reciente (2025 o el último encontrado)
+        const anioActual = document.getElementById('select-anio').value;
+        filtrarTodo(); 
 
     } catch (error) {
-        console.error(error);
-        estado.innerHTML = `🚨 Error: ${error.message}`;
+        estado.innerHTML = "🚨 Error al cargar datos.";
     }
 }
 
-// 3. Función de filtrado (ahora más robusta)
-function filtrarProyectos() {
-    const texto = document.getElementById('buscador').value.toLowerCase().trim();
-    const estado = document.getElementById('estado');
+function configurarSelectorAnios() {
+    const select = document.getElementById('select-anio');
+    // Extraer años únicos del JSON
+    const aniosUnicos = [...new Set(todosLosProyectos.map(p => p.anio))].sort((a, b) => b - a);
+    
+    select.innerHTML = aniosUnicos.map(a => `<option value="${a}">${a}</option>`).join('');
+}
 
-    const filtrados = todosLosProyectos.filter(p => {
-        const nombre = (p.NOMBRE || "").toLowerCase();
-        return nombre.includes(texto);
+function filtrarTodo() {
+    const anioSeleccionado = document.getElementById('select-anio').value;
+    const textoBusqueda = document.getElementById('buscador').value.toLowerCase();
+    
+    // Aplicamos ambos filtros: Año Y Búsqueda de texto
+    proyectosFiltrados = todosLosProyectos.filter(p => {
+        const coincideAnio = p.anio === anioSeleccionado;
+        const coincideTexto = p.NOMBRE.toLowerCase().includes(textoBusqueda);
+        return coincideAnio && coincideTexto;
     });
 
-    renderizar(filtrados);
-    estado.innerHTML = `🔍 Mostrando <b>${filtrados.length}</b> de ${todosLosProyectos.length} proyectos.`;
+    renderizar(proyectosFiltrados);
+    actualizarKPIs(proyectosFiltrados);
 }
 
-function renderizar(lista) {
-    const contenedor = document.getElementById('contenedor-proyectos');
+function filtrarPorRango(rango) {
+    let final = proyectosFiltrados;
+    if (rango === 'bajo') final = proyectosFiltrados.filter(p => p.avance <= 30);
+    if (rango === 'medio') final = proyectosFiltrados.filter(p => p.avance > 30 && p.avance <= 70);
+    if (rango === 'alto') final = proyectosFiltrados.filter(p => p.avance > 70);
     
-    if (lista.length === 0) {
-        contenedor.innerHTML = '<div class="col-12 text-center py-5 text-muted">No se encontraron coincidencias.</div>';
-        return;
-    }
-
-    contenedor.innerHTML = lista.map(p => {
-        // Determinamos la clase de color según el avance
-        let claseAvance = "avance-bajo";
-        if (p.avance > 30 && p.avance <= 70) claseAvance = "avance-medio";
-        if (p.avance > 70) claseAvance = "avance-alto";
-
-        return `
-        <div class="col">
-            <div class="card h-100 shadow-sm card-proyecto ${claseAvance}">
-                <div class="card-body p-3">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="badge ${p.avance > 50 ? 'bg-success' : 'bg-danger'}">
-                            ${p.avance}% avance
-                        </span>
-                    </div>
-                    <h6 class="card-title text-uppercase mb-3" style="font-size: 0.75rem; height: 3.2em; overflow: hidden; font-weight: bold;">
-                        ${p.NOMBRE}
-                    </h6>
-                    <div class="small mb-1">PIM: <b>S/ ${p.pim.toLocaleString('es-PE')}</b></div>
-                    <div class="small mb-2">Devengado: <b class="text-success">S/ ${p.devengado.toLocaleString('es-PE')}</b></div>
-                    <div class="progress" style="height: 6px;">
-                        <div class="progress-bar ${p.avance > 50 ? 'bg-success' : 'bg-warning'}" style="width: ${p.avance}%"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `}).join('');
+    renderizar(final);
 }
 
-// 4. IMPORTANTE: Conectar el buscador apenas cargue la página
-document.addEventListener('DOMContentLoaded', () => {
-    consultarMEF();
-    
-    // Escuchamos el teclado en el input de búsqueda
-    const inputBuscador = document.getElementById('buscador');
-    if(inputBuscador) {
-        inputBuscador.addEventListener('input', filtrarProyectos);
-    }
-});
+function actualizarKPIs(lista) {
+    const totalPim = lista.reduce((acc, p) => acc + (p.pim || 0), 0);
+    const totalDev = lista.reduce((acc, p) => acc + (p.devengado || 0), 0);
+    const avanceGlobal = totalPim > 0 ? ((totalDev / totalPim) * 100).toFixed(1) : 0;
+
+    document.getElementById('total-pim').innerText = `S/ ${totalPim.toLocaleString('es-PE')}`;
+    document.getElementById('total-ejecutado').innerText = `S/ ${totalDev.toLocaleString('es-PE')}`;
+    document.getElementById('avance-global').innerText = `${avanceGlobal}%`;
+}
+// ... (Resto de funciones renderizar y exportar)
