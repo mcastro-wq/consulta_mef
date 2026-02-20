@@ -1,4 +1,4 @@
-// CONFIGURACIÓN INICIAL
+// 1. VARIABLES GLOBALES (Sin duplicados)
 let todosLosProyectos = [];
 let filtroRango = 'todos';
 let chartSectores = null;
@@ -10,40 +10,42 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('select-anio').addEventListener('change', filtrarTodo);
 });
 
-// CARGA DE DATOS
+// 2. CARGA DE DATOS
 async function consultarMEF() {
     try {
         const response = await fetch('data_mef.json?v=' + Math.random());
         const dataTotal = await response.json();
         
-        // 1. Mostrar Fecha
+        // Mostrar fecha en el banner
         if (dataTotal.ultima_actualizacion) {
             const elFecha = document.getElementById('fecha-actualizacion');
             if (elFecha) elFecha.innerText = dataTotal.ultima_actualizacion;
         }
 
-        // 2. Extraer Proyectos (Blindado para ambos formatos)
+        // Extraer proyectos (soporta el nuevo formato con fecha)
         todosLosProyectos = dataTotal.proyectos || (Array.isArray(dataTotal) ? dataTotal : []);
 
-        // 3. Configurar Select de Años
+        // Configurar selector de años
         const anios = [...new Set(todosLosProyectos.map(p => p.anio))].sort((a,b) => b-a);
         const selectAnio = document.getElementById('select-anio');
         if (selectAnio && anios.length > 0) {
             selectAnio.innerHTML = anios.map(a => `<option value="${a}">${a}</option>`).join('');
         }
         
-        filtrarTodo(); // Inicia el renderizado
+        // Ejecutar primer renderizado
+        filtrarTodo();
 
     } catch (e) {
         console.error("Error cargando JSON:", e);
-        document.getElementById('contenedor-proyectos').innerHTML = "Error al conectar con la base de datos.";
+        const cont = document.getElementById('contenedor-proyectos');
+        if (cont) cont.innerHTML = "Error al conectar con la base de datos.";
     }
 }
 
-// FILTROS
+// 3. LÓGICA DE FILTROS
 function filtrarTodo() {
-    const busqueda = document.getElementById('buscador').value.toLowerCase();
-    const anioSel = document.getElementById('select-anio').value;
+    const busqueda = (document.getElementById('buscador')?.value || "").toLowerCase();
+    const anioSel = document.getElementById('select-anio')?.value;
 
     const filtrados = todosLosProyectos.filter(p => {
         const coincideAnio = String(p.anio) === anioSel;
@@ -60,7 +62,7 @@ function filtrarTodo() {
     renderizarCards(filtrados);
 }
 
-// KPIs
+// 4. ACTUALIZAR KPIs
 function actualizarKPIs(lista) {
     const tPim = lista.reduce((a, p) => a + (Number(p.pim) || 0), 0);
     const tDev = lista.reduce((a, p) => a + (Number(p.devengado) || 0), 0);
@@ -72,7 +74,7 @@ function actualizarKPIs(lista) {
     document.getElementById('avance-global').innerText = avanceGlobal + "%";
 }
 
-// GRÁFICOS
+// 5. ACTUALIZAR GRÁFICOS (Color Granate #801616)
 function actualizarGraficos(lista) {
     const sectoresMap = {};
     lista.forEach(p => { 
@@ -110,7 +112,7 @@ function actualizarGraficos(lista) {
     });
 }
 
-// CARDS
+// 6. RENDERIZAR TARJETAS
 function renderizarCards(lista) {
     const contenedor = document.getElementById('contenedor-proyectos');
     if (!contenedor) return;
