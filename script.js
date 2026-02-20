@@ -67,6 +67,9 @@ function actualizarGraficos(lista) {
     const sectores = {};
     lista.forEach(p => {
         const s = p.sector || 'OTROS';
+
+        // Si el sector viene vacío, nulo o es solo un espacio, le ponemos "NO ASIGNADO"
+    const s = (p.sector && p.sector.trim() !== "") ? p.sector.trim() : 'OTROS / NO ASIGNADO';
         // Solo sumamos si el PIM es mayor a 0, si no, le damos un valor mínimo 
         // para que la barra exista en el gráfico (opcional)
         sectores[s] = (sectores[s] || 0) + (p.pim || 0);
@@ -157,4 +160,5 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('buscador').addEventListener('input', filtrarTodo);
     document.getElementById('select-anio').addEventListener('change', filtrarTodo);
 });
+
 
