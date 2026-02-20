@@ -1,80 +1,32 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
 
-:root {
-    --mef-blue: #0d47a1;
-    --mef-gold: #ffd600;
-    --bg-body: #f1f3f7;
-    --text-main: #1a202c;
-    --text-muted: #718096;
-}
-
 body { 
     font-family: 'Inter', sans-serif; 
-    background-color: var(--bg-body); 
-    color: var(--text-main);
+    background-color: #f1f3f7; 
+    padding: 0; margin: 0;
 }
 
-/* Tarjeta de Proyecto Estilo Moderno */
+.navbar { background-color: #0d47a1 !important; border-bottom: 5px solid #ffd600; }
+
+.card-kpi { border: none; border-radius: 12px; color: white; padding: 20px; margin-bottom: 10px; }
+
+.card-chart { 
+    background: white; border-radius: 15px; padding: 20px; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05); height: 350px; 
+}
+
 .proyecto-card { 
-    background: white; 
-    padding: 24px; 
-    border-radius: 20px; 
-    height: 100%; /* Permite que todas las de la misma fila igualen altura */
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    border: none;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background: white; padding: 20px; border-radius: 15px; 
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05); height: 100%;
+    display: flex; flex-direction: column; justify-content: space-between;
 }
 
-.proyecto-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-}
+h3 { font-size: 0.85rem; font-weight: 700; color: #333; height: 3.6em; overflow: hidden; margin: 10px 0; }
 
-/* Tipografía del Proyecto - Sin límites de corte */
-.proyecto-card h3 { 
-    margin: 12px 0; 
-    font-size: 0.9rem; 
-    font-weight: 700;
-    color: var(--text-main); 
-    line-height: 1.5;
-    text-transform: uppercase;
-}
+.regiao { font-size: 0.65rem; color: #0d47a1; font-weight: 800; text-transform: uppercase; }
 
-.regiao { 
-    font-size: 0.7rem; 
-    color: var(--mef-blue); 
-    font-weight: 800; 
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
+.metricas-box { border-top: 1px solid #eee; padding-top: 12px; }
 
-.metricas { 
-    display: flex; 
-    justify-content: space-between; 
-    font-size: 0.85rem; 
-    margin-top: 15px;
-    font-weight: 600;
-    border-top: 1px solid #f1f5f9;
-    padding-top: 10px;
-}
+.barra-fondo { background: #eee; height: 8px; border-radius: 10px; overflow: hidden; }
 
-.barra-fondo { 
-    background: #edf2f7; 
-    height: 8px; 
-    border-radius: 10px; 
-    overflow: hidden; 
-    margin-top: 8px;
-}
-
-.barra-progreso { 
-    height: 100%; 
-    border-radius: 10px;
-    transition: width 0.5s ease;
-}
-
-/* Gráficos y Cards de Arriba */
-.card-kpi { border: none; border-radius: 16px; }
-.card-chart { border: none; border-radius: 20px; background: white; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+.barra-progreso { height: 100%; border-radius: 10px; transition: width 0.5s; }
