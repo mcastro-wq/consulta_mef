@@ -8,21 +8,22 @@ async function consultarMEF() {
     try {
         const response = await fetch(url);
         const data = await response.json();
+        
+        // Verificación de seguridad: ¿Es Lambayeque?
         todosLosProyectos = data;
 
-        // Verificar si existe el campo 'anio' en los datos
         const aniosUnicos = [...new Set(todosLosProyectos.map(p => p.anio))].filter(a => a).sort((a,b) => b-a);
-        
         const selectAnio = document.getElementById('select-anio');
+        
         if (aniosUnicos.length > 0) {
             selectAnio.innerHTML = aniosUnicos.map(a => `<option value="${a}">${a}</option>`).join('');
         } else {
-            selectAnio.innerHTML = `<option value="2025">2025 (Sin más datos)</option>`;
+            selectAnio.innerHTML = '<option value="2025">2025</option>';
         }
 
         filtrarTodo();
     } catch (error) {
-        estado.innerHTML = `🚨 Error: El archivo data_mef.json no tiene el formato correcto.`;
+        estado.innerHTML = `🚨 Error de carga.`;
     }
 }
 
@@ -31,7 +32,7 @@ function filtrarTodo() {
     const anioSel = document.getElementById('select-anio').value;
 
     const filtrados = todosLosProyectos.filter(p => {
-        const coincideAnio = p.anio === anioSel;
+        const coincideAnio = String(p.anio) === String(anioSel);
         const nombreLimpio = p.NOMBRE.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
         const coincideTexto = nombreLimpio.includes(busqueda);
         
@@ -52,16 +53,16 @@ function actualizarKPIs(lista) {
     const totalDev = lista.reduce((acc, p) => acc + (p.devengado || 0), 0);
     const avanceGlobal = totalPim > 0 ? ((totalDev / totalPim) * 100).toFixed(1) : 0;
 
-    document.getElementById('total-pim').innerText = `S/ ${totalPim.toLocaleString('es-PE', {minimumFractionDigits: 2})}`;
-    document.getElementById('total-ejecutado').innerText = `S/ ${totalDev.toLocaleString('es-PE', {minimumFractionDigits: 2})}`;
+    document.getElementById('total-pim').innerText = `S/ ${totalPim.toLocaleString('es-PE')}`;
+    document.getElementById('total-ejecutado').innerText = `S/ ${totalDev.toLocaleString('es-PE')}`;
     document.getElementById('avance-global').innerText = `${avanceGlobal}%`;
-    document.getElementById('estado').innerHTML = `✅ Mostrando <b>${lista.length}</b> proyectos del año ${document.getElementById('select-anio').value}`;
+    document.getElementById('estado').innerHTML = `📍 Lambayeque: <b>${lista.length}</b> proyectos mostrados.`;
 }
 
 function renderizar(lista) {
     const contenedor = document.getElementById('contenedor-proyectos');
     if (lista.length === 0) {
-        contenedor.innerHTML = '<div class="col-12 text-center py-5 text-muted">No hay proyectos para este filtro.</div>';
+        contenedor.innerHTML = '<div class="col-12 text-center py-5 text-muted">No hay proyectos.</div>';
         return;
     }
 
@@ -69,16 +70,18 @@ function renderizar(lista) {
         let claseBorde = p.avance > 70 ? "avance-alto" : (p.avance > 30 ? "avance-medio" : "avance-bajo");
         return `
         <div class="col">
-            <div class="card h-100 card-proyecto ${claseBorde} shadow-sm">
+            <div class="card h-100 card-proyecto ${claseBorde} shadow-sm border-0">
                 <div class="card-body p-3">
                     <div class="d-flex justify-content-between mb-2">
-                        <span class="badge ${p.avance > 50 ? 'bg-success' : 'bg-danger'}">${p.avance}% Avance</span>
-                        <span style="font-size: 0.7rem; font-weight: bold; background: #eee; padding: 2px 6px; border-radius: 4px;">AÑO ${p.anio}</span>
+                        <span class="badge ${p.avance > 50 ? 'bg-success' : 'bg-danger'}">${p.avance}%</span>
+                        <span class="badge bg-light text-dark border small">AÑO ${p.anio}</span>
                     </div>
-                    <h6 class="card-title text-uppercase mb-3" style="font-size: 0.75rem; font-weight: bold; height: 3.2em; overflow: hidden;">${p.NOMBRE}</h6>
+                    <h6 class="card-title text-uppercase mb-3" style="font-size: 0.75rem; font-weight: 800; height: 3.2em; overflow: hidden;">${p.NOMBRE}</h6>
                     <div class="small">PIM: <b>S/ ${p.pim.toLocaleString('es-PE')}</b></div>
-                    <div class="small mb-2">Devengado: <b class="text-success">S/ ${p.devengado.toLocaleString('es-PE')}</b></div>
-                    <div class="progress" style="height: 6px;"><div class="progress-bar ${p.avance > 50 ? 'bg-success' : 'bg-warning'}" style="width: ${p.avance}%"></div></div>
+                    <div class="small mb-2 text-success">DEV: <b>S/ ${p.devengado.toLocaleString('es-PE')}</b></div>
+                    <div class="progress" style="height: 6px; background: #eee;">
+                        <div class="progress-bar ${p.avance > 50 ? 'bg-success' : 'bg-warning'}" style="width: ${p.avance}%"></div>
+                    </div>
                 </div>
             </div>
         </div>`;
