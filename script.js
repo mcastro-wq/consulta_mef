@@ -2,6 +2,7 @@ let todosLosProyectos = [];
 let filtroRango = 'todos';
 let chartSectores = null;
 let chartTorta = null;
+let todosLosProyectos = []; // Siempre inicializa así arriba del todo
 
 document.addEventListener('DOMContentLoaded', () => {
     consultarMEF();
@@ -153,6 +154,7 @@ function renderizarCards(lista) {
 }
 
 function setRango(r) { filtroRango = r; filtrarTodo(); }
+
 
 
 
