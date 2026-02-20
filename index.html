@@ -3,51 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitor GORE Lambayeque</title>
+    <title>Monitor Regional Lambayeque | Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --mef-blue: #0d47a1; }
-        body { background-color: #f8f9fa; }
-        .navbar { background-color: var(--mef-blue) !important; border-bottom: 4px solid #ffd600; }
-        .card-kpi { border: none; border-radius: 12px; color: white; }
+        :root { --mef-blue: #0d47a1; --mef-gold: #ffd600; }
+        body { background-color: #f1f3f7; font-family: 'Inter', sans-serif; }
+        .navbar { background-color: var(--mef-blue) !important; border-bottom: 5px solid var(--mef-gold); }
+        .card-kpi { border: none; border-radius: 16px; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .card-chart { border: none; border-radius: 16px; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 20px; }
+        .card-proyecto { border-radius: 12px; transition: 0.3s; border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .card-proyecto:hover { transform: translateY(-5px); box-shadow: 0 12px 24px rgba(0,0,0,0.1) !important; }
         .avance-alto { border-left: 6px solid #198754; }
         .avance-medio { border-left: 6px solid #ffc107; }
         .avance-bajo { border-left: 6px solid #dc3545; }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-dark mb-4 py-2">
+    <nav class="navbar navbar-dark mb-4 py-3">
         <div class="container text-center">
-            <span class="navbar-brand fw-bold">🏛️ MONITOR PRESUPUESTAL: LAMBAYEQUE (CÓD. 14)</span>
+            <span class="navbar-brand fw-bold fs-3">🏛️ MONITOR REGIONAL: LAMBAYEQUE</span>
         </div>
     </nav>
 
     <div class="container">
         <div class="row mb-4">
-            <div class="col-md-4 mb-2"><div class="card card-kpi bg-primary p-3 text-center"><small>PIM TOTAL</small><h3 id="total-pim">S/ 0</h3></div></div>
-            <div class="col-md-4 mb-2"><div class="card card-kpi bg-success p-3 text-center"><small>DEVENGADO TOTAL</small><h3 id="total-ejecutado">S/ 0</h3></div></div>
-            <div class="col-md-4 mb-2"><div class="card card-kpi bg-dark p-3 text-center"><small>AVANCE GLOBAL</small><h3 id="avance-global">0%</h3></div></div>
+            <div class="col-md-4 mb-3">
+                <div class="card card-kpi bg-primary p-4 text-center">
+                    <small class="text-uppercase fw-bold opacity-75">Presupuesto PIM</small>
+                    <h2 id="total-pim" class="fw-bold mb-0">S/ 0.00</h2>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card card-kpi bg-success p-4 text-center">
+                    <small class="text-uppercase fw-bold opacity-75">Total Devengado</small>
+                    <h2 id="total-ejecutado" class="fw-bold mb-0">S/ 0.00</h2>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card card-kpi bg-dark p-4 text-center">
+                    <small class="text-uppercase fw-bold opacity-75">Avance Promedio</small>
+                    <h2 id="avance-global" class="fw-bold mb-0">0%</h2>
+                </div>
+            </div>
         </div>
 
-        <div class="card p-3 mb-4 shadow-sm">
-            <div class="row g-2 align-items-end">
-                <div class="col-md-5"><label class="small fw-bold">🔍 BUSCADOR</label><input type="text" id="buscador" class="form-control" placeholder="Buscar..."></div>
-                <div class="col-md-2"><label class="small fw-bold">📅 AÑO</label><select id="select-anio" class="form-select"></select></div>
-                <div class="col-md-5">
-                    <label class="small fw-bold">📊 ESTADO</label>
+        <div class="row mb-4">
+            <div class="col-lg-7 mb-3">
+                <div class="card-chart h-100">
+                    <h6 class="fw-bold text-muted mb-3 text-uppercase">Inversión PIM por Función / Sector</h6>
+                    <canvas id="chartSectores" height="250"></canvas>
+                </div>
+            </div>
+            <div class="col-lg-5 mb-3">
+                <div class="card-chart h-100 text-center">
+                    <h6 class="fw-bold text-muted mb-3 text-uppercase">Distribución de Proyectos</h6>
+                    <canvas id="chartTorta" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="card p-4 mb-4 shadow-sm border-0 rounded-4">
+            <div class="row g-3 align-items-end">
+                <div class="col-lg-5">
+                    <label class="small fw-bold text-secondary mb-1">🔍 FILTRAR POR PROYECTO</label>
+                    <input type="text" id="buscador" class="form-control form-control-lg border-2" placeholder="Buscar por nombre...">
+                </div>
+                <div class="col-lg-2">
+                    <label class="small fw-bold text-secondary mb-1">📅 AÑO</label>
+                    <select id="select-anio" class="form-select form-select-lg border-2"></select>
+                </div>
+                <div class="col-lg-5 text-end">
+                    <label class="small fw-bold text-secondary d-block mb-1 text-start">📊 ESTADO DE EJECUCIÓN</label>
                     <div class="btn-group w-100">
-                        <button class="btn btn-outline-danger btn-sm" onclick="setRango('bajo')">Bajo</button>
-                        <button class="btn btn-outline-warning btn-sm text-dark" onclick="setRango('medio')">Medio</button>
-                        <button class="btn btn-outline-success btn-sm" onclick="setRango('alto')">Alto</button>
-                        <button class="btn btn-secondary btn-sm" onclick="setRango('todos')">Todos</button>
+                        <button class="btn btn-outline-danger" onclick="setRango('bajo')">Bajo</button>
+                        <button class="btn btn-outline-warning text-dark" onclick="setRango('medio')">Medio</button>
+                        <button class="btn btn-outline-success" onclick="setRango('alto')">Alto</button>
+                        <button class="btn btn-secondary" onclick="setRango('todos')">Todos</button>
                     </div>
                 </div>
             </div>
         </div>
         
-        <div id="estado" class="text-center mb-3 fw-bold text-muted">Cargando...</div>
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3" id="contenedor-proyectos"></div>
+        <div id="estado" class="text-center mb-4 fw-bold text-muted">Cargando análisis...</div>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="contenedor-proyectos"></div>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>
