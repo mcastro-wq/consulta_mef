@@ -4,7 +4,16 @@ body { font-family: 'Inter', sans-serif; background-color: #f1f3f7; padding-bott
 .navbar { background-color: #0d47a1 !important; border-bottom: 5px solid #ffd600; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
 .card-kpi { border: none; border-radius: 12px; color: white; padding: 20px; transition: transform 0.3s; }
 .card-kpi:hover { transform: translateY(-5px); }
-.card-chart { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); height: 400px; }
+.card-chart { 
+    background: white; 
+    border-radius: 15px; 
+    padding: 20px; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
+    /* BLOQUEO DE ALTURA PARA EVITAR CRECIMIENTO INFINITO */
+    height: 400px; 
+    position: relative; 
+    overflow: hidden;
+}
 .proyecto-card { 
     background: white; padding: 20px; border-radius: 15px; 
     box-shadow: 0 4px 6px rgba(0,0,0,0.05); height: 100%;
@@ -17,3 +26,4 @@ h3 { font-size: 0.85rem; font-weight: 700; color: #1a202c; height: 3.6em; overfl
 .metricas-box { border-top: 1px solid #edf2f7; padding-top: 12px; }
 .barra-fondo { background: #eee; height: 8px; border-radius: 10px; overflow: hidden; margin-top: 8px; }
 .barra-progreso { height: 100%; border-radius: 10px; transition: width 0.8s ease-in-out; }
+
