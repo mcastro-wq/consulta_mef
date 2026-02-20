@@ -1,3 +1,4 @@
+// CONFIGURACIÓN INICIAL
 let todosLosProyectos = [];
 let filtroRango = 'todos';
 let chartSectores = null;
@@ -9,44 +10,37 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('select-anio').addEventListener('change', filtrarTodo);
 });
 
+// CARGA DE DATOS
 async function consultarMEF() {
     try {
         const response = await fetch('data_mef.json?v=' + Math.random());
         const dataTotal = await response.json();
         
-        console.log("Datos recibidos:", dataTotal);
-
-        // 1. Actualizar la fecha en el banner
+        // 1. Mostrar Fecha
         if (dataTotal.ultima_actualizacion) {
             const elFecha = document.getElementById('fecha-actualizacion');
             if (elFecha) elFecha.innerText = dataTotal.ultima_actualizacion;
         }
 
-        // 2. Extraer la lista correctamente (Soporta formato viejo y nuevo)
-        todosLosProyectos = dataTotal.proyectos || dataTotal; 
+        // 2. Extraer Proyectos (Blindado para ambos formatos)
+        todosLosProyectos = dataTotal.proyectos || (Array.isArray(dataTotal) ? dataTotal : []);
 
-        if (!Array.isArray(todosLosProyectos)) {
-            console.error("Formato de proyectos no reconocido");
-            return;
-        }
-
-        // 3. Cargar años
+        // 3. Configurar Select de Años
         const anios = [...new Set(todosLosProyectos.map(p => p.anio))].sort((a,b) => b-a);
         const selectAnio = document.getElementById('select-anio');
         if (selectAnio && anios.length > 0) {
             selectAnio.innerHTML = anios.map(a => `<option value="${a}">${a}</option>`).join('');
         }
         
-        // 4. Renderizar todo
-        filtrarTodo(); 
+        filtrarTodo(); // Inicia el renderizado
 
     } catch (e) {
-        console.error("Error crítico en carga:", e);
-        const cont = document.getElementById('contenedor-proyectos');
-        if (cont) cont.innerHTML = `<div class="col-12 text-center">Error al cargar datos.</div>`;
+        console.error("Error cargando JSON:", e);
+        document.getElementById('contenedor-proyectos').innerHTML = "Error al conectar con la base de datos.";
     }
 }
 
+// FILTROS
 function filtrarTodo() {
     const busqueda = document.getElementById('buscador').value.toLowerCase();
     const anioSel = document.getElementById('select-anio').value;
@@ -66,21 +60,19 @@ function filtrarTodo() {
     renderizarCards(filtrados);
 }
 
+// KPIs
 function actualizarKPIs(lista) {
     const tPim = lista.reduce((a, p) => a + (Number(p.pim) || 0), 0);
     const tDev = lista.reduce((a, p) => a + (Number(p.devengado) || 0), 0);
     
-    const elPim = document.getElementById('total-pim');
-    const elEjec = document.getElementById('total-ejecutado');
-    const elAvance = document.getElementById('avance-global');
-
-    if (elPim) elPim.innerText = "S/ " + tPim.toLocaleString('es-PE');
-    if (elEjec) elEjec.innerText = "S/ " + tDev.toLocaleString('es-PE');
+    document.getElementById('total-pim').innerText = "S/ " + tPim.toLocaleString('es-PE');
+    document.getElementById('total-ejecutado').innerText = "S/ " + tDev.toLocaleString('es-PE');
     
     const avanceGlobal = tPim > 0 ? ((tDev / tPim) * 100).toFixed(1) : 0;
-    if (elAvance) elAvance.innerText = avanceGlobal + "%";
+    document.getElementById('avance-global').innerText = avanceGlobal + "%";
 }
 
+// GRÁFICOS
 function actualizarGraficos(lista) {
     const sectoresMap = {};
     lista.forEach(p => { 
@@ -91,59 +83,48 @@ function actualizarGraficos(lista) {
     const sorted = Object.entries(sectoresMap).sort((a, b) => b[1] - a[1]).slice(0, 8);
 
     if (chartSectores) chartSectores.destroy();
-    const ctxSectores = document.getElementById('chartSectores');
-    if (ctxSectores) {
-        chartSectores = new Chart(ctxSectores, {
-            type: 'bar',
-            data: {
-                labels: sorted.map(s => s[0]),
-                // Usamos el color granate solicitado: #801616
-                datasets: [{ label: 'PIM', data: sorted.map(s => s[1]), backgroundColor: '#801616', borderRadius: 5 }]
-            },
-            options: { 
-                responsive: true, 
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: { x: { ticks: { autoSkip: false, maxRotation: 45, minRotation: 45, font: { size: 9 } } } }
-            }
-        });
-    }
+    chartSectores = new Chart(document.getElementById('chartSectores'), {
+        type: 'bar',
+        data: {
+            labels: sorted.map(s => s[0]),
+            datasets: [{ label: 'PIM', data: sorted.map(s => s[1]), backgroundColor: '#801616', borderRadius: 5 }]
+        },
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { x: { ticks: { autoSkip: false, maxRotation: 45, minRotation: 45, font: { size: 9 } } } }
+        }
+    });
 
     const counts = [
         lista.filter(p => p.avance <= 30).length, 
         lista.filter(p => p.avance > 30 && p.avance <= 70).length, 
         lista.filter(p => p.avance > 70).length
     ];
-    
     if (chartTorta) chartTorta.destroy();
-    const ctxTorta = document.getElementById('chartTorta');
-    if (ctxTorta) {
-        chartTorta = new Chart(ctxTorta, {
-            type: 'doughnut',
-            data: { labels: ['Crítico', 'Medio', 'Óptimo'], datasets: [{ data: counts, backgroundColor: ['#dc3545', '#ffc107', '#198754'] }] },
-            options: { responsive: true, maintainAspectRatio: false }
-        });
-    }
+    chartTorta = new Chart(document.getElementById('chartTorta'), {
+        type: 'doughnut',
+        data: { labels: ['Crítico', 'Medio', 'Óptimo'], datasets: [{ data: counts, backgroundColor: ['#dc3545', '#ffc107', '#198754'] }] },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
 }
 
+// CARDS
 function renderizarCards(lista) {
     const contenedor = document.getElementById('contenedor-proyectos');
     if (!contenedor) return;
     
-    const elEstado = document.getElementById('estado');
-    if (elEstado) elEstado.innerHTML = `📍 Lambayeque: <b>${lista.length}</b> proyectos encontrados.`;
+    document.getElementById('estado').innerHTML = `📍 Lambayeque: <b>${lista.length}</b> proyectos encontrados.`;
 
     let html = '';
     lista.forEach(p => {
         const avanceNum = Number(p.avance) || 0;
         const color = avanceNum > 70 ? "#198754" : (avanceNum > 30 ? "#ffc107" : "#dc3545");
         
-        let valSector = p.sector || p.SECTOR || p.Sector || "";
-        let sectorLimpio = String(valSector).replace(/[´`']/g, '').trim();
-        const sectorTexto = (sectorLimpio !== "") ? sectorLimpio.toUpperCase() : "OTROS";
-
-        const pimStr = (Number(p.pim) || 0).toLocaleString('es-PE');
-        const devStr = (Number(p.devengado) || 0).toLocaleString('es-PE');
+        let valSector = p.sector || "OTROS";
+        let sectorTexto = String(valSector).replace(/[´`']/g, '').trim().toUpperCase();
+        if (sectorTexto === "") sectorTexto = "OTROS";
 
         html += `
         <div class="col">
@@ -155,11 +136,11 @@ function renderizarCards(lista) {
                 <div class="metricas-box">
                     <div class="d-flex justify-content-between mb-1">
                         <span class="text-muted small">PIM:</span>
-                        <span class="fw-bold">S/ ${pimStr}</span>
+                        <span class="fw-bold">S/ ${(Number(p.pim) || 0).toLocaleString('es-PE')}</span>
                     </div>
                     <div class="d-flex justify-content-between mb-1">
                         <span class="text-muted small">DEVENGADO:</span>
-                        <span class="text-primary fw-bold">S/ ${devStr}</span>
+                        <span class="text-primary fw-bold">S/ ${(Number(p.devengado) || 0).toLocaleString('es-PE')}</span>
                     </div>
                     <div class="d-flex justify-content-between mt-2">
                         <span class="text-muted small">Avance:</span>
