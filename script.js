@@ -1,78 +1,88 @@
-// Variable global para guardar los datos y no volver a pedirlos al MEF al buscar
-window.datosMEF = [];
+// 1. Variable global para mantener los datos en memoria
+let todosLosProyectos = [];
 
 async function consultarMEF() {
     const estado = document.getElementById('estado');
+    // Forzamos descarga fresca
     const url = `data_mef.json?v=${new Date().getTime()}`;
 
     try {
-        estado.innerHTML = "⏳ Sincronizando con los datos del MEF...";
+        estado.innerHTML = "⏳ Cargando base de datos de Lambayeque...";
         const response = await fetch(url);
-        if (!response.ok) throw new Error("Archivo de datos no encontrado.");
+        if (!response.ok) throw new Error("No se pudo cargar el archivo data_mef.json");
         
-        const records = await response.json();
-        window.datosMEF = records; // Guardamos la data real aquí
+        const data = await response.json();
+        
+        // 2. Guardamos en la variable global para que el buscador pueda verlos
+        todosLosProyectos = data;
 
-        estado.innerHTML = `✅ <b>${records.length}</b> proyectos de Lambayeque listos.`;
-        renderizar(records);
+        estado.innerHTML = `✅ <b>${todosLosProyectos.length}</b> proyectos detectados.`;
+        renderizar(todosLosProyectos);
 
     } catch (error) {
+        console.error(error);
         estado.innerHTML = `🚨 Error: ${error.message}`;
     }
 }
 
-// ESTA ES LA FUNCIÓN DEL BUSCADOR QUE FALTABA O FALLABA
+// 3. Función de filtrado (ahora más robusta)
 function filtrarProyectos() {
-    const busqueda = document.getElementById('inputBusqueda').value.toLowerCase();
-    
-    const filtrados = window.datosMEF.filter(p => 
-        p.NOMBRE.toLowerCase().includes(busqueda) || 
-        p.DEPARTAMENTO.toLowerCase().includes(busqueda)
-    );
+    const texto = document.getElementById('buscador').value.toLowerCase().trim();
+    const estado = document.getElementById('estado');
+
+    const filtrados = todosLosProyectos.filter(p => {
+        const nombre = (p.NOMBRE || "").toLowerCase();
+        return nombre.includes(texto);
+    });
 
     renderizar(filtrados);
-    
-    // Actualizamos el contador de resultados
-    document.getElementById('estado').innerHTML = `🔍 Encontrados: <b>${filtrados.length}</b> proyectos.`;
+    estado.innerHTML = `🔍 Mostrando <b>${filtrados.length}</b> de ${todosLosProyectos.length} proyectos.`;
 }
 
 function renderizar(lista) {
     const contenedor = document.getElementById('contenedor-proyectos');
     
     if (lista.length === 0) {
-        contenedor.innerHTML = '<div class="col-12 text-center text-muted">No se encontraron proyectos con ese nombre.</div>';
+        contenedor.innerHTML = '<div class="col-12 text-center py-5 text-muted">No se encontraron coincidencias.</div>';
         return;
     }
 
-    contenedor.innerHTML = lista.map(p => `
-        <div class="col-md-6 col-lg-4 mb-3">
-            <div class="card h-100 shadow-sm border-start border-4 ${p.avance > 40 ? 'border-success' : 'border-danger'}">
+    contenedor.innerHTML = lista.map(p => {
+        // Determinamos la clase de color según el avance
+        let claseAvance = "avance-bajo";
+        if (p.avance > 30 && p.avance <= 70) claseAvance = "avance-medio";
+        if (p.avance > 70) claseAvance = "avance-alto";
+
+        return `
+        <div class="col">
+            <div class="card h-100 shadow-sm card-proyecto ${claseAvance}">
                 <div class="card-body p-3">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <span class="badge ${p.avance > 70 ? 'bg-success' : (p.avance > 30 ? 'bg-warning text-dark' : 'bg-danger')}">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="badge ${p.avance > 50 ? 'bg-success' : 'bg-danger'}">
                             ${p.avance}% avance
                         </span>
-                        <small class="text-primary fw-bold">ID: 14</small>
                     </div>
-                    <h6 class="card-title text-uppercase" style="font-size: 0.8rem; min-height: 3.5em; overflow: hidden;">
+                    <h6 class="card-title text-uppercase mb-3" style="font-size: 0.75rem; height: 3.2em; overflow: hidden; font-weight: bold;">
                         ${p.NOMBRE}
                     </h6>
-                    <hr class="my-2">
-                    <div class="d-flex justify-content-between small">
-                        <span class="text-muted">PIM:</span>
-                        <span class="fw-bold">S/ ${p.pim.toLocaleString('es-PE')}</span>
-                    </div>
-                    <div class="d-flex justify-content-between small mb-2">
-                        <span class="text-muted">Ejecutado:</span>
-                        <span class="fw-bold text-success">S/ ${p.devengado.toLocaleString('es-PE')}</span>
-                    </div>
+                    <div class="small mb-1">PIM: <b>S/ ${p.pim.toLocaleString('es-PE')}</b></div>
+                    <div class="small mb-2">Devengado: <b class="text-success">S/ ${p.devengado.toLocaleString('es-PE')}</b></div>
                     <div class="progress" style="height: 6px;">
-                        <div class="progress-bar ${p.avance > 40 ? 'bg-success' : 'bg-danger'}" style="width: ${p.avance}%"></div>
+                        <div class="progress-bar ${p.avance > 50 ? 'bg-success' : 'bg-warning'}" style="width: ${p.avance}%"></div>
                     </div>
                 </div>
             </div>
         </div>
-    `).join('');
+    `}).join('');
 }
 
-document.addEventListener('DOMContentLoaded', consultarMEF);
+// 4. IMPORTANTE: Conectar el buscador apenas cargue la página
+document.addEventListener('DOMContentLoaded', () => {
+    consultarMEF();
+    
+    // Escuchamos el teclado en el input de búsqueda
+    const inputBuscador = document.getElementById('buscador');
+    if(inputBuscador) {
+        inputBuscador.addEventListener('input', filtrarProyectos);
+    }
+});
