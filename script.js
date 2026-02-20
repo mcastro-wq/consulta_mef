@@ -4,23 +4,24 @@ let chartSectores = null, chartTorta = null;
 
 async function consultarMEF() {
     try {
-        // Usamos una ruta relativa limpia
         const response = await fetch('data_mef.json');
-        if (!response.ok) throw new Error("No se pudo cargar el JSON");
+        if (!response.ok) throw new Error("Archivo data_mef.json no encontrado");
         
         todosLosProyectos = await response.json();
         
-        // Cargar años dinámicamente
         const anios = [...new Set(todosLosProyectos.map(p => p.anio))].sort((a,b) => b-a);
         const selectAnio = document.getElementById('select-anio');
+        
         if (anios.length > 0) {
             selectAnio.innerHTML = anios.map(a => `<option value="${a}">${a}</option>`).join('');
+            // Forzamos el primer año disponible
+            selectAnio.value = anios[0];
         }
 
         filtrarTodo();
     } catch (e) {
-        console.error("Error:", e);
-        document.getElementById('estado').innerText = "🚨 Error al cargar datos: " + e.message;
+        console.error(e);
+        document.body.innerHTML += `<div class="alert alert-danger m-5">Error: Ejecuta primero el script.py para generar los datos.</div>`;
     }
 }
 
@@ -50,7 +51,6 @@ function actualizarKPIs(lista) {
     document.getElementById('total-pim').innerText = `S/ ${tPim.toLocaleString('es-PE')}`;
     document.getElementById('total-ejecutado').innerText = `S/ ${tDev.toLocaleString('es-PE')}`;
     document.getElementById('avance-global').innerText = `${tPim > 0 ? ((tDev/tPim)*100).toFixed(1) : 0}%`;
-    document.getElementById('estado').innerText = `Lambayeque: ${lista.length} proyectos encontrados.`;
 }
 
 function actualizarGraficos(lista) {
@@ -62,72 +62,58 @@ function actualizarGraficos(lista) {
     
     const sorted = Object.entries(sectores).sort((a,b) => b[1]-a[1]).slice(0,6);
 
-    // Gráfico de Barras
     if (chartSectores) chartSectores.destroy();
-    const ctxBar = document.getElementById('chartSectores').getContext('2d');
-    chartSectores = new Chart(ctxBar, {
+    chartSectores = new Chart(document.getElementById('chartSectores'), {
         type: 'bar',
         data: {
             labels: sorted.map(s => s[0]),
-            datasets: [{ 
-                label: 'PIM',
-                data: sorted.map(s => s[1]), 
-                backgroundColor: '#0d47a1', 
-                borderRadius: 5 
-            }]
+            datasets: [{ label: 'PIM', data: sorted.map(s => s[1]), backgroundColor: '#0d47a1', borderRadius: 5 }]
         },
         options: { 
-            responsive: true,
-            maintainAspectRatio: false,
+            responsive: true, maintainAspectRatio: false,
             plugins: { legend: { display: false } },
             scales: { x: { ticks: { autoSkip: false, maxRotation: 45, minRotation: 45, font: { size: 9 } } } }
         }
     });
 
-    // Gráfico de Torta
-    const counts = [
-        lista.filter(p=>p.avance<=30).length, 
-        lista.filter(p=>p.avance>30&&p.avance<=70).length, 
-        lista.filter(p=>p.avance>70).length
-    ];
+    const counts = [lista.filter(p=>p.avance<=30).length, lista.filter(p=>p.avance>30&&p.avance<=70).length, lista.filter(p=>p.avance>70).length];
     if (chartTorta) chartTorta.destroy();
     chartTorta = new Chart(document.getElementById('chartTorta'), {
         type: 'doughnut',
-        data: { 
-            labels: ['Crítico', 'Medio', 'Óptimo'], 
-            datasets: [{ data: counts, backgroundColor: ['#dc3545', '#ffc107', '#198754'] }] 
-        },
+        data: { labels: ['Crítico', 'Medio', 'Óptimo'], datasets: [{ data: counts, backgroundColor: ['#dc3545', '#ffc107', '#198754'] }] },
         options: { responsive: true, maintainAspectRatio: false }
     });
 }
 
 function renderizar(lista) {
     const contenedor = document.getElementById('contenedor-proyectos');
+    if (lista.length === 0) {
+        contenedor.innerHTML = '<div class="col-12 text-center p-5 text-muted">No se encontraron proyectos con esos filtros.</div>';
+        return;
+    }
     contenedor.innerHTML = lista.map(p => {
         const color = p.avance > 70 ? "#198754" : (p.avance > 30 ? "#ffc107" : "#dc3545");
         return `
         <div class="col">
             <div class="proyecto-card">
                 <div>
-                    <span class="regiao">${p.sector || 'SIN SECTOR'}</span>
+                    <span class="regiao">${p.sector}</span>
                     <h3>${p.NOMBRE}</h3>
                 </div>
                 <div class="metricas-box">
                     <div class="d-flex justify-content-between mb-1">
                         <span class="text-muted">PIM:</span>
-                        <span class="fw-bold">S/ ${(p.pim || 0).toLocaleString('es-PE')}</span>
+                        <span class="fw-bold">S/ ${p.pim.toLocaleString('es-PE')}</span>
                     </div>
                     <div class="d-flex justify-content-between mb-1">
-                        <span class="text-muted">DEVENGADO:</span>
-                        <span class="text-primary fw-bold">S/ ${(p.devengado || 0).toLocaleString('es-PE')}</span>
+                        <span class="text-muted small">DEVENGADO:</span>
+                        <span class="text-primary fw-bold">S/ ${p.devengado.toLocaleString('es-PE')}</span>
                     </div>
                     <div class="d-flex justify-content-between mt-2">
                         <span class="text-muted small">Avance:</span>
                         <span style="color:${color}; font-weight:800;">${p.avance}%</span>
                     </div>
-                    <div class="barra-fondo">
-                        <div class="barra-progreso" style="width:${p.avance}%; background:${color}"></div>
-                    </div>
+                    <div class="barra-fondo"><div class="barra-progreso" style="width:${p.avance}%; background:${color}"></div></div>
                 </div>
             </div>
         </div>`;
@@ -135,8 +121,6 @@ function renderizar(lista) {
 }
 
 function setRango(r) { filtroRango = r; filtrarTodo(); }
-
-// Eventos
 document.addEventListener('DOMContentLoaded', consultarMEF);
 document.getElementById('buscador').addEventListener('input', filtrarTodo);
 document.getElementById('select-anio').addEventListener('change', filtrarTodo);
