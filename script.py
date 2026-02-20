@@ -32,11 +32,14 @@ def update_data():
                         continue
             
             # --- ESTRUCTURA CON FECHA Y HORA ---
-            # Guardamos todo en un diccionario para que JS lo lea fácilmente
+            # Restamos 5 horas al UTC de GitHub para tener la hora de Perú
+            hora_peru = datetime.now() - timedelta(hours=5)
+            
             output = {
-                "ultima_actualizacion": datetime.now().strftime("%d/%m/%Y %H:%M"),
+                "ultima_actualizacion": hora_peru.strftime("%d/%m/%Y %H:%M"),
                 "proyectos": processed
             }
+            # Guardamos todo en un diccionario para que JS lo lea fácilmente
             
             with open('data_mef.json', 'w', encoding='utf-8') as f:
                 json.dump(output, f, indent=2, ensure_ascii=False)
