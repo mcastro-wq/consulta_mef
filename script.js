@@ -12,27 +12,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function consultarMEF() {
     try {
+        // El random evita que la caché te muestre el formato antiguo
         const response = await fetch('data_mef.json?v=' + Math.random());
         const dataTotal = await response.json();
         
-        // 1. Pintar la fecha en el banner (si el id existe en tu HTML)
+        console.log("Datos recibidos:", dataTotal); // Para que revises en la consola (F12)
+
+        // 1. Actualizar la fecha en el banner
         if (dataTotal.ultima_actualizacion) {
             const elFecha = document.getElementById('fecha-actualizacion');
             if (elFecha) elFecha.innerText = dataTotal.ultima_actualizacion;
         }
 
-        // 2. Extraer la lista de proyectos para los cálculos
-        todosLosProyectos = dataTotal.proyectos; 
-        
-        // Continuar con el resto del script...
+        // 2. IMPORTANTE: Extraer la lista correctamente
+        // Si dataTotal es el objeto nuevo, usamos .proyectos. Si fuera el viejo, usamos dataTotal.
+        todosLosProyectos = dataTotal.proyectos || dataTotal; 
+
+        if (!Array.isArray(todosLosProyectos)) {
+            console.error("Formato de proyectos no reconocido");
+            return;
+        }
+
+        // 3. Cargar años y mostrar datos
         const anios = [...new Set(todosLosProyectos.map(p => p.anio))].sort((a,b) => b-a);
         const selectAnio = document.getElementById('select-anio');
         if (selectAnio && anios.length > 0) {
             selectAnio.innerHTML = anios.map(a => `<option value="${a}">${a}</option>`).join('');
         }
-        filtrarTodo();
+        
+        filtrarTodo(); // Esta función se encarga de quitar el mensaje "Cargando..."
+
     } catch (e) {
-        console.error("Error:", e);
+        console.error("Error crítico en carga:", e);
+        document.getElementById('contenedor-proyectos').innerHTML = "Error al procesar los datos.";
     }
 }
 
@@ -154,6 +166,7 @@ function renderizarCards(lista) {
 }
 
 function setRango(r) { filtroRango = r; filtrarTodo(); }
+
 
 
 
