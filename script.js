@@ -44,28 +44,94 @@ function actualizarKPIs(lista) {
 
 function actualizarGraficos(lista) {
     const sectores = {};
+    
     lista.forEach(p => { 
-        const s = (p.sector && p.sector !== "undefined") ? p.sector : "OTROS";
-        sectores[s] = (sectores[s] || 0) + (p.pim || 0); 
+        // 1. Limpiamos espacios y manejamos vacíos o undefined
+        let s = "OTROS";
+        if (p.sector && typeof p.sector === 'string' && p.sector.trim() !== "") {
+            s = p.sector.trim().toUpperCase();
+        }
+
+        // 2. Sumamos el PIM (asegurándonos que sea número)
+        const montoPim = parseFloat(p.pim) || 0;
+        sectores[s] = (sectores[s] || 0) + montoPim; 
     });
-    const sorted = Object.entries(sectores).sort((a,b) => b[1]-a[1]).slice(0,6);
+    
+    // 3. Convertimos a array, filtramos los que tienen PIM 0 (opcional) y ordenamos
+    const sorted = Object.entries(sectores)
+        .filter(s => s[1] > 0) // Solo sectores con presupuesto
+        .sort((a, b) => b[1] - a[1]) // De mayor a menor
+        .slice(0, 8); // Los 8 principales para que no se amontone el gráfico
 
     if (chartSectores) chartSectores.destroy();
-    chartSectores = new Chart(document.getElementById('chartSectores'), {
+    
+    const ctxBar = document.getElementById('chartSectores').getContext('2d');
+    chartSectores = new Chart(ctxBar, {
         type: 'bar',
         data: {
             labels: sorted.map(s => s[0]),
-            datasets: [{ label: 'PIM', data: sorted.map(s => s[1]), backgroundColor: '#0d47a1' }]
+            datasets: [{ 
+                label: 'PIM (S/)',
+                data: sorted.map(s => s[1]), 
+                backgroundColor: '#0d47a1', 
+                borderRadius: 5 
+            }]
         },
-        options: { responsive: true, maintainAspectRatio: false } // ESTO EVITA QUE CREZCA SOLO
+        options: { 
+            responsive: true,
+            maintainAspectRatio: false, // CLAVE: Evita que el gráfico crezca solo
+            plugins: { 
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: (context) => `PIM: S/ ${context.raw.toLocaleString('es-PE')}`
+                    }
+                }
+            },
+            scales: { 
+                x: { 
+                    ticks: { 
+                        autoSkip: false, 
+                        maxRotation: 45, 
+                        minRotation: 45, 
+                        font: { size: 9, weight: 'bold' } 
+                    } 
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: (value) => 'S/ ' + value.toLocaleString('es-PE', { notation: 'compact' })
+                    }
+                }
+            }
+        }
     });
 
-    const counts = [lista.filter(p=>p.avance<=30).length, lista.filter(p=>p.avance>30&&p.avance<=70).length, lista.filter(p=>p.avance>70).length];
+    // Gráfico de Torta (Estado de proyectos)
+    const counts = [
+        lista.filter(p => p.avance <= 30).length, 
+        lista.filter(p => p.avance > 30 && p.avance <= 70).length, 
+        lista.filter(p => p.avance > 70).length
+    ];
+
     if (chartTorta) chartTorta.destroy();
     chartTorta = new Chart(document.getElementById('chartTorta'), {
         type: 'doughnut',
-        data: { labels: ['Crítico', 'Medio', 'Óptimo'], datasets: [{ data: counts, backgroundColor: ['#dc3545', '#ffc107', '#198754'] }] },
-        options: { responsive: true, maintainAspectRatio: false }
+        data: { 
+            labels: ['Bajo (0-30%)', 'Medio (31-70%)', 'Alto (>70%)'], 
+            datasets: [{ 
+                data: counts, 
+                backgroundColor: ['#dc3545', '#ffc107', '#198754'],
+                borderWidth: 0
+            }] 
+        },
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
+            }
+        }
     });
 }
 
@@ -96,4 +162,5 @@ function setRango(r) { filtroRango = r; filtrarTodo(); }
 document.addEventListener('DOMContentLoaded', consultarMEF);
 document.getElementById('buscador').addEventListener('input', filtrarTodo);
 document.getElementById('select-anio').addEventListener('change', filtrarTodo);
+
 
