@@ -5,23 +5,16 @@ let chartSectores = null, chartTorta = null;
 async function consultarMEF() {
     try {
         const response = await fetch('data_mef.json');
-        if (!response.ok) throw new Error("Archivo data_mef.json no encontrado");
-        
         todosLosProyectos = await response.json();
         
         const anios = [...new Set(todosLosProyectos.map(p => p.anio))].sort((a,b) => b-a);
         const selectAnio = document.getElementById('select-anio');
-        
         if (anios.length > 0) {
             selectAnio.innerHTML = anios.map(a => `<option value="${a}">${a}</option>`).join('');
-            // Forzamos el primer año disponible
-            selectAnio.value = anios[0];
         }
-
         filtrarTodo();
     } catch (e) {
-        console.error(e);
-        document.body.innerHTML += `<div class="alert alert-danger m-5">Error: Ejecuta primero el script.py para generar los datos.</div>`;
+        console.error("Error cargando datos", e);
     }
 }
 
@@ -47,10 +40,10 @@ function filtrarTodo() {
 function actualizarKPIs(lista) {
     const tPim = lista.reduce((a, p) => a + (p.pim || 0), 0);
     const tDev = lista.reduce((a, p) => a + (p.devengado || 0), 0);
-    
     document.getElementById('total-pim').innerText = `S/ ${tPim.toLocaleString('es-PE')}`;
     document.getElementById('total-ejecutado').innerText = `S/ ${tDev.toLocaleString('es-PE')}`;
     document.getElementById('avance-global').innerText = `${tPim > 0 ? ((tDev/tPim)*100).toFixed(1) : 0}%`;
+    document.getElementById('estado').innerText = `Lambayeque: ${lista.length} proyectos encontrados.`;
 }
 
 function actualizarGraficos(lista) {
@@ -59,7 +52,6 @@ function actualizarGraficos(lista) {
         const s = (p.sector && p.sector.trim()) ? p.sector : "OTROS";
         sectores[s] = (sectores[s] || 0) + (p.pim || 0); 
     });
-    
     const sorted = Object.entries(sectores).sort((a,b) => b[1]-a[1]).slice(0,6);
 
     if (chartSectores) chartSectores.destroy();
@@ -67,10 +59,11 @@ function actualizarGraficos(lista) {
         type: 'bar',
         data: {
             labels: sorted.map(s => s[0]),
-            datasets: [{ label: 'PIM', data: sorted.map(s => s[1]), backgroundColor: '#0d47a1', borderRadius: 5 }]
+            datasets: [{ data: sorted.map(s => s[1]), backgroundColor: '#0d47a1', borderRadius: 5 }]
         },
         options: { 
-            responsive: true, maintainAspectRatio: false,
+            responsive: true, 
+            maintainAspectRatio: false, // BLOQUEA CRECIMIENTO
             plugins: { legend: { display: false } },
             scales: { x: { ticks: { autoSkip: false, maxRotation: 45, minRotation: 45, font: { size: 9 } } } }
         }
@@ -87,17 +80,13 @@ function actualizarGraficos(lista) {
 
 function renderizar(lista) {
     const contenedor = document.getElementById('contenedor-proyectos');
-    if (lista.length === 0) {
-        contenedor.innerHTML = '<div class="col-12 text-center p-5 text-muted">No se encontraron proyectos con esos filtros.</div>';
-        return;
-    }
     contenedor.innerHTML = lista.map(p => {
         const color = p.avance > 70 ? "#198754" : (p.avance > 30 ? "#ffc107" : "#dc3545");
         return `
         <div class="col">
             <div class="proyecto-card">
                 <div>
-                    <span class="regiao">${p.sector}</span>
+                    <span class="regiao">${p.sector || 'SIN SECTOR'}</span>
                     <h3>${p.NOMBRE}</h3>
                 </div>
                 <div class="metricas-box">
