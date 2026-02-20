@@ -57,77 +57,64 @@ function actualizarKPIs(lista) {
     document.getElementById('total-pim').innerText = `S/ ${totalPim.toLocaleString('es-PE')}`;
     document.getElementById('total-ejecutado').innerText = `S/ ${totalDev.toLocaleString('es-PE')}`;
     document.getElementById('avance-global').innerText = `${avanceGlobal}%`;
-    document.getElementById('estado').innerHTML = `📍 Lambayeque: <b>${lista.length}</b> proyectos filtrados.`;
+    document.getElementById('estado').innerHTML = `📍 Lambayeque: <b>${lista.length}</b> proyectos en este filtro.`;
 }
 
 function actualizarGraficos(lista) {
-    // 1. Agrupar PIM por Sector (para gráfico de barras)
-    const sectoresMap = {};
+    // 1. Datos por Sector
+    const sectores = {};
     lista.forEach(p => {
         const s = p.sector || 'OTROS';
-        sectoresMap[s] = (sectoresMap[s] || 0) + p.pim;
+        sectores[s] = (sectores[s] || 0) + p.pim;
     });
 
-    const labels = Object.keys(sectoresMap).slice(0, 8); // Top 8 sectores
-    const dataPim = labels.map(l => sectoresMap[l]);
+    const sortSectores = Object.entries(sectores).sort((a,b) => b[1] - a[1]).slice(0, 7);
+    const labelsSector = sortSectores.map(s => s[0]);
+    const dataSector = sortSectores.map(s => s[1]);
 
-    // 2. Contar proyectos por rango (para gráfico de torta)
+    // 2. Datos por Avance (Torta)
     const bajos = lista.filter(p => p.avance <= 30).length;
     const medios = lista.filter(p => p.avance > 30 && p.avance <= 70).length;
     const altos = lista.filter(p => p.avance > 70).length;
 
-    // --- Gráfico de Barras ---
+    // Dibujar Barra
     if (chartSectores) chartSectores.destroy();
-    const ctxBar = document.getElementById('chartSectores').getContext('2d');
-    chartSectores = new Chart(ctxBar, {
+    chartSectores = new Chart(document.getElementById('chartSectores'), {
         type: 'bar',
         data: {
-            labels: labels,
-            datasets: [{
-                label: 'Presupuesto PIM (Soles)',
-                data: dataPim,
-                backgroundColor: '#0d47a1'
-            }]
+            labels: labelsSector,
+            datasets: [{ label: 'PIM por Sector', data: dataSector, backgroundColor: '#0d47a1' }]
         },
         options: { responsive: true, plugins: { legend: { display: false } } }
     });
 
-    // --- Gráfico de Torta ---
+    // Dibujar Torta
     if (chartTorta) chartTorta.destroy();
-    const ctxPie = document.getElementById('chartTorta').getContext('2d');
-    chartTorta = new Chart(ctxPie, {
+    chartTorta = new Chart(document.getElementById('chartTorta'), {
         type: 'doughnut',
         data: {
-            labels: ['Bajo (0-30%)', 'Medio (30-70%)', 'Alto (>70%)'],
-            datasets: [{
-                data: [bajos, medios, altos],
-                backgroundColor: ['#dc3545', '#ffc107', '#198754']
-            }]
+            labels: ['Crítico', 'Medio', 'Óptimo'],
+            datasets: [{ data: [bajos, medios, altos], backgroundColor: ['#dc3545', '#ffc107', '#198754'] }]
         },
-        options: { responsive: true, cutout: '60%' }
+        options: { responsive: true, cutout: '70%' }
     });
 }
 
 function renderizar(lista) {
     const contenedor = document.getElementById('contenedor-proyectos');
-    if (lista.length === 0) {
-        contenedor.innerHTML = '<div class="col-12 text-center py-5 text-muted">Sin resultados.</div>';
-        return;
-    }
-
     contenedor.innerHTML = lista.map(p => {
-        let claseBorde = p.avance > 70 ? "avance-alto" : (p.avance > 30 ? "avance-medio" : "avance-bajo");
+        let clase = p.avance > 70 ? "avance-alto" : (p.avance > 30 ? "avance-medio" : "avance-bajo");
         return `
         <div class="col">
-            <div class="card h-100 card-proyecto ${claseBorde} shadow-sm">
+            <div class="card h-100 card-proyecto ${clase}">
                 <div class="card-body p-3">
                     <div class="d-flex justify-content-between mb-2">
                         <span class="badge ${p.avance > 50 ? 'bg-success' : 'bg-danger'}">${p.avance}%</span>
-                        <small class="fw-bold text-muted">${p.anio}</small>
+                        <small class="text-muted fw-bold">AÑO ${p.anio}</small>
                     </div>
                     <h6 class="card-title text-uppercase fw-bold mb-3" style="font-size: 0.7rem; height: 3.2em; overflow: hidden;">${p.NOMBRE}</h6>
                     <div class="small">PIM: <b>S/ ${p.pim.toLocaleString('es-PE')}</b></div>
-                    <div class="progress mt-2" style="height: 5px;"><div class="progress-bar ${p.avance > 50 ? 'bg-success' : 'bg-warning'}" style="width: ${p.avance}%"></div></div>
+                    <div class="progress mt-2" style="height: 5px;"><div class="progress-bar" style="width: ${p.avance}%"></div></div>
                 </div>
             </div>
         </div>`;
