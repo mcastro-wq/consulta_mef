@@ -1,4 +1,5 @@
 import urllib.request, csv, json, io
+from datetime import datetime
 
 def update_data():
     url = "https://fs.datosabiertos.mef.gob.pe/datastorefiles/2025-Seguimiento-PI.csv"
@@ -10,6 +11,7 @@ def update_data():
             content = response.read().decode('utf-8-sig')
             reader = csv.DictReader(io.StringIO(content))
             reader.fieldnames = [f.strip() for f in reader.fieldnames]
+            
             processed = []
             for r in reader:
                 # Filtro Lambayeque (14)
@@ -17,6 +19,7 @@ def update_data():
                     try:
                         pim = float(r.get('MONTO_PIM', 0) or 0)
                         dev = float(r.get('MONTO_DEVENGADO_ANO_EJE', 0) or 0)
+                        
                         processed.append({
                             "NOMBRE": r.get('PRODUCTO_PROYECTO_NOMBRE', 'SIN NOMBRE'),
                             "anio": r.get('ANO_EJE', '2025'),
@@ -28,9 +31,18 @@ def update_data():
                     except:
                         continue
             
+            # --- ESTRUCTURA CON FECHA Y HORA ---
+            # Guardamos todo en un diccionario para que JS lo lea fácilmente
+            output = {
+                "ultima_actualizacion": datetime.now().strftime("%d/%m/%Y %H:%M"),
+                "proyectos": processed
+            }
+            
             with open('data_mef.json', 'w', encoding='utf-8') as f:
-                json.dump(processed, f, indent=2, ensure_ascii=False)
+                json.dump(output, f, indent=2, ensure_ascii=False)
+                
             print(f"✅ ¡Éxito! {len(processed)} proyectos procesados.")
+            print(f"⏰ Actualización registrada: {output['ultima_actualizacion']}")
             
     except Exception as e:
         print(f"🚨 Error crítico: {e}")
