@@ -13,15 +13,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      
       - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
+
       - name: Ejecutar recolección
         run: python script.py
+
       - name: Guardar cambios
         run: |
           git config --global user.name 'GitHub Action'
           git config --global user.email 'action@github.com'
           git add data_mef.json
-          git commit -m "📊 Datos Reales MEF Actualizados: $(date)" || echo "Sin cambios"
-          git push
+          # El commit incluye la fecha para que el historial sea claro
+          git commit -m "📊 Datos Reales MEF Actualizados: $(date)" || echo "Sin cambios para commitear"
+          git push origin main
