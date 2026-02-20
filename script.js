@@ -6,7 +6,6 @@ async function consultarMEF() {
     try {
         const response = await fetch('data_mef.json');
         todosLosProyectos = await response.json();
-        
         const anios = [...new Set(todosLosProyectos.map(p => p.anio))].sort((a,b) => b-a);
         const selectAnio = document.getElementById('select-anio');
         if (anios.length > 0) {
@@ -15,6 +14,7 @@ async function consultarMEF() {
         filtrarTodo();
     } catch (e) {
         console.error("Error cargando datos", e);
+        document.getElementById('estado').innerText = "Error al cargar data_mef.json";
     }
 }
 
@@ -34,7 +34,7 @@ function filtrarTodo() {
 
     actualizarKPIs(filtrados);
     actualizarGraficos(filtrados);
-    renderizar(filtrados); // ESTA ERA LA LÍNEA QUE FALTABA
+    renderizar(filtrados); // Llamada vital
 }
 
 function actualizarKPIs(lista) {
@@ -53,10 +53,7 @@ function actualizarGraficos(lista) {
         sectoresMap[s] = (sectoresMap[s] || 0) + (p.pim || 0); 
     });
     
-    const sorted = Object.entries(sectoresMap)
-        .filter(s => s[1] > 0)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 8);
+    const sorted = Object.entries(sectoresMap).sort((a, b) => b[1] - a[1]).slice(0, 8);
 
     if (chartSectores) chartSectores.destroy();
     chartSectores = new Chart(document.getElementById('chartSectores'), {
@@ -65,12 +62,7 @@ function actualizarGraficos(lista) {
             labels: sorted.map(s => s[0]),
             datasets: [{ label: 'PIM', data: sorted.map(s => s[1]), backgroundColor: '#0d47a1', borderRadius: 5 }]
         },
-        options: { 
-            responsive: true, 
-            maintainAspectRatio: false, 
-            plugins: { legend: { display: false } },
-            scales: { x: { ticks: { autoSkip: false, maxRotation: 45, minRotation: 45, font: { size: 9 } } } }
-        }
+        options: { responsive: true, maintainAspectRatio: false }
     });
 
     const counts = [
@@ -81,10 +73,7 @@ function actualizarGraficos(lista) {
     if (chartTorta) chartTorta.destroy();
     chartTorta = new Chart(document.getElementById('chartTorta'), {
         type: 'doughnut',
-        data: { 
-            labels: ['Bajo', 'Medio', 'Alto'], 
-            datasets: [{ data: counts, backgroundColor: ['#dc3545', '#ffc107', '#198754'] }] 
-        },
+        data: { labels: ['Bajo', 'Medio', 'Alto'], datasets: [{ data: counts, backgroundColor: ['#dc3545', '#ffc107', '#198754'] }] },
         options: { responsive: true, maintainAspectRatio: false }
     });
 }
@@ -93,11 +82,13 @@ function renderizar(lista) {
     const contenedor = document.getElementById('contenedor-proyectos');
     if (!contenedor) return;
     
-    document.getElementById('estado').innerHTML = `📍 Lambayeque: <b>${lista.length}</b> proyectos en este filtro.`;
+    document.getElementById('estado').innerHTML = `📍 Lambayeque: <b>${lista.length}</b> proyectos encontrados.`;
     
-    contenedor.innerHTML = lista.map(p => {
+    // Limpiar y reconstruir
+    let html = '';
+    lista.forEach(p => {
         const color = p.avance > 70 ? "#198754" : (p.avance > 30 ? "#ffc107" : "#dc3545");
-        return `
+        html += `
         <div class="col">
             <div class="proyecto-card">
                 <div>
@@ -107,17 +98,24 @@ function renderizar(lista) {
                 <div class="metricas-box">
                     <div class="d-flex justify-content-between mb-1">
                         <span class="text-muted small">PIM:</span>
-                        <span class="fw-bold">S/ ${p.pim.toLocaleString('es-PE')}</span>
+                        <span class="fw-bold">S/ ${(p.pim || 0).toLocaleString('es-PE')}</span>
                     </div>
                     <div class="d-flex justify-content-between mb-1">
-                        <span class="text-muted small">AVANCE:</span>
+                        <span class="text-muted small">DEVENGADO:</span>
+                        <span class="text-primary fw-bold">S/ ${(p.devengado || 0).toLocaleString('es-PE')}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mt-2">
+                        <span class="text-muted small">Avance:</span>
                         <span style="color:${color}; font-weight:800;">${p.avance}%</span>
                     </div>
-                    <div class="barra-fondo"><div class="barra-progreso" style="width:${p.avance}%; background:${color}"></div></div>
+                    <div class="barra-fondo">
+                        <div class="barra-progreso" style="width:${p.avance}%; background:${color}"></div>
+                    </div>
                 </div>
             </div>
         </div>`;
-    }).join('');
+    });
+    contenedor.innerHTML = html;
 }
 
 function setRango(r) { filtroRango = r; filtrarTodo(); }
