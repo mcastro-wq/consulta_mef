@@ -15,6 +15,11 @@ async function consultarMEF() {
         estadoMsg.innerText = "⏳ Cargando datos...";
         const response = await fetch('data_mef.json');
         todosLosProyectos = await response.json();
+
+        // --- CÓDIGO NUEVO PARA LA HORA ---
+        const ahora = new Date();
+        const opciones = { hour: '2-digit', minute: '2-digit' };
+        const horaCarga = ahora.toLocaleTimeString('es-PE', opciones);
         
         const anios = [...new Set(todosLosProyectos.map(p => p.anio))].sort((a,b) => b-a);
         const selectAnio = document.getElementById('select-anio');
@@ -139,4 +144,5 @@ function renderizarCards(lista) {
 }
 
 function setRango(r) { filtroRango = r; filtrarTodo(); }
+
 
