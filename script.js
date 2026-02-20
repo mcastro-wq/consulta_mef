@@ -1,47 +1,37 @@
-const resource_id = "749cb9b6-604f-485b-bb06-4b906b44034f";
-
 async function consultarMEF() {
     const estado = document.getElementById('estado');
     const contenedor = document.getElementById('contenedor-proyectos');
     
-    // Cambiamos a datastore_search (más estable) con un filtro de texto para Lambayeque
-    const apiUrl = `https://api.datosabiertos.mef.gob.pe/DatosAbiertos/v1/datastore_search?resource_id=${resource_id}&q=LAMBAYEQUE&limit=50`;
-    
-    // Usamos el Proxy de Cloudflare (muy potente)
-    const finalUrl = `https://corsproxy.io/?${encodeURIComponent(apiUrl)}`;
+    // IMPORTANTE: Ahora leemos el archivo que genera tu GitHub Action
+    // No usamos proxies porque el archivo está en tu propio servidor/repo
+    const localUrl = 'data_mef.json'; 
 
     try {
-        estado.innerHTML = "⏳ Intentando conexión de alta prioridad...";
+        estado.innerHTML = "⏳ Cargando datos actualizados...";
         
-        const response = await fetch(finalUrl);
+        // Fetch simple al archivo local
+        const response = await fetch(localUrl);
         
-        if (!response.ok) throw new Error(`Error del servidor: ${response.status}`);
+        if (!response.ok) throw new Error(`No se encontró el archivo de datos.`);
         
-        const data = await response.json();
-        
-        // Estructura para datastore_search
-        const records = data.result?.records || [];
+        const records = await response.json();
 
         if (records.length === 0) {
-            estado.innerHTML = "⚠️ Conexión establecida, pero no hay datos para LAMBAYEQUE.";
+            estado.innerHTML = "⚠️ El archivo de datos está vacío.";
             return;
         }
 
-        estado.innerHTML = `✅ ¡Conectado! Mostrando proyectos de la región.`;
-        
-        window.datosMEF = records.map(r => ({
-            depto: r.DEPARTAMENTO_META_NOMBRE || "REGIONAL",
-            nombre: r.PRODUCTO_PROYECTO_NOMBRE || "PROYECTO SIN NOMBRE",
-            pim: parseFloat(r.MONTO_PIM) || 0,
-            dev: parseFloat(r.MONTO_DEVENGADO_ANO_EJE) || 0,
-            avance: parseFloat(r.MONTO_PIM) > 0 ? ((parseFloat(r.MONTO_DEVENGADO_ANO_EJE) / parseFloat(r.MONTO_PIM)) * 100).toFixed(1) : 0
-        }));
+        // Ya no mapeamos 'result.records' porque tu script.py ya guardó la lista limpia
+        // Tu script.py usa minúsculas: 'pim', 'devengado', 'avance', 'NOMBRE'
+        window.datosMEF = records;
 
+        estado.innerHTML = `✅ Datos sincronizados con el MEF (GitHub Actions).`;
+        
         renderizar(window.datosMEF);
 
     } catch (error) {
-        console.error("Detalle del error:", error);
-        estado.innerHTML = `🚨 Error de Red: ${error.message}. El MEF ha bloqueado el acceso temporalmente.`;
+        console.error("Error local:", error);
+        estado.innerHTML = `🚨 Error: No se pudo cargar el JSON automatizado. Asegúrate de que el Workflow de GitHub haya terminado.`;
     }
 }
 
@@ -49,16 +39,18 @@ function renderizar(lista) {
     const contenedor = document.getElementById('contenedor-proyectos');
     if (!lista.length) return;
     
+    // Adaptado a las claves que genera tu script.py: NOMBRE, DEPARTAMENTO, pim, devengado, avance
     contenedor.innerHTML = lista.map(p => `
         <div class="col-md-6 mb-3">
             <div class="card h-100 shadow-sm border-start border-4 ${p.avance > 40 ? 'border-success' : 'border-danger'}">
                 <div class="card-body p-3">
                     <div class="d-flex justify-content-between">
-                        <small class="fw-bold text-primary">${p.depto}</small>
+                        <small class="fw-bold text-primary">${p.DEPARTAMENTO}</small>
                         <span class="badge ${p.avance > 40 ? 'bg-success' : 'bg-danger'}">${p.avance}%</span>
                     </div>
-                    <h6 class="card-title mt-2 mb-3" style="font-size: 0.85rem; line-height: 1.2;">${p.nombre}</h6>
+                    <h6 class="card-title mt-2 mb-3" style="font-size: 0.85rem; line-height: 1.2;">${p.NOMBRE}</h6>
                     <div class="small text-muted mb-1">PIM: S/ ${p.pim.toLocaleString()}</div>
+                    <div class="small text-muted mb-1">Ejecutado: S/ ${p.devengado.toLocaleString()}</div>
                     <div class="progress" style="height: 6px;">
                         <div class="progress-bar ${p.avance > 40 ? 'bg-success' : 'bg-warning'}" style="width: ${p.avance}%"></div>
                     </div>
