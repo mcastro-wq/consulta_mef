@@ -14,7 +14,7 @@ def generate_ranking():
             ranking_data = {}
 
             for r in reader:
-                # FILTRO ESTRICTO: Solo nivel Regional o la Municipalidad de Lima
+                # FILTRO ESTRICTO: Solo nivel Regional o la Municipalidad de Lima claro
                 nivel = str(r.get('NIVEL_GOBIERNO_NOMBRE', '')).upper()
                 pliego_raw = str(r.get('PLIEGO_NOMBRE', '')).upper()
                 
