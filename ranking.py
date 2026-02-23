@@ -9,18 +9,17 @@ def generate_ranking():
         with urllib.request.urlopen(req, timeout=300) as response:
             content = response.read().decode('utf-8-sig')
             reader = csv.DictReader(io.StringIO(content))
-            
-            # Limpiamos nombres de columnas
             reader.fieldnames = [f.strip() for f in reader.fieldnames]
             
             ranking_data = {}
 
             for r in reader:
-                # Solo procesamos Nivel de Gobierno Regional (R)
-                if r.get('NIVEL_GOBIERNO') == 'R':
-                    pliego_raw = str(r.get('PLIEGO_NOMBRE', '')).upper()
-                    
-                    # Normalización del nombre
+                # FILTRO ESTRICTO: Solo nivel Regional o la Municipalidad de Lima
+                nivel = str(r.get('NIVEL_GOBIERNO_NOMBRE', '')).upper()
+                pliego_raw = str(r.get('PLIEGO_NOMBRE', '')).upper()
+                
+                if "REGIONALES" in nivel or "MUNICIPALIDAD METROPOLITANA DE LIMA" in pliego_raw:
+                    # Limpiar nombre para el ranking
                     nombre = pliego_raw.replace("GOBIERNO REGIONAL DEL DEPARTAMENTO DE ", "") \
                                        .replace("GOBIERNO REGIONAL DE ", "") \
                                        .replace("GOBIERNO REGIONAL DEL ", "") \
@@ -43,18 +42,16 @@ def generate_ranking():
             final_list = []
             for nombre, montos in ranking_data.items():
                 if montos["pim"] > 0:
-                    avance = (montos["devengado"] / montos["pim"] * 100) if montos["pim"] > 0 else 0
-                    saldo = montos["pim"] - montos["devengado"]
-                    
+                    avance = (montos["devengado"] / montos["pim"] * 100)
                     final_list.append({
                         "pliego": nombre,
                         "pim": montos["pim"],
                         "devengado": montos["devengado"],
-                        "saldo": saldo,
+                        "saldo": montos["pim"] - montos["devengado"],
                         "avance": round(avance, 1)
                     })
 
-            # Ordenar por avance de mayor a menor
+            # Ordenar inicialmente por avance
             final_list.sort(key=lambda x: x["avance"], reverse=True)
 
             hora_peru = datetime.now() - timedelta(hours=5)
@@ -65,8 +62,7 @@ def generate_ranking():
 
             with open('data_ranking.json', 'w', encoding='utf-8') as f:
                 json.dump(output, f, indent=2, ensure_ascii=False)
-            
-            print(f"✅ Ranking generado: {len(final_list)} regiones.")
+            print(f"✅ Ranking Regional generado con {len(final_list)} entidades.")
 
     except Exception as e:
         print(f"🚨 Error: {e}")
