@@ -11,37 +11,41 @@ def generate_ranking():
             content = response.read().decode('utf-8-sig')
             reader = csv.DictReader(io.StringIO(content))
             
-            # Diccionario para acumular montos por departamento
             ranking_data = {}
 
             for r in reader:
-                # Solo procesamos si es un Gobierno Regional (para el ranking de la imagen)
+                # Filtrar solo Gobiernos Regionales
                 if "GOBIERNO REGIONAL" in str(r.get('PLIEGO_NOMBRE', '')).upper():
                     pliego = r.get('PLIEGO_NOMBRE', 'OTROS').strip()
                     try:
                         pim = float(r.get('MONTO_PIM', 0) or 0)
+                        cert = float(r.get('MONTO_CERTIFICADO', 0) or 0)
                         dev = float(r.get('MONTO_DEVENGADO_ANO_EJE', 0) or 0)
                         
                         if pliego not in ranking_data:
-                            ranking_data[pliego] = {"pim": 0, "devengado": 0}
+                            ranking_data[pliego] = {"pim": 0, "certificado": 0, "devengado": 0}
                         
                         ranking_data[pliego]["pim"] += pim
+                        ranking_data[pliego]["certificado"] += cert
                         ranking_data[pliego]["devengado"] += dev
                     except:
                         continue
 
-            # Convertir a lista y calcular porcentajes
+            # Procesar lista final y calcular Saldo (Por Devengar)
             final_list = []
             for pliego, montos in ranking_data.items():
                 avance = (montos["devengado"] / montos["pim"] * 100) if montos["pim"] > 0 else 0
+                saldo = montos["pim"] - montos["devengado"]
                 final_list.append({
                     "pliego": pliego.replace("GOBIERNO REGIONAL ", ""),
                     "pim": montos["pim"],
+                    "certificado": montos["certificado"],
                     "devengado": montos["devengado"],
+                    "saldo": saldo,
                     "avance": round(avance, 1)
                 })
 
-            # Ordenar por avance (de mayor a menor) para el ranking
+            # Ordenar por avance de mayor a menor
             final_list.sort(key=lambda x: x["avance"], reverse=True)
 
             hora_peru = datetime.now() - timedelta(hours=5)
