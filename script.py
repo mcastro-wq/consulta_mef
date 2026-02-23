@@ -15,7 +15,7 @@ def update_data():
             
             processed = []
             for r in reader:
-                # Filtro Lambayeque (14)
+                # Filtro Lambayeque (14) filtro
                 if str(r.get('DEPARTAMENTO_EJECUTORA', '')).strip() == '14':
                     try:
                         pim = float(r.get('MONTO_PIM', 0) or 0)
