@@ -18,8 +18,12 @@ jobs:
         with:
           python-version: '3.10'
 
+      # ... dentro de los pasos de tu workflow
       - name: Ejecutar recolección
-        run: python script.py
+        run: |
+          python script.py
+          python ranking.py # Ejecuta el nuevo script del ranking
+      # ... dentro de los pasos de tu workflow
 
       - name: Guardar cambios
         run: |
@@ -29,3 +33,5 @@ jobs:
           # El commit incluye la fecha para que el historial sea claro
           git commit -m "📊 Datos Reales MEF Actualizados: $(date)" || echo "Sin cambios para commitear"
           git push origin main
+
+      
