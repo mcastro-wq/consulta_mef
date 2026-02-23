@@ -11,16 +11,25 @@ def generate_ranking():
             content = response.read().decode('utf-8-sig')
             reader = csv.DictReader(io.StringIO(content))
             
+            # Limpiar nombres de columnas por si traen espacios
+            reader.fieldnames = [f.strip() for f in reader.fieldnames]
+            
             ranking_data = {}
 
             for r in reader:
-                # Filtrar solo Gobiernos Regionales
-                if "GOBIERNO REGIONAL" in str(r.get('PLIEGO_NOMBRE', '')).upper():
-                    pliego = r.get('PLIEGO_NOMBRE', 'OTROS').strip()
+                # Filtrar solo Gobiernos Regionales (Pliegos 441 al 463 aprox)
+                pliego_nom = str(r.get('PLIEGO_NOMBRE', '')).upper()
+                if "GOBIERNO REGIONAL" in pliego_nom:
+                    pliego = pliego_nom.strip()
                     try:
+                        # Extraer montos probando diferentes nombres de columna comunes en el MEF
                         pim = float(r.get('MONTO_PIM', 0) or 0)
-                        cert = float(r.get('MONTO_CERTIFICADO', 0) or 0)
-                        dev = float(r.get('MONTO_DEVENGADO_ANO_EJE', 0) or 0)
+                        
+                        # El certificado a veces viene como MONTO_CERTIFICADO o MONTO_CERTIFICADO_ANO_EJE
+                        cert = float(r.get('MONTO_CERTIFICADO_ANO_EJE', r.get('MONTO_CERTIFICADO', 0)) or 0)
+                        
+                        # El devengado igual
+                        dev = float(r.get('MONTO_DEVENGADO_ANO_EJE', r.get('MONTO_DEVENGADO', 0)) or 0)
                         
                         if pliego not in ranking_data:
                             ranking_data[pliego] = {"pim": 0, "certificado": 0, "devengado": 0}
@@ -31,13 +40,14 @@ def generate_ranking():
                     except:
                         continue
 
-            # Procesar lista final y calcular Saldo (Por Devengar)
             final_list = []
             for pliego, montos in ranking_data.items():
                 avance = (montos["devengado"] / montos["pim"] * 100) if montos["pim"] > 0 else 0
+                # Saldo es PIM menos lo que ya se devengó
                 saldo = montos["pim"] - montos["devengado"]
+                
                 final_list.append({
-                    "pliego": pliego.replace("GOBIERNO REGIONAL ", ""),
+                    "pliego": pliego.replace("GOBIERNO REGIONAL DEL DEPARTAMENTO DE ", "").replace("GOBIERNO REGIONAL DE ", "").replace("GOBIERNO REGIONAL DEL ", ""),
                     "pim": montos["pim"],
                     "certificado": montos["certificado"],
                     "devengado": montos["devengado"],
