@@ -3,21 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ranking Nacional - MEF</title>
+    <title>Ranking Regional - MEF</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body { background-color: #f4f6f9; font-family: 'Segoe UI', sans-serif; }
-        .header-mef { background-color: #801616; color: white; padding: 25px 0; border-bottom: 5px solid #ffc107; }
-        .table-container { background: white; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-top: 20px; padding: 25px; }
-        .table thead { background-color: #801616; color: white; text-align: center; vertical-align: middle; }
-        .table-sm td { font-size: 0.85rem; padding: 12px 8px; }
-        .progress { height: 22px; border-radius: 11px; background-color: #eee; position: relative; border: 1px solid #ccc; overflow: hidden; }
+        .header-mef { background-color: #801616; color: white; padding: 20px 0; border-bottom: 5px solid #ffc107; }
+        .table-container { background: white; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-top: 20px; padding: 20px; }
+        .table thead { background-color: #801616; color: white; cursor: pointer; }
+        .table thead th:hover { background-color: #a01d1d; }
+        .progress { height: 22px; border-radius: 11px; background-color: #eee; position: relative; border: 1px solid #ccc; }
         .progress-bar-text { position: absolute; width: 100%; text-align: center; font-size: 0.75rem; font-weight: 800; color: #000; z-index: 5; line-height: 20px; }
-        .bar-fill { height: 100%; z-index: 1; transition: width 0.6s ease; }
-        .highlight-lambayeque { background-color: #fff4f4 !important; border: 2px solid #801616 !important; transform: scale(1.01); }
-        .monto { font-family: 'Roboto Mono', monospace; font-weight: 600; white-space: nowrap; }
-        .btn-back { background: #ffc107; color: #000; font-weight: bold; border-radius: 20px; text-decoration: none; padding: 8px 20px; transition: 0.3s; }
-        .btn-back:hover { background: #e5ac00; transform: translateX(-5px); }
+        .bar-fill { height: 100%; z-index: 1; transition: width 0.5s; }
+        .highlight-lambayeque { background-color: #fff4f4 !important; border: 2px solid #801616 !important; font-weight: bold; }
+        .monto { font-family: 'monospace'; font-weight: 600; }
+        .th-sort::after { content: ' ↕'; opacity: 0.5; font-size: 0.8em; }
     </style>
 </head>
 <body>
@@ -25,78 +24,88 @@
 <div class="header-mef">
     <div class="container d-flex justify-content-between align-items-center">
         <div>
-            <h2 class="fw-bold mb-0">RANKING NACIONAL DE EJECUCIÓN</h2>
+            <h2 class="fw-bold mb-0">RANKING REGIONAL DE EJECUCIÓN 2025</h2>
             <p class="mb-0 opacity-75">Sincronizado: <span id="fecha-actualizacion">...</span></p>
         </div>
-        <a href="index.html" class="btn-back">← Volver al Monitor</a>
+        <a href="index.html" class="btn btn-warning fw-bold rounded-pill">← Volver al Monitor</a>
     </div>
 </div>
 
 <div class="container mb-5">
     <div class="table-container">
         <div class="table-responsive">
-            <table class="table table-hover align-middle">
+            <table class="table table-hover align-middle" id="tablaMaster">
                 <thead>
                     <tr>
-                        <th style="width: 50px;">N°</th>
-                        <th>REGIÓN (PLIEGO)</th>
-                        <th>PIM (S/)</th>
-                        <th>DEVENGADO (S/)</th>
-                        <th style="width: 250px;">AVANCE (%)</th>
-                        <th>SALDO POR DEVENGAR (S/)</th>
+                        <th onclick="sortTable(0)">N°</th>
+                        <th onclick="sortTable(1)" class="th-sort">PLIEGO</th>
+                        <th onclick="sortTable(2)" class="th-sort text-center">PIM (S/)</th>
+                        <th onclick="sortTable(3)" class="th-sort text-center">DEVENGADO (S/)</th>
+                        <th onclick="sortTable(4)" class="th-sort text-center">AVANCE (%)</th>
+                        <th onclick="sortTable(5)" class="th-sort text-center">SALDO (S/)</th>
                     </tr>
                 </thead>
-                <tbody id="tabla-ranking">
-                    </tbody>
+                <tbody id="tabla-ranking"></tbody>
             </table>
         </div>
     </div>
 </div>
 
 <script>
+    let rawData = [];
+    let sortOrder = [true, true, true, true, true, true];
+
     async function cargarRanking() {
-        try {
-            const res = await fetch('data_ranking.json?v=' + Math.random());
-            const data = await res.json();
-            document.getElementById('fecha-actualizacion').innerText = data.ultima_actualizacion;
-
-            const tbody = document.getElementById('tabla-ranking');
-            tbody.innerHTML = '';
-
-            data.ranking.forEach((reg, index) => {
-                const esLambayeque = reg.pliego.toUpperCase().includes("LAMBAYEQUE");
-                
-                let colorBarra = "#dc3545"; 
-                let semaforo = "🔴";
-                if (reg.avance > 30) { colorBarra = "#ffc107"; semaforo = "🟡"; }
-                if (reg.avance > 70) { colorBarra = "#198754"; semaforo = "🟢"; }
-
-                const row = `
-                    <tr class="${esLambayeque ? 'highlight-lambayeque' : ''}">
-                        <td class="text-center fw-bold">${index + 1}</td>
-                        <td class="fw-bold text-uppercase">${reg.pliego}</td>
-                        <td class="text-end monto">${reg.pim.toLocaleString('es-PE', {minimumFractionDigits: 2})}</td>
-                        <td class="text-end monto text-primary">${reg.devengado.toLocaleString('es-PE', {minimumFractionDigits: 2})}</td>
-                        <td>
-                            <div class="d-flex align-items-center gap-2">
-                                <span style="font-size: 1.2rem;">${semaforo}</span>
-                                <div class="progress flex-grow-1">
-                                    <div class="progress-bar-text">${reg.avance}%</div>
-                                    <div class="bar-fill" style="width: ${reg.avance}%; background-color: ${colorBarra}; opacity: 0.8;"></div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="text-end monto text-danger">${reg.saldo.toLocaleString('es-PE', {minimumFractionDigits: 2})}</td>
-                    </tr>
-                `;
-                tbody.innerHTML += row;
-            });
-        } catch (e) {
-            console.error("Error cargando ranking:", e);
-        }
+        const res = await fetch('data_ranking.json?v=' + Math.random());
+        const data = await res.json();
+        document.getElementById('fecha-actualizacion').innerText = data.ultima_actualizacion;
+        rawData = data.ranking;
+        renderTable(rawData);
     }
+
+    function renderTable(data) {
+        const tbody = document.getElementById('tabla-ranking');
+        tbody.innerHTML = '';
+        data.forEach((reg, index) => {
+            const esLambayeque = reg.pliego.includes("LAMBAYEQUE");
+            let color = reg.avance > 70 ? "#198754" : (reg.avance > 30 ? "#ffc107" : "#dc3545");
+            let semaforo = reg.avance > 70 ? "🟢" : (reg.avance > 30 ? "🟡" : "🔴");
+
+            tbody.innerHTML += `
+                <tr class="${esLambayeque ? 'highlight-lambayeque' : ''}">
+                    <td class="text-center">${index + 1}</td>
+                    <td class="text-uppercase">${reg.pliego}</td>
+                    <td class="text-end monto">${reg.pim.toLocaleString('es-PE')}</td>
+                    <td class="text-end monto text-primary">${reg.devengado.toLocaleString('es-PE')}</td>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <span>${semaforo}</span>
+                            <div class="progress flex-grow-1">
+                                <div class="progress-bar-text">${reg.avance}%</div>
+                                <div class="bar-fill" style="width: ${reg.avance}%; background-color: ${color};"></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="text-end monto text-danger">${reg.saldo.toLocaleString('es-PE')}</td>
+                </tr>`;
+        });
+    }
+
+    function sortTable(colIndex) {
+        const keys = ['index', 'pliego', 'pim', 'devengado', 'avance', 'saldo'];
+        const key = keys[colIndex];
+        
+        sortOrder[colIndex] = !sortOrder[colIndex];
+        rawData.sort((a, b) => {
+            let valA = a[key];
+            let valB = b[key];
+            if (colIndex === 0) return sortOrder[colIndex] ? 1 : -1; // Simplificado para N°
+            return sortOrder[colIndex] ? (valA > valB ? 1 : -1) : (valA < valB ? 1 : -1);
+        });
+        renderTable(rawData);
+    }
+
     document.addEventListener('DOMContentLoaded', cargarRanking);
 </script>
-
 </body>
 </html>
