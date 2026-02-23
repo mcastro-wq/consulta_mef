@@ -3,184 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ranking Nacional de Ejecución - MEF</title>
+    <title>Ranking Nacional - MEF</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f4f7f6;
-            color: #333;
-        }
-        .navbar-mef {
-            background-color: #801616; /* Tu color granate */
-            color: white;
-            padding: 1rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .card-ranking {
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            background: white;
-            margin-top: -20px;
-        }
-        .table thead {
-            background-color: #f8f9fa;
-        }
-        .table thead th {
-            border-bottom: 2px solid #dee2e6;
-            color: #666;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .rank-number {
-            font-weight: 800;
-            color: #801616;
-            width: 40px;
-        }
-        .region-name {
-            font-weight: 600;
-            color: #2c3e50;
-        }
-        .progress {
-            height: 12px;
-            border-radius: 6px;
-            background-color: #e9ecef;
-        }
-        .progress-bar {
-            border-radius: 6px;
-        }
-        .badge-update {
-            font-size: 0.75rem;
-            background-color: rgba(255,255,255,0.2);
-            padding: 5px 12px;
-            border-radius: 20px;
-        }
-        .btn-back {
-            color: white;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            transition: 0.3s;
-        }
-        .btn-back:hover {
-            opacity: 0.8;
-            color: #ffc107;
-        }
-        .monto-text {
-            font-family: 'monospace';
-            font-weight: 600;
-        }
+        body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .header-mef { background-color: #801616; color: white; padding: 15px 0; margin-bottom: 20px; }
+        .table-ranking { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .table thead { background-color: #801616; color: white; }
+        .table-sm td, .table-sm th { padding: 8px; font-size: 0.85rem; }
+        .progress { height: 18px; background-color: #e9ecef; border-radius: 10px; position: relative; }
+        .progress-text { position: absolute; width: 100%; text-align: center; font-size: 0.7rem; font-weight: bold; color: #000; line-height: 18px; }
+        .highlight-lambayeque { background-color: #fff3f3 !important; font-weight: bold; border: 2px solid #801616 !important; }
+        .btn-mef { background-color: white; color: #801616; border: none; font-weight: bold; padding: 5px 15px; border-radius: 20px; text-decoration: none; }
+        .btn-mef:hover { background-color: #f0f0f0; }
     </style>
 </head>
 <body>
 
-    <nav class="navbar-mef">
-        <div class="container d-flex justify-content-between align-items-center">
-            <div>
-                <a href="index.html" class="btn-back">
-                    ← Volver a Lambayeque
-                </a>
-                <h4 class="mb-0 mt-2 fw-800">Ranking Nacional de Ejecución 2025</h4>
-            </div>
-            <div class="text-end">
-                <span class="badge-update">
-                    Sincronización: <span id="fecha-actualizacion">Cargando...</span>
-                </span>
-            </div>
+<div class="header-mef">
+    <div class="container d-flex justify-content-between align-items-center">
+        <div>
+            <h4 class="mb-0">Ranking de Ejecución Presupuestal 2025</h4>
+            <small>Actualizado: <span id="fecha-actualizacion">...</span></small>
         </div>
-    </nav>
+        <a href="index.html" class="btn-mef">← Detalle Lambayeque</a>
+    </div>
+</div>
 
-    <div class="container py-4">
-        <div class="row">
-            <div class="col-12">
-                <div class="card card-ranking p-4">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h5 class="fw-bold mb-0">Ranking de Gobiernos Regionales</h5>
-                        <input type="text" id="filtroRegion" class="form-control w-25" placeholder="Buscar región...">
-                    </div>
-
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle">
-                            <thead>
-                                <tr>
-                                    <th class="text-center">#</th>
-                                    <th>Gobierno Regional</th>
-                                    <th>PIM (S/)</th>
-                                    <th>Devengado (S/)</th>
-                                    <th style="width: 30%;">Avance %</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabla-ranking">
-                                </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+<div class="container">
+    <div class="table-ranking p-3">
+        <div class="table-responsive">
+            <table class="table table-sm table-bordered table-hover align-middle">
+                <thead>
+                    <tr class="text-center">
+                        <th>N°</th>
+                        <th>PLIEGO (REGIÓN)</th>
+                        <th>PIM</th>
+                        <th>CERTIFICADO</th>
+                        <th>DEVENGADO</th>
+                        <th style="width: 200px;">AVANCE %</th>
+                        <th>POR DEVENGAR (SALDO)</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-ranking">
+                    </tbody>
+            </table>
         </div>
     </div>
+</div>
 
-    <script>
-        async function cargarRanking() {
-            try {
-                const response = await fetch('data_ranking.json?v=' + Math.random());
-                const dataTotal = await response.json();
+<script>
+    async function cargarRanking() {
+        try {
+            const res = await fetch('data_ranking.json?v=' + Math.random());
+            const data = await res.json();
+            document.getElementById('fecha-actualizacion').innerText = data.ultima_actualizacion;
 
-                // Actualizar fecha
-                document.getElementById('fecha-actualizacion').innerText = dataTotal.ultima_actualizacion;
+            const tbody = document.getElementById('tabla-ranking');
+            tbody.innerHTML = '';
 
-                const ranking = dataTotal.ranking;
-                const tbody = document.getElementById('tabla-ranking');
-                
-                function renderTable(lista) {
-                    tbody.innerHTML = '';
-                    lista.forEach((reg, index) => {
-                        // Determinar color de barra según avance
-                        let colorBarra = '#dc3545'; // Crítico
-                        if (reg.avance > 30) colorBarra = '#ffc107'; // Medio
-                        if (reg.avance > 70) colorBarra = '#198754'; // Óptimo
+            data.ranking.forEach((reg, index) => {
+                const esLambayeque = reg.pliego.includes("LAMBAYEQUE");
+                let colorBarra = "#dc3545"; // Rojo
+                let semaforo = "🔴";
 
-                        const row = `
-                            <tr>
-                                <td class="text-center rank-number">${index + 1}</td>
-                                <td class="region-name">${reg.pliego}</td>
-                                <td class="monto-text">S/ ${reg.pim.toLocaleString('es-PE')}</td>
-                                <td class="monto-text text-primary">S/ ${reg.devengado.toLocaleString('es-PE')}</td>
-                                <td>
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="progress flex-grow-1">
-                                            <div class="progress-bar" role="progressbar" 
-                                                 style="width: ${reg.avance}%; background-color: ${colorBarra};">
-                                            </div>
-                                        </div>
-                                        <span class="fw-bold" style="min-width: 45px; color: ${colorBarra}">${reg.avance}%</span>
-                                    </div>
-                                </td>
-                            </tr>
-                        `;
-                        tbody.innerHTML += row;
-                    });
-                }
+                if (reg.avance > 30) { colorBarra = "#ffc107"; semaforo = "🟡"; }
+                if (reg.avance > 70) { colorBarra = "#198754"; semaforo = "🟢"; }
 
-                renderTable(ranking);
-
-                // Buscador interactivo
-                document.getElementById('filtroRegion').addEventListener('input', (e) => {
-                    const busqueda = e.target.value.toLowerCase();
-                    const filtrados = ranking.filter(r => r.pliego.toLowerCase().includes(busqueda));
-                    renderTable(filtrados);
-                });
-
-            } catch (error) {
-                console.error("Error cargando ranking:", error);
-                document.getElementById('tabla-ranking').innerHTML = '<tr><td colspan="5" class="text-center text-danger">Error al cargar los datos del ranking.</td></tr>';
-            }
+                const row = `
+                    <tr class="${esLambayeque ? 'highlight-lambayeque' : ''}">
+                        <td class="text-center fw-bold">${index + 1}</td>
+                        <td>${reg.pliego}</td>
+                        <td class="text-end">S/ ${reg.pim.toLocaleString('es-PE')}</td>
+                        <td class="text-end">S/ ${reg.certificado.toLocaleString('es-PE')}</td>
+                        <td class="text-end fw-bold text-primary">S/ ${reg.devengado.toLocaleString('es-PE')}</td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <span>${semaforo}</span>
+                                <div class="progress flex-grow-1">
+                                    <div class="progress-bar" style="width: ${reg.avance}%; background-color: ${colorBarra};"></div>
+                                    <span class="progress-text">${reg.avance}%</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-end text-danger fw-bold">S/ ${reg.saldo.toLocaleString('es-PE')}</td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        } catch (e) {
+            console.error(e);
         }
+    }
+    document.addEventListener('DOMContentLoaded', cargarRanking);
+</script>
 
-        document.addEventListener('DOMContentLoaded', cargarRanking);
-    </script>
 </body>
 </html>
