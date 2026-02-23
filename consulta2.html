@@ -102,10 +102,11 @@
         tbody.innerHTML = '';
         data.forEach((reg, index) => {
             const esLambayeque = reg.pliego.toUpperCase().includes("LAMBAYEQUE");
-            
-            // CÁLCULO DE PRECISIÓN CON UN DECIMAL
-            const avanceReal = (reg.devengado / reg.pim * 100);
-            const avanceVisible = avanceReal.toFixed(1);
+
+
+            // Usamos Math.floor con una multiplicación por 10 para "cortar" el decimal sin redondear
+const avanceReal = (reg.devengado / reg.pim * 100);
+const avanceVisible = (Math.floor(avanceReal * 10) / 10).toFixed(1);
 
             // LOGICA DE COLORES POR GRADIENTE DINÁMICO
             let color;
