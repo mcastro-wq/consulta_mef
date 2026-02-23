@@ -75,6 +75,7 @@ function actualizarKPIs(lista) {
 }
 
 // 5. ACTUALIZAR GRÁFICOS (Color Granate #801616)
+// 5. ACTUALIZAR GRÁFICOS (Corregido para evitar desbordamientos)
 function actualizarGraficos(lista) {
     const sectoresMap = {};
     lista.forEach(p => { 
@@ -84,6 +85,7 @@ function actualizarGraficos(lista) {
     
     const sorted = Object.entries(sectoresMap).sort((a, b) => b[1] - a[1]).slice(0, 8);
 
+    // --- GRÁFICO DE BARRAS ---
     if (chartSectores) chartSectores.destroy();
     chartSectores = new Chart(document.getElementById('chartSectores'), {
         type: 'bar',
@@ -94,11 +96,35 @@ function actualizarGraficos(lista) {
         options: { 
             responsive: true, 
             maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    top: 10,
+                    bottom: 30, // Espacio extra para que no se corten las letras abajo
+                    left: 10,
+                    right: 20
+                }
+            },
             plugins: { legend: { display: false } },
-            scales: { x: { ticks: { autoSkip: false, maxRotation: 45, minRotation: 45, font: { size: 9 } } } }
+            scales: { 
+                x: { 
+                    ticks: { 
+                        autoSkip: false, 
+                        maxRotation: 45, 
+                        minRotation: 45, 
+                        font: { size: 9 } 
+                    } 
+                },
+                y: {
+                    ticks: {
+                        font: { size: 10 },
+                        callback: function(value) { return 'S/ ' + (value / 1e6) + 'M'; } // Simplifica números largos
+                    }
+                }
+            }
         }
     });
 
+    // --- GRÁFICO DE TORTA (DOUGHNUT) ---
     const counts = [
         lista.filter(p => p.avance <= 30).length, 
         lista.filter(p => p.avance > 30 && p.avance <= 70).length, 
@@ -107,8 +133,23 @@ function actualizarGraficos(lista) {
     if (chartTorta) chartTorta.destroy();
     chartTorta = new Chart(document.getElementById('chartTorta'), {
         type: 'doughnut',
-        data: { labels: ['Crítico', 'Medio', 'Óptimo'], datasets: [{ data: counts, backgroundColor: ['#dc3545', '#ffc107', '#198754'] }] },
-        options: { responsive: true, maintainAspectRatio: false }
+        data: { 
+            labels: ['Crítico', 'Medio', 'Óptimo'], 
+            datasets: [{ data: counts, backgroundColor: ['#dc3545', '#ffc107', '#198754'] }] 
+        },
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false,
+            layout: {
+                padding: 25 // Esto encoge el círculo para que no se salga del contenedor
+            },
+            plugins: {
+                legend: {
+                    position: 'bottom', // Mover leyenda abajo da más espacio al círculo
+                    labels: { boxWidth: 12, font: { size: 11 } }
+                }
+            }
+        }
     });
 }
 
@@ -162,4 +203,5 @@ function renderizarCards(lista) {
 }
 
 function setRango(r) { filtroRango = r; filtrarTodo(); }
+
 
