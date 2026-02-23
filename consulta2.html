@@ -41,16 +41,25 @@
         .btn-pdf:hover { background-color: #850900; color: white; }
 
 
-        /* Color cuando pasas el mouse por encima de cualquier fila */
-.table-hover tbody tr:hover {
-    background-color: #fff0f0 !important; /* Un rojo muy suave */
+
+        /* Color cuando pasas el mouse por encima de cualquier fila normal */
+.table-hover tbody tr:hover td {
+    background-color: #fff0f0 !important; 
     transition: background-color 0.2s ease;
 }
 
-/* Color especial para cuando pasas el mouse sobre Lambayeque */
-.table-hover tbody tr.highlight-lambayeque:hover {
-    background-color: #ffe5e5 !important; /* Un tono un poco más fuerte para que resalte */
+/* Color especial cuando pasas el mouse sobre la fila de Lambayeque */
+.table-hover tbody tr.highlight-lambayeque:hover td {
+    background-color: #ffe5e5 !important; 
 }
+
+/* Para que el puntero indique que se puede interactuar */
+.table-hover tbody tr {
+    cursor: pointer;
+}
+
+
+        
     </style>
 </head>
 <body>
