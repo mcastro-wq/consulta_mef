@@ -1,5 +1,5 @@
 {
-  "ultima_actualizacion": "23/02/2026 08:44",
+  "ultima_actualizacion": "23/02/2026 08:51",
   "ranking": [
     {
       "pliego": "PIURA",
@@ -7,6 +7,94 @@
       "certificado": 0.0,
       "devengado": 1089628169.3500001,
       "saldo": 166480.64999985695,
+      "avance": 100.0
+    },
+    {
+      "pliego": "U.N. TORIBIO RODRIGUEZ DE MENDOZA DE AMAZONAS",
+      "pim": 93976783.0,
+      "certificado": 0.0,
+      "devengado": 93976729.41000003,
+      "saldo": 53.589999973773956,
+      "avance": 100.0
+    },
+    {
+      "pliego": "U.N. HERMILIO VALDIZAN",
+      "pim": 28699492.0,
+      "certificado": 0.0,
+      "devengado": 28695052.98,
+      "saldo": 4439.019999999553,
+      "avance": 100.0
+    },
+    {
+      "pliego": "INTENDENCIA NACIONAL DE BOMBEROS DEL PERÚ - INBP",
+      "pim": 24391860.0,
+      "certificado": 0.0,
+      "devengado": 24389966.3,
+      "saldo": 1893.699999999255,
+      "avance": 100.0
+    },
+    {
+      "pliego": "U.N. AUTÓNOMA DE HUANTA",
+      "pim": 11686022.0,
+      "certificado": 0.0,
+      "devengado": 11685936.29,
+      "saldo": 85.71000000089407,
+      "avance": 100.0
+    },
+    {
+      "pliego": "ORGANISMO DE SUPERVISION DE LOS RECURSOS FORESTALES Y DE FAUNA SILVESTRE",
+      "pim": 1110475.0,
+      "certificado": 0.0,
+      "devengado": 1110448.13,
+      "saldo": 26.87000000011176,
+      "avance": 100.0
+    },
+    {
+      "pliego": "AGENCIA DE COMPRAS DE LAS FUERZAS ARMADAS",
+      "pim": 169795.0,
+      "certificado": 0.0,
+      "devengado": 169795.0,
+      "saldo": 0.0,
+      "avance": 100.0
+    },
+    {
+      "pliego": "INSTITUTO NACIONAL DE INVESTIGACION EN GLACIARES Y ECOSISTEMAS DE MONTAÑA - INAIGEM",
+      "pim": 292495.0,
+      "certificado": 0.0,
+      "devengado": 292494.73,
+      "saldo": 0.27000000001862645,
+      "avance": 100.0
+    },
+    {
+      "pliego": "PROCURADURIA GENERAL DEL ESTADO",
+      "pim": 500311.0,
+      "certificado": 0.0,
+      "devengado": 500310.41,
+      "saldo": 0.5900000000256114,
+      "avance": 100.0
+    },
+    {
+      "pliego": "INSTITUTO NACIONAL DE DEFENSA DE LA COMPETENCIA Y DE LA PROTECCION DE LA PROPIEDAD INTELECTUAL",
+      "pim": 3402478.0,
+      "certificado": 0.0,
+      "devengado": 3402477.0,
+      "saldo": 1.0,
+      "avance": 100.0
+    },
+    {
+      "pliego": "OFICINA NACIONAL DE PROCESOS ELECTORALES",
+      "pim": 186002.0,
+      "certificado": 0.0,
+      "devengado": 186001.27,
+      "saldo": 0.7300000000104774,
+      "avance": 100.0
+    },
+    {
+      "pliego": "SERVICIO NACIONAL DE CERTIFICACION AMBIENTAL PARA LAS INVERSIONES SOSTENIBLES -SENACE",
+      "pim": 512750.0,
+      "certificado": 0.0,
+      "devengado": 512750.0,
+      "saldo": 0.0,
       "avance": 100.0
     },
     {
@@ -18,6 +106,30 @@
       "avance": 99.9
     },
     {
+      "pliego": "M. DE TRABAJO Y PROMOCION DEL EMPLEO",
+      "pim": 7434909.0,
+      "certificado": 0.0,
+      "devengado": 7424929.7299999995,
+      "saldo": 9979.270000000484,
+      "avance": 99.9
+    },
+    {
+      "pliego": "SUPERINTENDENCIA NACIONAL DE FISCALIZACION LABORAL",
+      "pim": 4717294.0,
+      "certificado": 0.0,
+      "devengado": 4712794.0,
+      "saldo": 4500.0,
+      "avance": 99.9
+    },
+    {
+      "pliego": "MINISTERIO DE DESARROLLO E INCLUSION SOCIAL",
+      "pim": 8462568.0,
+      "certificado": 0.0,
+      "devengado": 8453016.259999998,
+      "saldo": 9551.740000002086,
+      "avance": 99.9
+    },
+    {
       "pliego": "AREQUIPA",
       "pim": 686857114.0,
       "certificado": 0.0,
@@ -26,12 +138,100 @@
       "avance": 99.8
     },
     {
-      "pliego": "JUNIN",
-      "pim": 973420872.0,
+      "pliego": "U.N. DE JULIACA",
+      "pim": 16570312.0,
       "certificado": 0.0,
-      "devengado": 966974393.2999998,
-      "saldo": 6446478.700000167,
-      "avance": 99.3
+      "devengado": 16540825.72,
+      "saldo": 29486.27999999933,
+      "avance": 99.8
+    },
+    {
+      "pliego": "AUTORIDAD NACIONAL DE INFRAESTRUCTURA",
+      "pim": 3772365139.0,
+      "certificado": 0.0,
+      "devengado": 3766308820.110002,
+      "saldo": 6056318.889997959,
+      "avance": 99.8
+    },
+    {
+      "pliego": "CENTRO NACIONAL DE PLANEAMIENTO ESTRATEGICO - CEPLAN",
+      "pim": 1151176.0,
+      "certificado": 0.0,
+      "devengado": 1148890.0,
+      "saldo": 2286.0,
+      "avance": 99.8
+    },
+    {
+      "pliego": "MINISTERIO DE LA MUJER Y POBLACIONES VULNERABLES",
+      "pim": 13121986.0,
+      "certificado": 0.0,
+      "devengado": 13087849.170000004,
+      "saldo": 34136.82999999635,
+      "avance": 99.7
+    },
+    {
+      "pliego": "INSTITUTO NACIONAL DE RADIO Y TELEVISION DEL PERU - IRTP",
+      "pim": 4809254.0,
+      "certificado": 0.0,
+      "devengado": 4794148.4399999995,
+      "saldo": 15105.560000000522,
+      "avance": 99.7
+    },
+    {
+      "pliego": "AGROMERCADO",
+      "pim": 5298876.0,
+      "certificado": 0.0,
+      "devengado": 5276982.72,
+      "saldo": 21893.28000000026,
+      "avance": 99.6
+    },
+    {
+      "pliego": "ORGANISMO DE FORMALIZACION DE LA PROPIEDAD INFORMAL",
+      "pim": 81039889.0,
+      "certificado": 0.0,
+      "devengado": 80745330.81,
+      "saldo": 294558.1899999976,
+      "avance": 99.6
+    },
+    {
+      "pliego": "ORGANISMO DE FOCALIZACIÓN E INFORMACIÓN SOCIAL",
+      "pim": 3234906.0,
+      "certificado": 0.0,
+      "devengado": 3223200.44,
+      "saldo": 11705.560000000056,
+      "avance": 99.6
+    },
+    {
+      "pliego": "INSTITUTO GEOLOGICO MINERO Y METALURGICO",
+      "pim": 4254928.0,
+      "certificado": 0.0,
+      "devengado": 4235127.13,
+      "saldo": 19800.87000000011,
+      "avance": 99.5
+    },
+    {
+      "pliego": "INSTITUTO GEOFISICO DEL PERU",
+      "pim": 10637888.0,
+      "certificado": 0.0,
+      "devengado": 10581466.899999999,
+      "saldo": 56421.10000000149,
+      "avance": 99.5
+    },
+    {
+      "pliego": "BIBLIOTECA NACIONAL DEL PERU",
+      "pim": 5017592.0,
+      "certificado": 0.0,
+      "devengado": 4993464.31,
+      "saldo": 24127.69000000041,
+      "avance": 99.5
+    },
+    {
+      "pliego": "U.N. AGRARIA DE LA SELVA",
+      "pim": 38335551.0,
+      "certificado": 0.0,
+      "devengado": 38105144.31,
+      "saldo": 230406.68999999762,
+      "avance": 99.4
     },
     {
       "pliego": "AMAZONAS",
@@ -42,11 +242,115 @@
       "avance": 99.3
     },
     {
+      "pliego": "JUNIN",
+      "pim": 973420872.0,
+      "certificado": 0.0,
+      "devengado": 966974393.2999998,
+      "saldo": 6446478.700000167,
+      "avance": 99.3
+    },
+    {
+      "pliego": "U.N. DEL ALTIPLANO",
+      "pim": 69098061.0,
+      "certificado": 0.0,
+      "devengado": 68631335.8,
+      "saldo": 466725.200000003,
+      "avance": 99.3
+    },
+    {
+      "pliego": "SUPERINTENDENCIA NACIONAL DE LOS REGISTROS PUBLICOS",
+      "pim": 33692095.0,
+      "certificado": 0.0,
+      "devengado": 33467577.230000008,
+      "saldo": 224517.7699999921,
+      "avance": 99.3
+    },
+    {
+      "pliego": "SUPERINTENDENCIA DE TRANSPORTE TERRESTRE DE PERSONAS, CARGA Y MERCANCIAS - SUTRAN",
+      "pim": 15809673.0,
+      "certificado": 0.0,
+      "devengado": 15695043.879999999,
+      "saldo": 114629.12000000104,
+      "avance": 99.3
+    },
+    {
+      "pliego": "M. DE SALUD",
+      "pim": 1943179253.0,
+      "certificado": 0.0,
+      "devengado": 1924250248.3900008,
+      "saldo": 18929004.60999918,
+      "avance": 99.0
+    },
+    {
+      "pliego": "AUTORIDAD NACIONAL DEL SERVICIO CIVIL",
+      "pim": 3604364.0,
+      "certificado": 0.0,
+      "devengado": 3563263.1,
+      "saldo": 41100.89999999991,
+      "avance": 98.9
+    },
+    {
+      "pliego": "INSTITUTO NACIONAL DE INNOVACION AGRARIA",
+      "pim": 123864448.0,
+      "certificado": 0.0,
+      "devengado": 122370973.19000001,
+      "saldo": 1493474.8099999875,
+      "avance": 98.8
+    },
+    {
+      "pliego": "MINISTERIO DE VIVIENDA, CONSTRUCCION Y SANEAMIENTO",
+      "pim": 1427890621.0,
+      "certificado": 0.0,
+      "devengado": 1408631470.4199994,
+      "saldo": 19259150.58000064,
+      "avance": 98.7
+    },
+    {
+      "pliego": "AUTORIDAD DE TRANSPORTE URBANO PARA LIMA Y CALLAO - ATU",
+      "pim": 333657138.0,
+      "certificado": 0.0,
+      "devengado": 329160664.4,
+      "saldo": 4496473.600000024,
+      "avance": 98.7
+    },
+    {
+      "pliego": "INSTITUTO NACIONAL DE CALIDAD (INACAL)",
+      "pim": 668999.0,
+      "certificado": 0.0,
+      "devengado": 660462.39,
+      "saldo": 8536.609999999986,
+      "avance": 98.7
+    },
+    {
+      "pliego": "CONSEJO NACIONAL PARA LA INTEGRACION DE LA PERSONA CON DISCAPACIDAD - CONADIS",
+      "pim": 1977078.0,
+      "certificado": 0.0,
+      "devengado": 1949420.41,
+      "saldo": 27657.590000000084,
+      "avance": 98.6
+    },
+    {
+      "pliego": "U.N. SAN LUIS GONZAGA DE ICA",
+      "pim": 31116059.0,
+      "certificado": 0.0,
+      "devengado": 30646434.029999997,
+      "saldo": 469624.97000000253,
+      "avance": 98.5
+    },
+    {
       "pliego": "ANCASH",
       "pim": 395908555.0,
       "certificado": 0.0,
       "devengado": 389292976.7800001,
       "saldo": 6615578.219999909,
+      "avance": 98.3
+    },
+    {
+      "pliego": "U.N. DE HUANCAVELICA",
+      "pim": 25545245.0,
+      "certificado": 0.0,
+      "devengado": 25108456.930000003,
+      "saldo": 436788.0699999966,
       "avance": 98.3
     },
     {
@@ -58,6 +362,38 @@
       "avance": 98.2
     },
     {
+      "pliego": "ORGANISMO TECNICO DE LA ADMINISTRACION DE LOS SERVICIOS DE SANEAMIENTO",
+      "pim": 40426946.0,
+      "certificado": 0.0,
+      "devengado": 39714406.18,
+      "saldo": 712539.8200000003,
+      "avance": 98.2
+    },
+    {
+      "pliego": "MINISTERIO DE COMERCIO EXTERIOR Y TURISMO",
+      "pim": 96604100.0,
+      "certificado": 0.0,
+      "devengado": 94762858.83999999,
+      "saldo": 1841241.1600000113,
+      "avance": 98.1
+    },
+    {
+      "pliego": "JUNTA NACIONAL DE JUSTICIA",
+      "pim": 2623179.0,
+      "certificado": 0.0,
+      "devengado": 2567680.27,
+      "saldo": 55498.72999999998,
+      "avance": 97.9
+    },
+    {
+      "pliego": "U.N. DEL CALLAO",
+      "pim": 21277295.0,
+      "certificado": 0.0,
+      "devengado": 20802037.8,
+      "saldo": 475257.19999999925,
+      "avance": 97.8
+    },
+    {
       "pliego": "TACNA",
       "pim": 305569983.0,
       "certificado": 0.0,
@@ -66,11 +402,131 @@
       "avance": 97.6
     },
     {
+      "pliego": "SUPERINTENDENCIA NACIONAL DE ADUANAS Y DE ADMINISTRACION TRIBUTARIA",
+      "pim": 338090251.0,
+      "certificado": 0.0,
+      "devengado": 330017152.37,
+      "saldo": 8073098.629999995,
+      "avance": 97.6
+    },
+    {
+      "pliego": "U. N. AUTÓNOMA ALTOANDINA DE TARMA",
+      "pim": 39184286.0,
+      "certificado": 0.0,
+      "devengado": 38221199.47,
+      "saldo": 963086.5300000012,
+      "avance": 97.5
+    },
+    {
+      "pliego": "U.N. DANIEL ALOMIA ROBLES",
+      "pim": 139499.0,
+      "certificado": 0.0,
+      "devengado": 136070.28999999998,
+      "saldo": 3428.710000000021,
+      "avance": 97.5
+    },
+    {
+      "pliego": "SUPERINTENDENCIA NACIONAL DE MIGRACIONES",
+      "pim": 9491189.0,
+      "certificado": 0.0,
+      "devengado": 9246408.14,
+      "saldo": 244780.8599999994,
+      "avance": 97.4
+    },
+    {
+      "pliego": "U.N. DE JAEN",
+      "pim": 43513723.0,
+      "certificado": 0.0,
+      "devengado": 42350672.669999994,
+      "saldo": 1163050.3300000057,
+      "avance": 97.3
+    },
+    {
+      "pliego": "SERVICIO NACIONAL DE SANIDAD AGRARIA - SENASA",
+      "pim": 17482028.0,
+      "certificado": 0.0,
+      "devengado": 16969675.2,
+      "saldo": 512352.80000000075,
+      "avance": 97.1
+    },
+    {
+      "pliego": "U.N. TECNOLOGICA DE LIMA SUR",
+      "pim": 6284320.0,
+      "certificado": 0.0,
+      "devengado": 6087214.4,
+      "saldo": 197105.59999999963,
+      "avance": 96.9
+    },
+    {
+      "pliego": "U.N. AMAZONICA DE MADRE DE DIOS",
+      "pim": 19644576.0,
+      "certificado": 0.0,
+      "devengado": 19031237.99,
+      "saldo": 613338.0100000016,
+      "avance": 96.9
+    },
+    {
+      "pliego": "INSTITUTO PERUANO DE ENERGIA NUCLEAR",
+      "pim": 11170304.0,
+      "certificado": 0.0,
+      "devengado": 10801553.879999999,
+      "saldo": 368750.12000000104,
+      "avance": 96.7
+    },
+    {
+      "pliego": "M. DEL AMBIENTE",
+      "pim": 346030716.0,
+      "certificado": 0.0,
+      "devengado": 334362555.03000003,
+      "saldo": 11668160.969999969,
+      "avance": 96.6
+    },
+    {
+      "pliego": "INSTITUTO NACIONAL DE ENFERMEDADES NEOPLASICAS - INEN",
+      "pim": 35734439.0,
+      "certificado": 0.0,
+      "devengado": 34434373.47,
+      "saldo": 1300065.5300000012,
+      "avance": 96.4
+    },
+    {
+      "pliego": "FONDO NACIONAL DE DESARROLLO PESQUERO - FONDEPES",
+      "pim": 64419074.0,
+      "certificado": 0.0,
+      "devengado": 62030860.91000002,
+      "saldo": 2388213.089999981,
+      "avance": 96.3
+    },
+    {
+      "pliego": "CENTRO NACIONAL DE ESTIMACION, PREVENCION Y REDUCCION DEL RIESGO DE DESASTRES - CENEPRED",
+      "pim": 1234128.0,
+      "certificado": 0.0,
+      "devengado": 1188062.0,
+      "saldo": 46066.0,
+      "avance": 96.3
+    },
+    {
       "pliego": "HUANUCO",
       "pim": 400919484.0,
       "certificado": 0.0,
       "devengado": 385497320.71999985,
       "saldo": 15422163.28000015,
+      "avance": 96.2
+    },
+    {
+      "pliego": "U.N. DE BARRANCA",
+      "pim": 25801251.0,
+      "certificado": 0.0,
+      "devengado": 24829670.29,
+      "saldo": 971580.7100000009,
+      "avance": 96.2
+    },
+    {
+      "pliego": "U.N. DE FRONTERA",
+      "pim": 40165583.0,
+      "certificado": 0.0,
+      "devengado": 38621456.879999995,
+      "saldo": 1544126.1200000048,
       "avance": 96.2
     },
     {
@@ -82,6 +538,22 @@
       "avance": 96.1
     },
     {
+      "pliego": "SERVICIO NACIONAL DE METEOROLOGIA E HIDROLOGIA",
+      "pim": 1802285.0,
+      "certificado": 0.0,
+      "devengado": 1732090.52,
+      "saldo": 70194.47999999998,
+      "avance": 96.1
+    },
+    {
+      "pliego": "ARCHIVO GENERAL DE LA NACION",
+      "pim": 781845.0,
+      "certificado": 0.0,
+      "devengado": 750559.41,
+      "saldo": 31285.589999999967,
+      "avance": 96.0
+    },
+    {
       "pliego": "MADRE DE DIOS",
       "pim": 216288078.0,
       "certificado": 0.0,
@@ -90,12 +562,36 @@
       "avance": 95.9
     },
     {
-      "pliego": "LORETO",
-      "pim": 1050495264.0,
+      "pliego": "M. DE RELACIONES EXTERIORES",
+      "pim": 51796064.0,
       "certificado": 0.0,
-      "devengado": 992912700.4000001,
-      "saldo": 57582563.599999905,
-      "avance": 94.5
+      "devengado": 49640159.37,
+      "saldo": 2155904.6300000027,
+      "avance": 95.8
+    },
+    {
+      "pliego": "MINISTERIO DE TRANSPORTES Y COMUNICACIONES",
+      "pim": 8086621628.0,
+      "certificado": 0.0,
+      "devengado": 7733389079.670001,
+      "saldo": 353232548.32999897,
+      "avance": 95.6
+    },
+    {
+      "pliego": "SERVICIO NACIONAL FORESTAL Y DE FAUNA SILVESTRE - SERFOR",
+      "pim": 76459711.0,
+      "certificado": 0.0,
+      "devengado": 73080349.76000002,
+      "saldo": 3379361.2399999797,
+      "avance": 95.6
+    },
+    {
+      "pliego": "AGENCIA DE PROMOCION DE LA INVERSION PRIVADA",
+      "pim": 191395.0,
+      "certificado": 0.0,
+      "devengado": 182229.23,
+      "saldo": 9165.76999999999,
+      "avance": 95.2
     },
     {
       "pliego": "SAN MARTIN",
@@ -106,12 +602,108 @@
       "avance": 94.5
     },
     {
+      "pliego": "LORETO",
+      "pim": 1050495264.0,
+      "certificado": 0.0,
+      "devengado": 992912700.4000001,
+      "saldo": 57582563.599999905,
+      "avance": 94.5
+    },
+    {
+      "pliego": "U.N. AGRARIA LA MOLINA",
+      "pim": 79373762.0,
+      "certificado": 0.0,
+      "devengado": 75045215.59,
+      "saldo": 4328546.409999996,
+      "avance": 94.5
+    },
+    {
+      "pliego": "M. DE ECONOMIA Y FINANZAS",
+      "pim": 106859471.0,
+      "certificado": 0.0,
+      "devengado": 100678167.35999998,
+      "saldo": 6181303.6400000155,
+      "avance": 94.2
+    },
+    {
+      "pliego": "PRESIDENCIA DEL CONSEJO DE MINISTROS",
+      "pim": 10660151.0,
+      "certificado": 0.0,
+      "devengado": 10027156.75,
+      "saldo": 632994.25,
+      "avance": 94.1
+    },
+    {
+      "pliego": "U.N. JOSE FAUSTINO SANCHEZ CARRION",
+      "pim": 24675822.0,
+      "certificado": 0.0,
+      "devengado": 23224434.26,
+      "saldo": 1451387.7399999984,
+      "avance": 94.1
+    },
+    {
+      "pliego": "U.N. JOSE MARIA ARGUEDAS",
+      "pim": 29390869.0,
+      "certificado": 0.0,
+      "devengado": 27609001.59,
+      "saldo": 1781867.4100000001,
+      "avance": 93.9
+    },
+    {
+      "pliego": "M. DE CULTURA",
+      "pim": 121065430.0,
+      "certificado": 0.0,
+      "devengado": 113287056.42,
+      "saldo": 7778373.579999998,
+      "avance": 93.6
+    },
+    {
+      "pliego": "REGISTRO NACIONAL DE IDENTIFICACION Y ESTADO CIVIL",
+      "pim": 46849012.0,
+      "certificado": 0.0,
+      "devengado": 43832246.83,
+      "saldo": 3016765.170000002,
+      "avance": 93.6
+    },
+    {
+      "pliego": "MUNICIPALIDAD METROPOLITANA DE LIMA",
+      "pim": 146442226.0,
+      "certificado": 0.0,
+      "devengado": 136751782.78,
+      "saldo": 9690443.219999999,
+      "avance": 93.4
+    },
+    {
+      "pliego": "U. N. DE MÚSICA",
+      "pim": 523458.0,
+      "certificado": 0.0,
+      "devengado": 488147.32999999996,
+      "saldo": 35310.67000000004,
+      "avance": 93.3
+    },
+    {
       "pliego": "PUNO",
       "pim": 921096476.0,
       "certificado": 0.0,
       "devengado": 858919781.2299998,
       "saldo": 62176694.77000022,
       "avance": 93.2
+    },
+    {
+      "pliego": "M. DE EDUCACION",
+      "pim": 2496525189.0,
+      "certificado": 0.0,
+      "devengado": 2321568637.56,
+      "saldo": 174956551.44000006,
+      "avance": 93.0
+    },
+    {
+      "pliego": "M. DE ENERGIA Y MINAS",
+      "pim": 518144327.0,
+      "certificado": 0.0,
+      "devengado": 481311866.6999998,
+      "saldo": 36832460.30000019,
+      "avance": 92.9
     },
     {
       "pliego": "CUSCO",
@@ -122,12 +714,20 @@
       "avance": 92.7
     },
     {
-      "pliego": "ICA",
-      "pim": 409997734.0,
+      "pliego": "SERVICIO NACIONAL DE AREAS NATURALES PROTEGIDAS POR EL ESTADO - SERNANP",
+      "pim": 3004544.0,
       "certificado": 0.0,
-      "devengado": 377635278.85999995,
-      "saldo": 32362455.140000045,
-      "avance": 92.1
+      "devengado": 2781553.4,
+      "saldo": 222990.6000000001,
+      "avance": 92.6
+    },
+    {
+      "pliego": "U.N. DE EDUCACION ENRIQUE GUZMAN Y VALLE",
+      "pim": 20596407.0,
+      "certificado": 0.0,
+      "devengado": 19039443.93,
+      "saldo": 1556963.0700000003,
+      "avance": 92.4
     },
     {
       "pliego": "APURIMAC",
@@ -138,12 +738,52 @@
       "avance": 92.1
     },
     {
+      "pliego": "ICA",
+      "pim": 409997734.0,
+      "certificado": 0.0,
+      "devengado": 377635278.85999995,
+      "saldo": 32362455.140000045,
+      "avance": 92.1
+    },
+    {
+      "pliego": "INSTITUTO DEL MAR DEL PERU - IMARPE",
+      "pim": 3602332.0,
+      "certificado": 0.0,
+      "devengado": 3314525.98,
+      "saldo": 287806.02,
+      "avance": 92.0
+    },
+    {
       "pliego": "PASCO",
       "pim": 467615572.0,
       "certificado": 0.0,
       "devengado": 429718330.5100002,
       "saldo": 37897241.48999977,
       "avance": 91.9
+    },
+    {
+      "pliego": "CONSEJO NACIONAL DE CIENCIA, TECNOLOGIA E INNOVACION TECNOLOGICA",
+      "pim": 60792955.0,
+      "certificado": 0.0,
+      "devengado": 55523830.47,
+      "saldo": 5269124.530000001,
+      "avance": 91.3
+    },
+    {
+      "pliego": "U.N. DE PIURA",
+      "pim": 44485291.0,
+      "certificado": 0.0,
+      "devengado": 40507796.71000001,
+      "saldo": 3977494.2899999917,
+      "avance": 91.1
+    },
+    {
+      "pliego": "U.N. TECNOLOGICA DE SAN JUAN DE LURIGANCHO",
+      "pim": 907410.0,
+      "certificado": 0.0,
+      "devengado": 826236.0,
+      "saldo": 81174.0,
+      "avance": 91.1
     },
     {
       "pliego": "CAJAMARCA",
@@ -154,11 +794,27 @@
       "avance": 91.0
     },
     {
+      "pliego": "DEFENSORIA DEL PUEBLO",
+      "pim": 3860859.0,
+      "certificado": 0.0,
+      "devengado": 3507570.89,
+      "saldo": 353288.10999999987,
+      "avance": 90.8
+    },
+    {
       "pliego": "MOQUEGUA",
       "pim": 315742833.0,
       "certificado": 0.0,
       "devengado": 286244865.53999984,
       "saldo": 29497967.460000157,
+      "avance": 90.7
+    },
+    {
+      "pliego": "INSTITUTO NACIONAL DE DEFENSA CIVIL",
+      "pim": 3898917.0,
+      "certificado": 0.0,
+      "devengado": 3535957.41,
+      "saldo": 362959.58999999985,
       "avance": 90.7
     },
     {
@@ -170,12 +826,60 @@
       "avance": 89.9
     },
     {
+      "pliego": "U.N. AUTONOMA DE CHOTA",
+      "pim": 10317864.0,
+      "certificado": 0.0,
+      "devengado": 9250099.92,
+      "saldo": 1067764.08,
+      "avance": 89.7
+    },
+    {
+      "pliego": "M. DE DESARROLLO AGRARIO Y RIEGO",
+      "pim": 996062352.0,
+      "certificado": 0.0,
+      "devengado": 885947886.4900008,
+      "saldo": 110114465.50999916,
+      "avance": 88.9
+    },
+    {
       "pliego": "LIMA",
       "pim": 586336422.0,
       "certificado": 0.0,
       "devengado": 511983145.5200001,
       "saldo": 74353276.4799999,
       "avance": 87.3
+    },
+    {
+      "pliego": "INSTITUTO DE INVESTIGACIONES DE LA AMAZONIA PERUANA",
+      "pim": 680883.0,
+      "certificado": 0.0,
+      "devengado": 593604.95,
+      "saldo": 87278.05000000005,
+      "avance": 87.2
+    },
+    {
+      "pliego": "INSTITUTO GEOGRAFICO NACIONAL",
+      "pim": 1513271.0,
+      "certificado": 0.0,
+      "devengado": 1317141.0,
+      "saldo": 196130.0,
+      "avance": 87.0
+    },
+    {
+      "pliego": "ORGANISMO ESPECIALIZADO PARA LAS CONTRATACIONES PUBLICAS EFICIENTES (OECE)",
+      "pim": 18353075.0,
+      "certificado": 0.0,
+      "devengado": 15923477.76,
+      "saldo": 2429597.24,
+      "avance": 86.8
+    },
+    {
+      "pliego": "U.N. MICAELA BASTIDAS DE APURIMAC",
+      "pim": 43149920.0,
+      "certificado": 0.0,
+      "devengado": 37261689.760000005,
+      "saldo": 5888230.239999995,
+      "avance": 86.4
     },
     {
       "pliego": "LAMBAYEQUE",
@@ -186,12 +890,244 @@
       "avance": 86.1
     },
     {
+      "pliego": "MINISTERIO DE LA PRODUCCION",
+      "pim": 40071821.0,
+      "certificado": 0.0,
+      "devengado": 34354080.739999995,
+      "saldo": 5717740.260000005,
+      "avance": 85.7
+    },
+    {
+      "pliego": "U.N. SAN CRISTOBAL DE HUAMANGA",
+      "pim": 32620499.0,
+      "certificado": 0.0,
+      "devengado": 27588935.38,
+      "saldo": 5031563.620000001,
+      "avance": 84.6
+    },
+    {
+      "pliego": "JURADO NACIONAL DE ELECCIONES",
+      "pim": 1236178.0,
+      "certificado": 0.0,
+      "devengado": 1044597.85,
+      "saldo": 191580.15000000002,
+      "avance": 84.5
+    },
+    {
+      "pliego": "INSTITUTO TECNOLOGICO DE LA PRODUCCION - ITP",
+      "pim": 30016967.0,
+      "certificado": 0.0,
+      "devengado": 24923494.05,
+      "saldo": 5093472.949999999,
+      "avance": 83.0
+    },
+    {
+      "pliego": "U.N. INTERCULTURAL DE LA AMAZONIA",
+      "pim": 15707555.0,
+      "certificado": 0.0,
+      "devengado": 12863973.0,
+      "saldo": 2843582.0,
+      "avance": 81.9
+    },
+    {
+      "pliego": "ORGANISMO SUPERVISOR DE LA INVERSION EN ENERGIA Y MINERIA",
+      "pim": 14495049.0,
+      "certificado": 0.0,
+      "devengado": 11786646.830000002,
+      "saldo": 2708402.169999998,
+      "avance": 81.3
+    },
+    {
+      "pliego": "U.N. DE TUMBES",
+      "pim": 19438915.0,
+      "certificado": 0.0,
+      "devengado": 15792233.17,
+      "saldo": 3646681.83,
+      "avance": 81.2
+    },
+    {
+      "pliego": "M. DE DEFENSA",
+      "pim": 806937533.0,
+      "certificado": 0.0,
+      "devengado": 649316503.98,
+      "saldo": 157621029.01999998,
+      "avance": 80.5
+    },
+    {
       "pliego": "TUMBES",
       "pim": 185356356.0,
       "certificado": 0.0,
       "devengado": 148274288.00000006,
       "saldo": 37082067.99999994,
       "avance": 80.0
+    },
+    {
+      "pliego": "U.N. DEL CENTRO DEL PERU",
+      "pim": 11400268.0,
+      "certificado": 0.0,
+      "devengado": 9082121.15,
+      "saldo": 2318146.8499999996,
+      "avance": 79.7
+    },
+    {
+      "pliego": "U.N. AUTONOMA DE ALTO AMAZONAS",
+      "pim": 8772876.0,
+      "certificado": 0.0,
+      "devengado": 6934527.46,
+      "saldo": 1838348.54,
+      "avance": 79.0
+    },
+    {
+      "pliego": "INSTITUTO NACIONAL PENITENCIARIO",
+      "pim": 135318644.0,
+      "certificado": 0.0,
+      "devengado": 106454161.61,
+      "saldo": 28864482.39,
+      "avance": 78.7
+    },
+    {
+      "pliego": "M. DE JUSTICIA Y DERECHOS HUMANOS",
+      "pim": 59990384.0,
+      "certificado": 0.0,
+      "devengado": 46514209.86999999,
+      "saldo": 13476174.13000001,
+      "avance": 77.5
+    },
+    {
+      "pliego": "INSTITUTO NACIONAL DE SALUD",
+      "pim": 46628425.0,
+      "certificado": 0.0,
+      "devengado": 36033329.31,
+      "saldo": 10595095.689999998,
+      "avance": 77.3
+    },
+    {
+      "pliego": "AUTORIDAD NACIONAL DE SANIDAD E INOCUIDAD EN PESCA Y ACUICULTURA - SANIPES",
+      "pim": 7609689.0,
+      "certificado": 0.0,
+      "devengado": 5797862.109999999,
+      "saldo": 1811826.8900000006,
+      "avance": 76.2
+    },
+    {
+      "pliego": "PODER JUDICIAL",
+      "pim": 166771470.0,
+      "certificado": 0.0,
+      "devengado": 124717871.36999999,
+      "saldo": 42053598.63000001,
+      "avance": 74.8
+    },
+    {
+      "pliego": "U.N. FEDERICO VILLARREAL",
+      "pim": 4811213.0,
+      "certificado": 0.0,
+      "devengado": 3591383.0300000003,
+      "saldo": 1219829.9699999997,
+      "avance": 74.6
+    },
+    {
+      "pliego": "U.N. INTERCULTURAL FABIOLA SALAZAR LEGUIA DE BAGUA",
+      "pim": 8418706.0,
+      "certificado": 0.0,
+      "devengado": 6251292.16,
+      "saldo": 2167413.84,
+      "avance": 74.3
+    },
+    {
+      "pliego": "U.N. DEL SANTA",
+      "pim": 48590515.0,
+      "certificado": 0.0,
+      "devengado": 35933406.330000006,
+      "saldo": 12657108.669999994,
+      "avance": 74.0
+    },
+    {
+      "pliego": "U.N. MAYOR DE SAN MARCOS",
+      "pim": 75978418.0,
+      "certificado": 0.0,
+      "devengado": 55849097.95,
+      "saldo": 20129320.049999997,
+      "avance": 73.5
+    },
+    {
+      "pliego": "U.N. DE CAJAMARCA",
+      "pim": 28512361.0,
+      "certificado": 0.0,
+      "devengado": 20849621.94,
+      "saldo": 7662739.059999999,
+      "avance": 73.1
+    },
+    {
+      "pliego": "U.N. DANIEL ALCIDES CARRION",
+      "pim": 21608901.0,
+      "certificado": 0.0,
+      "devengado": 15784714.6,
+      "saldo": 5824186.4,
+      "avance": 73.0
+    },
+    {
+      "pliego": "ORGANISMO DE EVALUACION Y FISCALIZACION AMBIENTAL - OEFA",
+      "pim": 28203013.0,
+      "certificado": 0.0,
+      "devengado": 20476161.54,
+      "saldo": 7726851.460000001,
+      "avance": 72.6
+    },
+    {
+      "pliego": "U.N. DE SAN AGUSTIN",
+      "pim": 65366637.0,
+      "certificado": 0.0,
+      "devengado": 47393665.51000001,
+      "saldo": 17972971.489999987,
+      "avance": 72.5
+    },
+    {
+      "pliego": "INSTITUTO NACIONAL DE ESTADISTICA E INFORMATICA",
+      "pim": 22976123.0,
+      "certificado": 0.0,
+      "devengado": 16589118.16,
+      "saldo": 6387004.84,
+      "avance": 72.2
+    },
+    {
+      "pliego": "U.N. DE TRUJILLO",
+      "pim": 21017658.0,
+      "certificado": 0.0,
+      "devengado": 15089584.2,
+      "saldo": 5928073.800000001,
+      "avance": 71.8
+    },
+    {
+      "pliego": "SUPERINTENDENCIA NACIONAL DE CONTROL DE SERVICIOS DE SEGURIDAD, ARMAS, MUNICIONES Y EXPLOSIVOS DE USO CIVIL",
+      "pim": 2166368.0,
+      "certificado": 0.0,
+      "devengado": 1519959.42,
+      "saldo": 646408.5800000001,
+      "avance": 70.2
+    },
+    {
+      "pliego": "INSTITUTO PERUANO DEL DEPORTE",
+      "pim": 5127862.0,
+      "certificado": 0.0,
+      "devengado": 3553970.76,
+      "saldo": 1573891.2400000002,
+      "avance": 69.3
+    },
+    {
+      "pliego": "U.N. DE SAN ANTONIO ABAD DEL CUSCO",
+      "pim": 113637070.0,
+      "certificado": 0.0,
+      "devengado": 78248356.56,
+      "saldo": 35388713.44,
+      "avance": 68.9
+    },
+    {
+      "pliego": "U.N. DE UCAYALI",
+      "pim": 8140843.0,
+      "certificado": 0.0,
+      "devengado": 5532628.41,
+      "saldo": 2608214.59,
+      "avance": 68.0
     },
     {
       "pliego": "LA PROVINCIA CONSTITUCIONAL DEL CALLAO",
@@ -202,204 +1138,212 @@
       "avance": 66.9
     },
     {
-      "pliego": "GOBIERNO REGIONAL TACNA",
-      "pim": 0.0,
+      "pliego": "U.N. DE MOQUEGUA",
+      "pim": 37878539.0,
       "certificado": 0.0,
-      "devengado": 0.0,
-      "saldo": 0.0,
-      "avance": 0
+      "devengado": 25113758.74,
+      "saldo": 12764780.260000002,
+      "avance": 66.3
     },
     {
-      "pliego": "GOBIERNO REGIONAL HUANUCO",
-      "pim": 0.0,
+      "pliego": "CONTRALORIA GENERAL",
+      "pim": 50450994.0,
       "certificado": 0.0,
-      "devengado": 0.0,
-      "saldo": 0.0,
-      "avance": 0
+      "devengado": 33154258.84,
+      "saldo": 17296735.16,
+      "avance": 65.7
     },
     {
-      "pliego": "GOBIERNO REGIONAL CUSCO",
-      "pim": 0.0,
+      "pliego": "CENTRO VACACIONAL HUAMPANI",
+      "pim": 1029231.0,
       "certificado": 0.0,
-      "devengado": 0.0,
-      "saldo": 0.0,
-      "avance": 0
+      "devengado": 672353.24,
+      "saldo": 356877.76,
+      "avance": 65.3
     },
     {
-      "pliego": "GOBIERNO REGIONAL TUMBES",
-      "pim": 0.0,
+      "pliego": "MANCOMUNIDAD REGIONAL DE LOS ANDES",
+      "pim": 10035101.0,
       "certificado": 0.0,
-      "devengado": 0.0,
-      "saldo": 0.0,
-      "avance": 0
+      "devengado": 6502916.34,
+      "saldo": 3532184.66,
+      "avance": 64.8
     },
     {
-      "pliego": "GOBIERNO REGIONAL PIURA",
-      "pim": 0.0,
+      "pliego": "U.N. PEDRO RUIZ GALLO",
+      "pim": 30688252.0,
       "certificado": 0.0,
-      "devengado": 0.0,
-      "saldo": 0.0,
-      "avance": 0
+      "devengado": 19839464.11,
+      "saldo": 10848787.89,
+      "avance": 64.6
     },
     {
-      "pliego": "GOBIERNO REGIONAL LIMA",
-      "pim": 0.0,
+      "pliego": "CENTRAL DE COMPRAS PUBLICAS - PERU COMPRAS",
+      "pim": 4302693.0,
       "certificado": 0.0,
-      "devengado": 0.0,
-      "saldo": 0.0,
-      "avance": 0
+      "devengado": 2765385.0599999996,
+      "saldo": 1537307.9400000004,
+      "avance": 64.3
     },
     {
-      "pliego": "GOBIERNO REGIONAL UCAYALI",
-      "pim": 0.0,
+      "pliego": "U.N. DE INGENIERIA",
+      "pim": 51526422.0,
       "certificado": 0.0,
-      "devengado": 0.0,
-      "saldo": 0.0,
-      "avance": 0
+      "devengado": 33000849.05999999,
+      "saldo": 18525572.94000001,
+      "avance": 64.0
     },
     {
-      "pliego": "GOBIERNO REGIONAL AMAZONAS",
-      "pim": 0.0,
+      "pliego": "U.N. INTERCULTURAL DE LA SELVA CENTRAL JUAN SANTOS ATAHUALPA",
+      "pim": 15116841.0,
       "certificado": 0.0,
-      "devengado": 0.0,
-      "saldo": 0.0,
-      "avance": 0
+      "devengado": 9645937.129999999,
+      "saldo": 5470903.870000001,
+      "avance": 63.8
     },
     {
-      "pliego": "GOBIERNO REGIONAL MADRE DE DIOS",
-      "pim": 0.0,
+      "pliego": "U.N. SANTIAGO ANTUNEZ DE MAYOLO",
+      "pim": 63960428.0,
       "certificado": 0.0,
-      "devengado": 0.0,
-      "saldo": 0.0,
-      "avance": 0
+      "devengado": 37725411.51,
+      "saldo": 26235016.490000002,
+      "avance": 59.0
     },
     {
-      "pliego": "GOBIERNO REGIONAL MOQUEGUA",
-      "pim": 0.0,
+      "pliego": "U.N. DE SAN MARTIN",
+      "pim": 9080147.0,
       "certificado": 0.0,
-      "devengado": 0.0,
-      "saldo": 0.0,
-      "avance": 0
+      "devengado": 5119363.93,
+      "saldo": 3960783.0700000003,
+      "avance": 56.4
     },
     {
-      "pliego": "GOBIERNO REGIONAL SAN MARTIN",
-      "pim": 0.0,
+      "pliego": "U.N. INTERCULTURAL DE QUILLABAMBA",
+      "pim": 49743694.0,
       "certificado": 0.0,
-      "devengado": 0.0,
-      "saldo": 0.0,
-      "avance": 0
+      "devengado": 26997891.090000004,
+      "saldo": 22745802.909999996,
+      "avance": 54.3
     },
     {
-      "pliego": "GOBIERNO REGIONAL APURIMAC",
-      "pim": 0.0,
+      "pliego": "U.N. DE LA AMAZONIA PERUANA",
+      "pim": 10717062.0,
       "certificado": 0.0,
-      "devengado": 0.0,
-      "saldo": 0.0,
-      "avance": 0
+      "devengado": 5801582.48,
+      "saldo": 4915479.52,
+      "avance": 54.1
     },
     {
-      "pliego": "GOBIERNO REGIONAL AREQUIPA",
-      "pim": 0.0,
+      "pliego": "MINISTERIO PUBLICO",
+      "pim": 60042273.0,
       "certificado": 0.0,
-      "devengado": 0.0,
-      "saldo": 0.0,
-      "avance": 0
+      "devengado": 31385505.959999993,
+      "saldo": 28656767.040000007,
+      "avance": 52.3
     },
     {
-      "pliego": "GOBIERNO REGIONAL ANCASH",
-      "pim": 0.0,
+      "pliego": "SUPERINTENDENCIA NACIONAL DE SERVICIOS DE SANEAMIENTO",
+      "pim": 1261541.0,
       "certificado": 0.0,
-      "devengado": 0.0,
-      "saldo": 0.0,
-      "avance": 0
+      "devengado": 604928.5900000001,
+      "saldo": 656612.4099999999,
+      "avance": 48.0
     },
     {
-      "pliego": "GOBIERNO REGIONAL CAJAMARCA",
-      "pim": 0.0,
+      "pliego": "AUTORIDAD PORTUARIA NACIONAL",
+      "pim": 546186.0,
       "certificado": 0.0,
-      "devengado": 0.0,
-      "saldo": 0.0,
-      "avance": 0
+      "devengado": 238738.0,
+      "saldo": 307448.0,
+      "avance": 43.7
     },
     {
-      "pliego": "GOBIERNO REGIONAL HUANCAVELICA",
-      "pim": 0.0,
+      "pliego": "U.N. JORGE BASADRE GROHMANN",
+      "pim": 64814616.0,
       "certificado": 0.0,
-      "devengado": 0.0,
-      "saldo": 0.0,
-      "avance": 0
+      "devengado": 27827651.69,
+      "saldo": 36986964.31,
+      "avance": 42.9
     },
     {
-      "pliego": "GOBIERNO REGIONAL ICA",
-      "pim": 0.0,
+      "pliego": "ORGANISMO DE ESTUDIOS Y DISEÑO DE PROYECTOS DE INVERSION",
+      "pim": 1185937.0,
       "certificado": 0.0,
-      "devengado": 0.0,
-      "saldo": 0.0,
-      "avance": 0
+      "devengado": 487476.98999999993,
+      "saldo": 698460.01,
+      "avance": 41.1
     },
     {
-      "pliego": "GOBIERNO REGIONAL JUNIN",
-      "pim": 0.0,
+      "pliego": "M. DEL INTERIOR",
+      "pim": 880716314.0,
       "certificado": 0.0,
-      "devengado": 0.0,
-      "saldo": 0.0,
-      "avance": 0
+      "devengado": 324079558.83,
+      "saldo": 556636755.1700001,
+      "avance": 36.8
     },
     {
-      "pliego": "GOBIERNO REGIONAL LORETO",
-      "pim": 0.0,
+      "pliego": "U. N. AUTONOMA DE TAYACAJA DANIEL HERNANDEZ MORILLO",
+      "pim": 48168560.0,
       "certificado": 0.0,
-      "devengado": 0.0,
-      "saldo": 0.0,
-      "avance": 0
+      "devengado": 16078795.08,
+      "saldo": 32089764.92,
+      "avance": 33.4
     },
     {
-      "pliego": "GOBIERNO REGIONAL PASCO",
-      "pim": 0.0,
+      "pliego": "OFICINA DE NORMALIZACION PREVISIONAL-ONP",
+      "pim": 6391529.0,
       "certificado": 0.0,
-      "devengado": 0.0,
-      "saldo": 0.0,
-      "avance": 0
+      "devengado": 1872815.91,
+      "saldo": 4518713.09,
+      "avance": 29.3
     },
     {
-      "pliego": "GOBIERNO REGIONAL AYACUCHO",
-      "pim": 0.0,
+      "pliego": "U.N. DE CAÑETE",
+      "pim": 22640923.0,
       "certificado": 0.0,
-      "devengado": 0.0,
-      "saldo": 0.0,
-      "avance": 0
+      "devengado": 6044756.5200000005,
+      "saldo": 16596166.48,
+      "avance": 26.7
     },
     {
-      "pliego": "GOBIERNO REGIONAL LAMBAYEQUE",
-      "pim": 0.0,
+      "pliego": "CONGRESO DE LA REPUBLICA",
+      "pim": 30816606.0,
       "certificado": 0.0,
-      "devengado": 0.0,
-      "saldo": 0.0,
-      "avance": 0
+      "devengado": 7929493.67,
+      "saldo": 22887112.33,
+      "avance": 25.7
     },
     {
-      "pliego": "GOBIERNO REGIONAL PUNO",
-      "pim": 0.0,
+      "pliego": "SERVICIO NACIONAL DE CAPACITACION PARA LA INDUSTRIA DE LA CONSTRUCCION",
+      "pim": 15876036.0,
       "certificado": 0.0,
-      "devengado": 0.0,
-      "saldo": 0.0,
-      "avance": 0
+      "devengado": 1882594.24,
+      "saldo": 13993441.76,
+      "avance": 11.9
     },
     {
-      "pliego": "GOBIERNO REGIONAL CALLAO",
-      "pim": 0.0,
+      "pliego": "SUPERINTENDENCIA DEL MERCADO DE VALORES",
+      "pim": 23823224.0,
       "certificado": 0.0,
-      "devengado": 0.0,
-      "saldo": 0.0,
-      "avance": 0
+      "devengado": 1818281.05,
+      "saldo": 22004942.95,
+      "avance": 7.6
     },
     {
-      "pliego": "GOBIERNO REGIONAL LA LIBERTAD",
-      "pim": 0.0,
+      "pliego": "U.N. CIRO ALEGRIA",
+      "pim": 7554278.0,
+      "certificado": 0.0,
+      "devengado": 209800.52,
+      "saldo": 7344477.48,
+      "avance": 2.8
+    },
+    {
+      "pliego": "U.N. DE ARTE DIEGO QUISPE TITO DEL CUSCO",
+      "pim": 381781.0,
       "certificado": 0.0,
       "devengado": 0.0,
-      "saldo": 0.0,
-      "avance": 0
+      "saldo": 381781.0,
+      "avance": 0.0
     }
   ]
 }
