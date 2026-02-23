@@ -18,7 +18,7 @@
         .progress-bar-text { position: absolute; width: 100%; text-align: center; font-size: 0.75rem; font-weight: 800; color: #000; z-index: 5; line-height: 20px; }
         .bar-fill { height: 100%; z-index: 1; transition: width 0.8s ease-in-out; }
         
-        /* Tipografía de números unificada y profesional */
+        /* Tipografía de números unificada */
         .monto { 
             font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace; 
             font-weight: 600; 
@@ -32,6 +32,13 @@
             border-left: 5px solid #801616 !important;
             background-color: #fff9e6;
         }
+
+        /* Botones de Exportación */
+        .btn-export { font-size: 0.85rem; font-weight: 600; transition: all 0.2s; }
+        .btn-excel { background-color: #1D6F42; color: white; border: none; }
+        .btn-excel:hover { background-color: #155231; color: white; }
+        .btn-pdf { background-color: #AD0B00; color: white; border: none; }
+        .btn-pdf:hover { background-color: #850900; color: white; }
     </style>
 </head>
 <body>
@@ -40,10 +47,9 @@
     <div class="container d-flex justify-content-between align-items-center">
         <div>
             <h3 class="fw-bold mb-0">RANKING REGIONAL DE EJECUCIÓN 2025</h3>
-            
-<span class="badge bg-light text-dark border fw-normal">
-        <i class="bi bi-database-check text-primary"></i> MEF: <span id="fecha-actualizacion">...</span>
-    </span>
+            <span class="badge bg-light text-dark border fw-normal">
+                <i class="bi bi-database-check text-primary"></i> MEF: <span id="fecha-actualizacion">...</span>
+            </span>
         </div>
         <a href="index.html" class="btn btn-warning fw-bold rounded-pill px-4">
             <i class="bi bi-arrow-left"></i> Volver al Monitor
@@ -59,13 +65,22 @@
                     <i class="bi bi-info-circle-fill me-2"></i>NOTA DE DESEMPEÑO INSTITUCIONAL:
                 </h6>
                 <p class="small mb-0" style="color: #555; text-align: justify;">
-                    Este ranking mide exclusivamente la eficiencia del <strong>Pliego: Gobierno Regional de Lambayeque</strong> frente a los otros 24 Gobiernos Regionales del país. Representa la capacidad de gestión directa sobre el presupuesto asignado a la <strong>institución</strong>, realizando una comparación justa entre regiones.
+                    Este ranking mide exclusivamente la eficiencia del <strong>Pliego: Gobierno Regional de Lambayeque</strong> frente a los otros 24 Gobiernos Regionales del país al cierre del año 2025.
                 </p>
             </div>
         </div>
     </div>
 
     <div class="table-container">
+        <div class="d-flex justify-content-end gap-2 mb-3">
+            <button onclick="exportToExcel()" class="btn btn-export btn-excel rounded-pill px-3 shadow-sm">
+                <i class="bi bi-file-earmark-excel-fill me-1"></i> Excel
+            </button>
+            <button onclick="exportToPDF()" class="btn btn-export btn-pdf rounded-pill px-3 shadow-sm">
+                <i class="bi bi-file-earmark-pdf-fill me-1"></i> PDF
+            </button>
+        </div>
+
         <div class="table-responsive">
             <table class="table table-hover align-middle" id="tablaMaster">
                 <thead>
@@ -83,6 +98,10 @@
         </div>
     </div>
 </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
 <script>
     let rawData = [];
@@ -106,30 +125,23 @@
         data.forEach((reg, index) => {
             const esLambayeque = reg.pliego.toUpperCase().includes("LAMBAYEQUE");
 
+            // TRUNCADO MATEMÁTICO (Evita que 99.98% sea 100%)
+            const avanceReal = (reg.devengado / reg.pim * 100);
+            const avanceVisible = (Math.floor(avanceReal * 10) / 10).toFixed(1);
 
-            // Usamos Math.floor con una multiplicación por 10 para "cortar" el decimal sin redondear
-const avanceReal = (reg.devengado / reg.pim * 100);
-const avanceVisible = (Math.floor(avanceReal * 10) / 10).toFixed(1);
-
-            // LOGICA DE COLORES POR GRADIENTE DINÁMICO
             let color;
             let semaforo;
             
             if (avanceReal >= 100) {
-                color = "#059669"; // Verde Esmeralda (Cerrado total)
-                semaforo = "💎"; 
+                color = "#059669"; semaforo = "💎"; 
             } else if (avanceReal >= 90) {
-                color = "#10b981"; // Verde normal (Excelente)
-                semaforo = "🟢";
+                color = "#10b981"; semaforo = "🟢";
             } else if (avanceReal > 70) {
-                color = "#34d399"; // Verde claro
-                semaforo = "🟢";
+                color = "#34d399"; semaforo = "🟢";
             } else if (avanceReal > 30) {
-                color = "#fbbf24"; // Ámbar
-                semaforo = "🟡";
+                color = "#fbbf24"; semaforo = "🟡";
             } else {
-                color = "#ef4444"; // Rojo
-                semaforo = "🔴";
+                color = "#ef4444"; semaforo = "🔴";
             }
 
             tbody.innerHTML += `
@@ -155,18 +167,42 @@ const avanceVisible = (Math.floor(avanceReal * 10) / 10).toFixed(1);
     function sortTable(colIndex) {
         const keys = ['index', 'pliego', 'pim', 'devengado', 'avance', 'saldo'];
         const key = keys[colIndex];
-        
         sortOrder[colIndex] = !sortOrder[colIndex];
         rawData.sort((a, b) => {
-            let valA = a[key];
-            let valB = b[key];
-            
+            let valA = a[key]; let valB = b[key];
             if (typeof valA === 'string') {
                 return sortOrder[colIndex] ? valA.localeCompare(valB) : valB.localeCompare(valA);
             }
             return sortOrder[colIndex] ? valA - valB : valB - valA;
         });
         renderTable(rawData);
+    }
+
+    function exportToExcel() {
+        const table = document.getElementById("tablaMaster");
+        const wb = XLSX.utils.table_to_book(table, { sheet: "Ranking 2025" });
+        XLSX.writeFile(wb, "Ranking_Regional_Ejecucion_2025.xlsx");
+    }
+
+    function exportToPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('l', 'mm', 'a4');
+        doc.setFontSize(16);
+        doc.setTextColor(128, 22, 22);
+        doc.text("RANKING REGIONAL DE EJECUCIÓN 2025", 14, 15);
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text("Sincronización MEF: " + document.getElementById('fecha-actualizacion').innerText, 14, 22);
+
+        doc.autoTable({
+            html: '#tablaMaster',
+            startY: 28,
+            theme: 'grid',
+            headStyles: { fillColor: [128, 22, 22] },
+            styles: { fontSize: 8 },
+            columnStyles: { 0:{halign:'center'}, 2:{halign:'right'}, 3:{halign:'right'}, 4:{halign:'center'}, 5:{halign:'right'} }
+        });
+        doc.save("Ranking_Regional_Ejecucion_2025.pdf");
     }
 
     document.addEventListener('DOMContentLoaded', cargarRanking);
