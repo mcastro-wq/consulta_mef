@@ -8,8 +8,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body { background-color: #f4f6f9; font-family: 'Segoe UI', sans-serif; }
-        .header-mef { background-color: #801616; color: white; padding: 20px 0; border-bottom: 5px solid #ffc107; }
-        .table-container { background: white; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-top: 20px; padding: 20px; }
+        .header-mef { background-color: #801616; color: white; padding: 25px 0; border-bottom: 5px solid #ffc107; }
+        .table-container { background: white; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); padding: 20px; }
         .table thead { background-color: #801616; color: white; cursor: pointer; }
         .table thead th:hover { background-color: #a01d1d; }
         .progress { height: 22px; border-radius: 11px; background-color: #eee; position: relative; border: 1px solid #ccc; }
@@ -18,41 +18,48 @@
         .highlight-lambayeque { background-color: #fff4f4 !important; border: 2px solid #801616 !important; font-weight: bold; }
         .monto { font-family: 'monospace'; font-weight: 600; }
         .th-sort::after { content: ' ↕'; opacity: 0.5; font-size: 0.8em; }
+        
+        /* Ajuste de alineación para la nota */
+        .alert-custom {
+            border-left: 5px solid #801616 !important;
+            background-color: #fff9e6;
+        }
     </style>
 </head>
 <body>
 
-<div class="header-mef">
+<div class="header-mef mb-4">
     <div class="container d-flex justify-content-between align-items-center">
         <div>
             <h2 class="fw-bold mb-0">RANKING REGIONAL DE EJECUCIÓN 2025</h2>
             <p class="mb-0 opacity-75">Sincronizado: <span id="fecha-actualizacion">...</span></p>
         </div>
-        <a href="index.html" class="btn btn-warning fw-bold rounded-pill">← Volver al Monitor</a>
+        <a href="index.html" class="btn btn-warning fw-bold rounded-pill px-4">
+            <i class="bi bi-arrow-left"></i> Volver al Monitor
+        </a>
     </div>
 </div>
 
-
-
 <div class="container mb-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="alert alert-custom border-0 shadow-sm mb-4">
+                <h6 class="fw-bold" style="color: #801616;">
+                    <i class="bi bi-info-circle-fill me-2"></i> NOTA DE DESEMPEÑO INSTITUCIONAL:
+                </h6>
+                <p class="small mb-0" style="color: #555; text-align: justify;">
+                    Este ranking mide exclusivamente la eficiencia del <strong>Pliego: Gobierno Regional de Lambayeque</strong> frente a los otros 24 Gobiernos Regionales del país. Representa la capacidad de gestión directa sobre el presupuesto asignado a la <strong>institución</strong>, realizando una comparación justa entre regiones.
+                </p>
+            </div>
+        </div>
+    </div>
 
-
-<div class="alert alert-warning border-0 shadow-sm mt-4 mb-4 mx-auto" style="border-left: 5px solid #801616 !important; background-color: #fff9e6; max-width: 1320px;">
-    <h6 class="fw-bold"><i class="bi bi-info-circle-fill"></i> NOTA DE DESEMPEÑO INSTITUCIONAL:</h6>
-    <p class="small mb-0" style="color: #555; text-align: justify;">
-        Este ranking mide exclusivamente la eficiencia del <strong>Pliego: Gobierno Regional de Lambayeque</strong> frente a los otros 24 Gobiernos Regionales del país. Representa
-        la capacidad de gestión directa sobre el presupuesto asignado a la institucion, realizando una comparación justa entre regiones.
-    </p>
-</div>
-
-
-    
     <div class="table-container">
         <div class="table-responsive">
             <table class="table table-hover align-middle" id="tablaMaster">
                 <thead>
                     <tr>
-                        <th onclick="sortTable(0)">N°</th>
+                        <th onclick="sortTable(0)" class="text-center">N°</th>
                         <th onclick="sortTable(1)" class="th-sort">PLIEGO</th>
                         <th onclick="sortTable(2)" class="th-sort text-center">PIM (S/)</th>
                         <th onclick="sortTable(3)" class="th-sort text-center">DEVENGADO (S/)</th>
@@ -71,18 +78,22 @@
     let sortOrder = [true, true, true, true, true, true];
 
     async function cargarRanking() {
-        const res = await fetch('data_ranking.json?v=' + Math.random());
-        const data = await res.json();
-        document.getElementById('fecha-actualizacion').innerText = data.ultima_actualizacion;
-        rawData = data.ranking;
-        renderTable(rawData);
+        try {
+            const res = await fetch('data_ranking.json?v=' + Math.random());
+            const data = await res.json();
+            document.getElementById('fecha-actualizacion').innerText = data.ultima_actualizacion;
+            rawData = data.ranking;
+            renderTable(rawData);
+        } catch (error) {
+            console.error("Error cargando el ranking:", error);
+        }
     }
 
     function renderTable(data) {
         const tbody = document.getElementById('tabla-ranking');
         tbody.innerHTML = '';
         data.forEach((reg, index) => {
-            const esLambayeque = reg.pliego.includes("LAMBAYEQUE");
+            const esLambayeque = reg.pliego.toUpperCase().includes("LAMBAYEQUE");
             let color = reg.avance > 70 ? "#198754" : (reg.avance > 30 ? "#ffc107" : "#dc3545");
             let semaforo = reg.avance > 70 ? "🟢" : (reg.avance > 30 ? "🟡" : "🔴");
 
@@ -94,7 +105,7 @@
                     <td class="text-end monto text-primary">${reg.devengado.toLocaleString('es-PE')}</td>
                     <td>
                         <div class="d-flex align-items-center gap-2">
-                            <span>${semaforo}</span>
+                            <span style="font-size: 0.9rem;">${semaforo}</span>
                             <div class="progress flex-grow-1">
                                 <div class="progress-bar-text">${reg.avance}%</div>
                                 <div class="bar-fill" style="width: ${reg.avance}%; background-color: ${color};"></div>
@@ -114,8 +125,11 @@
         rawData.sort((a, b) => {
             let valA = a[key];
             let valB = b[key];
-            if (colIndex === 0) return sortOrder[colIndex] ? 1 : -1; // Simplificado para N°
-            return sortOrder[colIndex] ? (valA > valB ? 1 : -1) : (valA < valB ? 1 : -1);
+            
+            if (typeof valA === 'string') {
+                return sortOrder[colIndex] ? valA.localeCompare(valB) : valB.localeCompare(valA);
+            }
+            return sortOrder[colIndex] ? valA - valB : valB - valA;
         });
         renderTable(rawData);
     }
