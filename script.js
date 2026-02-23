@@ -205,3 +205,4 @@ function renderizarCards(lista) {
 function setRango(r) { filtroRango = r; filtrarTodo(); }
 
 
+
