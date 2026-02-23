@@ -1,0 +1,405 @@
+{
+  "ultima_actualizacion": "23/02/2026 08:38",
+  "ranking": [
+    {
+      "pliego": "DEL DEPARTAMENTO DE PIURA",
+      "pim": 1089794650.0,
+      "certificado": 0.0,
+      "devengado": 1089628169.3500001,
+      "saldo": 166480.64999985695,
+      "avance": 100.0
+    },
+    {
+      "pliego": "DEL DEPARTAMENTO DE AYACUCHO",
+      "pim": 911142911.0,
+      "certificado": 0.0,
+      "devengado": 909776460.1300006,
+      "saldo": 1366450.8699994087,
+      "avance": 99.9
+    },
+    {
+      "pliego": "DEL DEPARTAMENTO DE AREQUIPA",
+      "pim": 686857114.0,
+      "certificado": 0.0,
+      "devengado": 685667730.6699998,
+      "saldo": 1189383.3300001621,
+      "avance": 99.8
+    },
+    {
+      "pliego": "DEL DEPARTAMENTO DE JUNIN",
+      "pim": 973420872.0,
+      "certificado": 0.0,
+      "devengado": 966974393.2999998,
+      "saldo": 6446478.700000167,
+      "avance": 99.3
+    },
+    {
+      "pliego": "DEL DEPARTAMENTO DE AMAZONAS",
+      "pim": 457124730.0,
+      "certificado": 0.0,
+      "devengado": 453947760.32000035,
+      "saldo": 3176969.6799996495,
+      "avance": 99.3
+    },
+    {
+      "pliego": "DEL DEPARTAMENTO DE ANCASH",
+      "pim": 395908555.0,
+      "certificado": 0.0,
+      "devengado": 389292976.7800001,
+      "saldo": 6615578.219999909,
+      "avance": 98.3
+    },
+    {
+      "pliego": "DEL DEPARTAMENTO DE HUANCAVELICA",
+      "pim": 307022357.0,
+      "certificado": 0.0,
+      "devengado": 301421914.42,
+      "saldo": 5600442.579999983,
+      "avance": 98.2
+    },
+    {
+      "pliego": "DEL DEPARTAMENTO DE TACNA",
+      "pim": 305569983.0,
+      "certificado": 0.0,
+      "devengado": 298384384.8700001,
+      "saldo": 7185598.129999876,
+      "avance": 97.6
+    },
+    {
+      "pliego": "DEL DEPARTAMENTO DE HUANUCO",
+      "pim": 400919484.0,
+      "certificado": 0.0,
+      "devengado": 385497320.71999985,
+      "saldo": 15422163.28000015,
+      "avance": 96.2
+    },
+    {
+      "pliego": "DEL DEPARTAMENTO DE LA LIBERTAD",
+      "pim": 702277636.0,
+      "certificado": 0.0,
+      "devengado": 674931302.2900001,
+      "saldo": 27346333.70999992,
+      "avance": 96.1
+    },
+    {
+      "pliego": "DEL DEPARTAMENTO DE MADRE DE DIOS",
+      "pim": 216288078.0,
+      "certificado": 0.0,
+      "devengado": 207386237.10000005,
+      "saldo": 8901840.899999946,
+      "avance": 95.9
+    },
+    {
+      "pliego": "DEL DEPARTAMENTO DE LORETO",
+      "pim": 1050495264.0,
+      "certificado": 0.0,
+      "devengado": 992912700.4000001,
+      "saldo": 57582563.599999905,
+      "avance": 94.5
+    },
+    {
+      "pliego": "DEL DEPARTAMENTO DE SAN MARTIN",
+      "pim": 654153819.0,
+      "certificado": 0.0,
+      "devengado": 617909937.3499999,
+      "saldo": 36243881.650000095,
+      "avance": 94.5
+    },
+    {
+      "pliego": "DEL DEPARTAMENTO DE PUNO",
+      "pim": 921096476.0,
+      "certificado": 0.0,
+      "devengado": 858919781.2299998,
+      "saldo": 62176694.77000022,
+      "avance": 93.2
+    },
+    {
+      "pliego": "DEL DEPARTAMENTO DE CUSCO",
+      "pim": 1017571783.0,
+      "certificado": 0.0,
+      "devengado": 942801918.9500008,
+      "saldo": 74769864.04999924,
+      "avance": 92.7
+    },
+    {
+      "pliego": "DEL DEPARTAMENTO DE ICA",
+      "pim": 409997734.0,
+      "certificado": 0.0,
+      "devengado": 377635278.85999995,
+      "saldo": 32362455.140000045,
+      "avance": 92.1
+    },
+    {
+      "pliego": "DEL DEPARTAMENTO DE APURIMAC",
+      "pim": 529848418.0,
+      "certificado": 0.0,
+      "devengado": 488084926.5799999,
+      "saldo": 41763491.42000008,
+      "avance": 92.1
+    },
+    {
+      "pliego": "DEL DEPARTAMENTO DE PASCO",
+      "pim": 467615572.0,
+      "certificado": 0.0,
+      "devengado": 429718330.5100002,
+      "saldo": 37897241.48999977,
+      "avance": 91.9
+    },
+    {
+      "pliego": "DEL DEPARTAMENTO DE CAJAMARCA",
+      "pim": 977208573.0,
+      "certificado": 0.0,
+      "devengado": 889663102.86,
+      "saldo": 87545470.13999999,
+      "avance": 91.0
+    },
+    {
+      "pliego": "DEL DEPARTAMENTO DE MOQUEGUA",
+      "pim": 315742833.0,
+      "certificado": 0.0,
+      "devengado": 286244865.53999984,
+      "saldo": 29497967.460000157,
+      "avance": 90.7
+    },
+    {
+      "pliego": "DEL DEPARTAMENTO DE UCAYALI",
+      "pim": 496937067.0,
+      "certificado": 0.0,
+      "devengado": 446672166.06,
+      "saldo": 50264900.94,
+      "avance": 89.9
+    },
+    {
+      "pliego": "DEL DEPARTAMENTO DE LIMA",
+      "pim": 586336422.0,
+      "certificado": 0.0,
+      "devengado": 511983145.5200001,
+      "saldo": 74353276.4799999,
+      "avance": 87.3
+    },
+    {
+      "pliego": "DEL DEPARTAMENTO DE LAMBAYEQUE",
+      "pim": 754899572.0,
+      "certificado": 0.0,
+      "devengado": 650108010.8900001,
+      "saldo": 104791561.1099999,
+      "avance": 86.1
+    },
+    {
+      "pliego": "DEL DEPARTAMENTO DE TUMBES",
+      "pim": 185356356.0,
+      "certificado": 0.0,
+      "devengado": 148274288.00000006,
+      "saldo": 37082067.99999994,
+      "avance": 80.0
+    },
+    {
+      "pliego": "DE LA PROVINCIA CONSTITUCIONAL DEL CALLAO",
+      "pim": 268227716.0,
+      "certificado": 0.0,
+      "devengado": 179387549.29999998,
+      "saldo": 88840166.70000002,
+      "avance": 66.9
+    },
+    {
+      "pliego": "TACNA",
+      "pim": 0.0,
+      "certificado": 0.0,
+      "devengado": 0.0,
+      "saldo": 0.0,
+      "avance": 0
+    },
+    {
+      "pliego": "HUANUCO",
+      "pim": 0.0,
+      "certificado": 0.0,
+      "devengado": 0.0,
+      "saldo": 0.0,
+      "avance": 0
+    },
+    {
+      "pliego": "CUSCO",
+      "pim": 0.0,
+      "certificado": 0.0,
+      "devengado": 0.0,
+      "saldo": 0.0,
+      "avance": 0
+    },
+    {
+      "pliego": "TUMBES",
+      "pim": 0.0,
+      "certificado": 0.0,
+      "devengado": 0.0,
+      "saldo": 0.0,
+      "avance": 0
+    },
+    {
+      "pliego": "PIURA",
+      "pim": 0.0,
+      "certificado": 0.0,
+      "devengado": 0.0,
+      "saldo": 0.0,
+      "avance": 0
+    },
+    {
+      "pliego": "LIMA",
+      "pim": 0.0,
+      "certificado": 0.0,
+      "devengado": 0.0,
+      "saldo": 0.0,
+      "avance": 0
+    },
+    {
+      "pliego": "UCAYALI",
+      "pim": 0.0,
+      "certificado": 0.0,
+      "devengado": 0.0,
+      "saldo": 0.0,
+      "avance": 0
+    },
+    {
+      "pliego": "AMAZONAS",
+      "pim": 0.0,
+      "certificado": 0.0,
+      "devengado": 0.0,
+      "saldo": 0.0,
+      "avance": 0
+    },
+    {
+      "pliego": "MADRE DE DIOS",
+      "pim": 0.0,
+      "certificado": 0.0,
+      "devengado": 0.0,
+      "saldo": 0.0,
+      "avance": 0
+    },
+    {
+      "pliego": "MOQUEGUA",
+      "pim": 0.0,
+      "certificado": 0.0,
+      "devengado": 0.0,
+      "saldo": 0.0,
+      "avance": 0
+    },
+    {
+      "pliego": "SAN MARTIN",
+      "pim": 0.0,
+      "certificado": 0.0,
+      "devengado": 0.0,
+      "saldo": 0.0,
+      "avance": 0
+    },
+    {
+      "pliego": "APURIMAC",
+      "pim": 0.0,
+      "certificado": 0.0,
+      "devengado": 0.0,
+      "saldo": 0.0,
+      "avance": 0
+    },
+    {
+      "pliego": "AREQUIPA",
+      "pim": 0.0,
+      "certificado": 0.0,
+      "devengado": 0.0,
+      "saldo": 0.0,
+      "avance": 0
+    },
+    {
+      "pliego": "ANCASH",
+      "pim": 0.0,
+      "certificado": 0.0,
+      "devengado": 0.0,
+      "saldo": 0.0,
+      "avance": 0
+    },
+    {
+      "pliego": "CAJAMARCA",
+      "pim": 0.0,
+      "certificado": 0.0,
+      "devengado": 0.0,
+      "saldo": 0.0,
+      "avance": 0
+    },
+    {
+      "pliego": "HUANCAVELICA",
+      "pim": 0.0,
+      "certificado": 0.0,
+      "devengado": 0.0,
+      "saldo": 0.0,
+      "avance": 0
+    },
+    {
+      "pliego": "ICA",
+      "pim": 0.0,
+      "certificado": 0.0,
+      "devengado": 0.0,
+      "saldo": 0.0,
+      "avance": 0
+    },
+    {
+      "pliego": "JUNIN",
+      "pim": 0.0,
+      "certificado": 0.0,
+      "devengado": 0.0,
+      "saldo": 0.0,
+      "avance": 0
+    },
+    {
+      "pliego": "LORETO",
+      "pim": 0.0,
+      "certificado": 0.0,
+      "devengado": 0.0,
+      "saldo": 0.0,
+      "avance": 0
+    },
+    {
+      "pliego": "PASCO",
+      "pim": 0.0,
+      "certificado": 0.0,
+      "devengado": 0.0,
+      "saldo": 0.0,
+      "avance": 0
+    },
+    {
+      "pliego": "AYACUCHO",
+      "pim": 0.0,
+      "certificado": 0.0,
+      "devengado": 0.0,
+      "saldo": 0.0,
+      "avance": 0
+    },
+    {
+      "pliego": "LAMBAYEQUE",
+      "pim": 0.0,
+      "certificado": 0.0,
+      "devengado": 0.0,
+      "saldo": 0.0,
+      "avance": 0
+    },
+    {
+      "pliego": "PUNO",
+      "pim": 0.0,
+      "certificado": 0.0,
+      "devengado": 0.0,
+      "saldo": 0.0,
+      "avance": 0
+    },
+    {
+      "pliego": "CALLAO",
+      "pim": 0.0,
+      "certificado": 0.0,
+      "devengado": 0.0,
+      "saldo": 0.0,
+      "avance": 0
+    },
+    {
+      "pliego": "LA LIBERTAD",
+      "pim": 0.0,
+      "certificado": 0.0,
+      "devengado": 0.0,
+      "saldo": 0.0,
+      "avance": 0
+    }
+  ]
+}
