@@ -29,7 +29,7 @@ jobs:
         run: |
           git config --global user.name 'GitHub Action'
           git config --global user.email 'action@github.com'
-          git add data_mef.json
+          git add data_mef.json data_ranking.json
           # El commit incluye la fecha para que el historial sea claro
           git commit -m "📊 Datos Reales MEF Actualizados: $(date)" || echo "Sin cambios para commitear"
           git push origin main
