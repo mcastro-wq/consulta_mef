@@ -12,14 +12,22 @@
         .table-container { background: white; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); padding: 20px; }
         .table thead { background-color: #801616; color: white; cursor: pointer; }
         .table thead th:hover { background-color: #a01d1d; }
-        .progress { height: 22px; border-radius: 11px; background-color: #eee; position: relative; border: 1px solid #ccc; }
+        
+        /* Barra de progreso mejorada */
+        .progress { height: 22px; border-radius: 11px; background-color: #eee; position: relative; border: 1px solid #ccc; overflow: hidden; }
         .progress-bar-text { position: absolute; width: 100%; text-align: center; font-size: 0.75rem; font-weight: 800; color: #000; z-index: 5; line-height: 20px; }
-        .bar-fill { height: 100%; z-index: 1; transition: width 0.5s; }
+        .bar-fill { height: 100%; z-index: 1; transition: width 0.8s ease-in-out; }
+        
+        /* Tipografía de números unificada y profesional */
+        .monto { 
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace; 
+            font-weight: 600; 
+            letter-spacing: -0.3px;
+        }
+
         .highlight-lambayeque { background-color: #fff4f4 !important; border: 2px solid #801616 !important; font-weight: bold; }
-        .monto { font-family: 'monospace'; font-weight: 600; }
         .th-sort::after { content: ' ↕'; opacity: 0.5; font-size: 0.8em; }
         
-        /* Ajuste de alineación para la nota */
         .alert-custom {
             border-left: 5px solid #801616 !important;
             background-color: #fff9e6;
@@ -94,25 +102,48 @@
         tbody.innerHTML = '';
         data.forEach((reg, index) => {
             const esLambayeque = reg.pliego.toUpperCase().includes("LAMBAYEQUE");
-            let color = reg.avance > 70 ? "#198754" : (reg.avance > 30 ? "#ffc107" : "#dc3545");
-            let semaforo = reg.avance > 70 ? "🟢" : (reg.avance > 30 ? "🟡" : "🔴");
+            
+            // CÁLCULO DE PRECISIÓN CON UN DECIMAL
+            const avanceReal = (reg.devengado / reg.pim * 100);
+            const avanceVisible = avanceReal.toFixed(1);
+
+            // LOGICA DE COLORES POR GRADIENTE DINÁMICO
+            let color;
+            let semaforo;
+            
+            if (avanceReal >= 100) {
+                color = "#059669"; // Verde Esmeralda (Cerrado total)
+                semaforo = "💎"; 
+            } else if (avanceReal >= 90) {
+                color = "#10b981"; // Verde normal (Excelente)
+                semaforo = "🟢";
+            } else if (avanceReal > 70) {
+                color = "#34d399"; // Verde claro
+                semaforo = "🟢";
+            } else if (avanceReal > 30) {
+                color = "#fbbf24"; // Ámbar
+                semaforo = "🟡";
+            } else {
+                color = "#ef4444"; // Rojo
+                semaforo = "🔴";
+            }
 
             tbody.innerHTML += `
                 <tr class="${esLambayeque ? 'highlight-lambayeque' : ''}">
                     <td class="text-center">${index + 1}</td>
                     <td class="text-uppercase">${reg.pliego}</td>
-                    <td class="text-end monto">${reg.pim.toLocaleString('es-PE')}</td>
-                    <td class="text-end monto text-primary">${reg.devengado.toLocaleString('es-PE')}</td>
+                    <td class="text-end monto">${reg.pim.toLocaleString('es-PE', {minimumFractionDigits: 2})}</td>
+                    <td class="text-end monto text-primary">${reg.devengado.toLocaleString('es-PE', {minimumFractionDigits: 2})}</td>
                     <td>
                         <div class="d-flex align-items-center gap-2">
                             <span style="font-size: 0.9rem;">${semaforo}</span>
                             <div class="progress flex-grow-1">
-                                <div class="progress-bar-text">${reg.avance}%</div>
-                                <div class="bar-fill" style="width: ${reg.avance}%; background-color: ${color};"></div>
+                                <div class="progress-bar-text">${avanceVisible}%</div>
+                                <div class="bar-fill" style="width: ${avanceVisible}%; background-color: ${color};"></div>
                             </div>
                         </div>
                     </td>
-                    <td class="text-end monto text-danger">${reg.saldo.toLocaleString('es-PE')}</td>
+                    <td class="text-end monto text-danger">${reg.saldo.toLocaleString('es-PE', {minimumFractionDigits: 2})}</td>
                 </tr>`;
         });
     }
