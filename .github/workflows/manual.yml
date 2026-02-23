@@ -3,7 +3,7 @@ name: Actualizacion Automatizada MEF
 on:
   schedule:
     - cron: '0 */6 * * *' # Cada 6 horas
-  workflow_dispatch: # Permite darle al botón "Run" manualmente
+  workflow_dispatch: # Permite darle al botón "Run" manualmente si
 
 permissions:
   contents: write
