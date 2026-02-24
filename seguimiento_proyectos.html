@@ -276,33 +276,24 @@ async function fetchData(anio = "2026") {
 
     try {
         let rawRecords = [];
+        let fileName = (anio === "2026") ? 'data_proyectos.json' : `data_${anio}.json`;
+        
+        const res = await fetch(fileName);
+        if (!res.ok) throw new Error(`Archivo ${fileName} no encontrado en el servidor.`);
+        
+        const json = await res.json();
+        
+        // Estructura según si es tu JSON manual o el formato directo de la API MEF
         if (anio === "2026") {
-            // Para 2026 sigue buscando tu archivo local
-            const res = await fetch('data_proyectos.json');
-            if (!res.ok) throw new Error("Archivo 2026 no encontrado");
-            const json = await res.json();
             rawRecords = json.proyectos;
-            document.getElementById('txt-corte').innerText = "LOCAL: " + (json.fecha_extraccion || '2026');
         } else {
-            const resourceId = MEF_RESOURCES[anio];
-            const sql = `SELECT * FROM "${resourceId}" WHERE "SEC_EJEC" = '452'`;
-            
-            // --- SOLUCIÓN CORS ---
-            // Usamos un proxy para saltar el bloqueo del MEF
-            const proxy = "https://corsproxy.io/?"; 
-            const apiTarget = `https://api.datosabiertos.mef.gob.pe/DatosAbiertos/v1/datastore_search_sql?sql=${encodeURIComponent(sql)}`;
-            
-            const res = await fetch(proxy + apiTarget);
-            if (!res.ok) throw new Error("Error en la respuesta del Proxy/MEF");
-            
-            const json = await res.json();
-            if (json.success) {
-                rawRecords = json.result.records;
-                document.getElementById('txt-corte').innerText = "API MEF - " + anio;
-            }
+            // El JSON descargado del MEF viene dentro de result.records
+            rawRecords = json.result ? json.result.records : json; 
         }
 
-        // NORMALIZACIÓN (Mantenemos esta lógica para que la tabla no se rompa)
+        document.getElementById('txt-corte').innerText = "ARCHIVO LOCAL - " + anio;
+
+        // NORMALIZACIÓN
         allData = rawRecords.map(r => ({
             CUI: r.PRODUCTO_PROYECTO || r.CUI || "0",
             NOMBRE: r.PRODUCTO_PROYECTO_NOMBRE || r.NOMBRE || "SIN NOMBRE",
@@ -319,10 +310,8 @@ async function fetchData(anio = "2026") {
         filtrar();
 
     } catch (e) {
-        console.error("Error detectado:", e);
-        document.getElementById('txt-corte').innerText = "ERROR: " + e.message;
-        // Limpiar tabla en caso de error para que no se vea data vieja
-        document.getElementById('tbody-main').innerHTML = `<tr><td colspan="8" class="text-center text-danger">Error al cargar datos de ${anio}. Es posible que el proxy esté saturado.</td></tr>`;
+        console.error("Fallo de carga:", e);
+        document.getElementById('tbody-main').innerHTML = `<tr><td colspan="8" class="text-center text-danger">Error: ${e.message}</td></tr>`;
     } finally {
         if (overlay) overlay.style.display = 'none';
     }
