@@ -1,61 +1,57 @@
-import requests
-import json
-import os
+import urllib.request, csv, json, io
+from datetime import datetime, timedelta
 
-def obtener_datos_mef():
-    # URL de la API de Datos Abiertos del MEF
-    API_URL = "https://api.datosabiertos.mef.gob.pe/DatosAbiertos/v1/datastore_search_sql"
-    
-    # ID del recurso para el año 2026 (según tu diccionario)
-    RESOURCE_ID = "615644aa-ef73-4358-b4e0-0c20931632f3"
-    
-    # Consulta SQL para traer lo necesario para el seguimiento de Lambayeque
-    # Filtramos por PLIEGO_NOMBRE y agrupamos para no saturar el JSON
-    query = f"""
-    SELECT 
-        "PRODUCTO_PROYECTO", 
-        "PRODUCTO_PROYECTO_NOMBRE", 
-        "EJECUTORA_NOMBRE", 
-        "CATEGORIA_GASTO_NOMBRE",
-        "MES_EJE",
-        SUM("MONTO_PIM") as "MONTO_PIM", 
-        SUM("MONTO_DEVENGADO") as "MONTO_DEVENGADO"
-    FROM "{RESOURCE_ID}" 
-    WHERE "PLIEGO_NOMBRE" LIKE '%LAMBAYEQUE%'
-    GROUP BY 
-        "PRODUCTO_PROYECTO", 
-        "PRODUCTO_PROYECTO_NOMBRE", 
-        "EJECUTORA_NOMBRE", 
-        "CATEGORIA_GASTO_NOMBRE",
-        "MES_EJE"
-    ORDER BY "MONTO_PIM" DESC
-    """
-
-    params = {'sql': query}
-
-    print("🚀 Conectando con la API del MEF...")
+def generate_seguimiento_detallado():
+    # URL del dataset 2026 (Seguimiento de Proyectos de Inversión)
+    url = "https://fs.datosabiertos.mef.gob.pe/datastorefiles/2026-Seguimiento-PI.csv"
+    headers = {'User-Agent': 'Mozilla/5.0'}
     
     try:
-        response = requests.get(API_URL, params=params)
-        response.raise_for_status() # Lanza error si la respuesta no es 200
+        print("🚀 Descargando base de datos completa del MEF (CSV)...")
+        req = urllib.request.Request(url, headers=headers)
         
-        data = response.json()
-        
-        if data['success']:
-            resultados = data['result']['records']
+        # Aumentamos el timeout porque el archivo CSV es pesado
+        with urllib.request.urlopen(req, timeout=600) as response:
+            content = response.read().decode('utf-8-sig')
+            reader = csv.DictReader(io.StringIO(content))
             
-            # Guardar en archivo JSON
-            nombre_archivo = 'data_proyectos.json'
-            with open(nombre_archivo, 'w', encoding='utf-8') as f:
-                json.dump(resultados, f, ensure_ascii=False, indent=4)
+            # Limpiar espacios en los nombres de las columnas
+            reader.fieldnames = [f.strip() for f in reader.fieldnames]
             
-            print(f"✅ ¡Éxito! Se han descargado {len(resultados)} registros.")
-            print(f"📂 Archivo guardado como: {nombre_archivo}")
-        else:
-            print("❌ Error en la consulta: La API respondió success: false")
+            proyectos_data = []
 
-    except requests.exceptions.RequestException as e:
-        print(f"❌ Error de conexión: {e}")
+            print("🔍 Filtrando inversiones para Lambayeque...")
+            for r in reader:
+                # FILTRO: Solo Lambayeque (ya sea por departamento o pliego)
+                pliego = str(r.get('PLIEGO_NOMBRE', '')).upper()
+                dpto_meta = str(r.get('DEPARTAMENTO_META_NOMBRE', '')).upper()
+                
+                if "LAMBAYEQUE" in pliego or "LAMBAYEQUE" in dpto_meta:
+                    try:
+                        pim = float(r.get('MONTO_PIM', 0) or 0)
+                        dev = float(r.get('MONTO_DEVENGADO', 0) or 0)
+                        
+                        # Guardamos la estructura que el HTML espera
+                        proyectos_data.append({
+                            "PRODUCTO_PROYECTO": r.get('PRODUCTO_PROYECTO', '0'),
+                            "PRODUCTO_PROYECTO_NOMBRE": r.get('PRODUCTO_PROYECTO_NOMBRE', 'SIN NOMBRE'),
+                            "EJECUTORA_NOMBRE": r.get('EJECUTORA_NOMBRE', 'SIN EJECUTORA'),
+                            "CATEGORIA_GASTO_NOMBRE": r.get('CATEGORIA_GASTO_NOMBRE', 'INVERSION'),
+                            "MES_EJE": r.get('MES_EJE', '1'),
+                            "MONTO_PIM": pim,
+                            "MONTO_DEVENGADO": dev
+                        })
+                    except ValueError:
+                        continue
+
+            # Guardar el archivo para el Dashboard de Seguimiento
+            with open('data_proyectos.json', 'w', encoding='utf-8') as f:
+                json.dump(proyectos_data, f, indent=2, ensure_ascii=False)
+            
+            print(f"✅ ¡Éxito! Se procesaron {len(proyectos_data)} registros para Lambayeque.")
+
+    except Exception as e:
+        print(f"🚨 Error en seguimiento.py: {e}")
 
 if __name__ == "__main__":
-    obtener_datos_mef()
+    generate_seguimiento_detallado()
