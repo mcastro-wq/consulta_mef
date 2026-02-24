@@ -477,7 +477,7 @@ function guardarSeguimiento(event) {
     .catch(error => {
         console.error('Error:', error);
         alert("❌ Error de comunicación.");
-    });
+    })
     .finally(() => {
         btn.disabled = false;
         btn.innerHTML = originalText;
