@@ -156,31 +156,43 @@
         }).join('');
     }
 
-    function seleccionar(cui, fila) {
-        document.querySelectorAll('tr').forEach(r => r.classList.remove('selected-row'));
-        fila.classList.add('selected-row');
+function seleccionar(cui, fila) {
+    // Marcamos la fila visualmente
+    document.querySelectorAll('tr').forEach(r => r.classList.remove('selected-row'));
+    fila.classList.add('selected-row');
+    
+    // FILTRAR todos los registros que tengan ese CUI (por si hay duplicados/metas)
+    const registros = allData.filter(i => i.PRODUCTO_PROYECTO.toString() === cui.toString());
+    
+    if(registros.length > 0) {
+        // SUMAR los valores de todos los registros encontrados para ese CUI
+        let totalPim = 0, totalCert = 0, totalComp = 0, totalDev = 0, totalGir = 0;
+
+        registros.forEach(r => {
+            totalPim += parseFloat(r.MONTO_PIM) || 0;
+            totalCert += parseFloat(r.MONTO_CERTIFICADO) || 0;
+            totalComp += parseFloat(r.MONTO_COMPROMETIDO_ANUAL) || 0;
+            totalDev += parseFloat(r.MONTO_DEVENGADO) || 0;
+            totalGir += parseFloat(r.MONTO_GIRADO) || 0;
+        });
+
+        // Calcular porcentajes basados en el PIM TOTAL sumado
+        const perc = (val) => totalPim > 0 ? (val / totalPim * 100).toFixed(1) : 0;
+
+        // Actualizar Velocímetros
+        updateGauge('g-cert', 'v-cert', perc(totalCert));
+        updateGauge('g-comp', 'v-comp', perc(totalComp));
+        updateGauge('g-dev', 'v-dev', perc(totalDev));
+        updateGauge('g-gir', 'v-gir', perc(totalGir));
+
+        // Actualizar textos informativos inferiores con el formato correcto
+        document.getElementById('txt-pim').innerText = 'S/ ' + totalPim.toLocaleString('es-PE', { minimumFractionDigits: 2 });
+        document.getElementById('txt-dev').innerText = 'S/ ' + totalDev.toLocaleString('es-PE', { minimumFractionDigits: 2 });
         
-        const p = allData.find(i => i.PRODUCTO_PROYECTO.toString() === cui.toString());
-        if(p) {
-            const pim = parseFloat(p.MONTO_PIM) || 0;
-            const cert = parseFloat(p.MONTO_CERTIFICADO) || 0;
-            const comp = parseFloat(p.MONTO_COMPROMETIDO_ANUAL) || 0;
-            const dev = parseFloat(p.MONTO_DEVENGADO) || 0;
-            const gir = parseFloat(p.MONTO_GIRADO) || 0;
-
-            const perc = (val) => pim > 0 ? (val/pim*100).toFixed(1) : 0;
-
-            updateGauge('g-cert', 'v-cert', perc(cert));
-            updateGauge('g-comp', 'v-comp', perc(comp));
-            updateGauge('g-dev', 'v-dev', perc(dev));
-            updateGauge('g-gir', 'v-gir', perc(gir));
-
-            // CORRECCIÓN AQUÍ: Se asegura que el texto informativo use los números del JSON
-            document.getElementById('txt-pim').innerText = 'S/ ' + pim.toLocaleString('es-PE');
-            document.getElementById('txt-dev').innerText = 'S/ ' + dev.toLocaleString('es-PE');
-            document.getElementById('btn-modal').disabled = false;
-        }
+        // Habilitar botón de registro
+        document.getElementById('btn-modal').disabled = false;
     }
+}
 
     function updateGauge(id, textId, value) {
         const path = document.getElementById(id);
