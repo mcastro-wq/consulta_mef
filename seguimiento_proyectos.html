@@ -411,52 +411,58 @@
 
 
 function guardarSeguimiento() {
-    console.log("Iniciando proceso de guardado..."); // Para debug
-    
     const urlApi = 'https://script.google.com/macros/s/AKfycbxwYHnLMHEDyCrCd-YoJ2dCJNhxexdm4WeqFPzGKyS_jHEOHgjkaaWpWLpNPjlTLb-r/exec';
     
-    // Capturamos los datos asegurándonos de que los IDs existan
-    try {
-        const datos = {
-            cui: document.getElementById('codigo_cui').value,
-            estado_g: document.getElementById('estado_general').value,
-            sisgedo: document.getElementById('sisgedo').value,
-            detalle_g: document.getElementById('detalle_estado_general').value,
-            estado_e: document.getElementById('estado_especifico').value,
-            detalle_e: document.getElementById('detalle_estado_especifico').value,
-            timeline: document.getElementById('timeline_inversion').value,
-            acciones: document.getElementById('acciones_programadas').value
-        };
+    // Función auxiliar para obtener valor sin errores si el ID no existe
+    const getVal = (id) => document.getElementById(id) ? document.getElementById(id).value : "";
 
-        console.log("Datos capturados:", datos);
+    const datos = {
+        cui: getVal('codigo_cui'),
+        estado_g: getVal('estado_general'),
+        sisgedo: getVal('sisgedo'),
+        detalle_g: getVal('detalle_estado_general'),
+        estado_e: getVal('estado_especifico'),
+        detalle_e: getVal('detalle_estado_especifico'),
+        timeline: getVal('timeline_inversion'),
+        acciones: getVal('acciones_programadas')
+    };
 
-        if (!datos.cui) {
-            alert("⚠️ Por favor, ingrese el Código CUI.");
-            return;
-        }
-
-        fetch(urlApi, {
-            method: 'POST',
-            mode: 'no-cors', 
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(datos)
-        })
-        .then(() => {
-            alert("✅ ¡Registro enviado con éxito!");
-            // Cerrar el modal (usando el ID que veo en tu inspección de elementos)
-            const modalElement = document.getElementById('modalRegistro');
-            const modal = bootstrap.Modal.getInstance(modalElement);
-            if (modal) modal.hide();
-        })
-        .catch(error => {
-            console.error('Error en fetch:', error);
-            alert("❌ Error al conectar con la API.");
-        });
-
-    } catch (err) {
-        console.error("Error capturando campos:", err);
-        alert("❌ Error: Uno de los campos del formulario no fue encontrado.");
+    if (!datos.cui) {
+        alert("⚠️ El Código CUI es obligatorio.");
+        return;
     }
+
+    // Cambiamos el botón a estado "Cargando..."
+    const btn = event.target.closest('button');
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Guardando...';
+
+    fetch(urlApi, {
+        method: 'POST',
+        mode: 'no-cors', 
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(datos)
+    })
+    .then(() => {
+        alert("✅ ¡Registro exitoso en Aiven para el CUI: " + datos.cui + "!");
+        
+        // Cerrar modal
+        const modalElement = document.getElementById('modalRegistro');
+        const modal = bootstrap.Modal.getInstance(modalElement);
+        if (modal) modal.hide();
+        
+        // Limpiar campos
+        document.querySelectorAll('#modalRegistro input, #modalRegistro textarea').forEach(f => f.value = '');
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert("❌ Error de conexión al servidor.");
+    })
+    .finally(() => {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    });
 }
 
     fetchData();
