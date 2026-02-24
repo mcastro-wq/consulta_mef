@@ -270,33 +270,45 @@ async function fetchData(anio = "2026") {
     if(overlay) overlay.style.display = 'flex';
 
     try {
+        let rawRecords = [];
         if (anio === "2026") {
-            // CARGA LOCAL (Tu script actual)
             const res = await fetch('data_proyectos.json');
             const json = await res.json();
-            allData = json.proyectos;
-            document.getElementById('txt-corte').innerText = "Local: " + json.fecha_extraccion;
+            rawRecords = json.proyectos;
+            document.getElementById('txt-corte').innerText = "LOCAL: " + json.fecha_extraccion;
         } else {
-            // CONSULTA SERIA A LA API DEL MEF (Históricos)
             const resourceId = MEF_RESOURCES[anio];
-            // SQL optimizado para Lambayeque (Ejecutora 452 o similar según el campo del MEF)
-            const sql = `SELECT * FROM "${resourceId}" WHERE "EJECUTORA_NOMBRE" LIKE 'REGION LAMBAYEQUE%'`;
+            // Filtramos por la Ejecutora 452 (Gore Lambayeque) que es constante en el tiempo
+            const sql = `SELECT * FROM "${resourceId}" WHERE "EJECUTORA" = '452'`;
             const url = `https://api.datosabiertos.mef.gob.pe/DatosAbiertos/v1/datastore_search_sql?sql=${encodeURIComponent(sql)}`;
 
             const res = await fetch(url);
             const json = await res.json();
-            
             if (json.success) {
-                allData = json.result.records;
-                document.getElementById('txt-corte').innerText = "Sincro MEF API - " + anio;
-            } else {
-                throw new Error("API falló");
+                rawRecords = json.result.records;
+                document.getElementById('txt-corte').innerText = "API MEF - HISTÓRICO " + anio;
             }
         }
-        filtrar(); // Procesar y mostrar los datos cargados
+
+        // --- PROCESO DE VERIFICACIÓN Y NORMALIZACIÓN ---
+        allData = rawRecords.map(r => ({
+            // Mapeamos los campos para que coincidan con lo que tu tabla ya usa
+            PRODUCTO_PROYECTO: r.PRODUCTO_PROYECTO || r.PRODUCTO_PROYECTO_CODIGO || "",
+            PRODUCTO_PROYECTO_NOMBRE: r.PRODUCTO_PROYECTO_NOMBRE || r.NOMBRE_INVERSION || "",
+            TIPO: (r.TIPO || "").toUpperCase(),
+            MONTO_PIA: parseFloat(r.MONTO_PIA || 0),
+            MONTO_PIM: parseFloat(r.MONTO_PIM || 0),
+            MONTO_CERTIFICADO: parseFloat(r.MONTO_CERTIFICADO || 0),
+            MONTO_COMPROMETIDO_ANUAL: parseFloat(r.MONTO_COMPROMETIDO_ANUAL || 0),
+            MONTO_COMPROMETIDO: parseFloat(r.MONTO_COMPROMETIDO || 0),
+            MONTO_DEVENGADO: parseFloat(r.MONTO_DEVENGADO || 0),
+            MONTO_GIRADO: parseFloat(r.MONTO_GIRADO || 0)
+        }));
+
+        filtrar();
     } catch (e) {
-        console.error("Error cargando datos:", e);
-        document.getElementById('txt-corte').innerText = "ERROR EN CARGA";
+        console.error("Error en verificación:", e);
+        document.getElementById('txt-corte').innerText = "ERROR DE SINCRONIZACIÓN";
     } finally {
         if(overlay) overlay.style.display = 'none';
     }
