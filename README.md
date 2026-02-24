@@ -41,22 +41,6 @@ El sistema sigue un flujo automatizado para garantizar que la información sea s
 
 ---
 
-## 💻 Instalación Local
-
-Si deseas ejecutar este monitor en tu computadora:
-
-1. **Clonar el repositorio:**
-   ```bash
-   git clone [https://github.com/](https://github.com/)[TU_USUARIO]/[TU_REPOSITORIO].git
-2. Preparar los datos (Opcional):
-Asegúrate de tener instalado Python y las dependencias necesarias:
-
-Bash
-pip install pandas
-python seguimiento.py
-Ver el monitor:
-Simplemente abre el archivo index.html en cualquier navegador moderno.
-
 📌 Notas de Uso
 Filtros: Al seleccionar una Unidad Ejecutora, los indicadores globales se recalculan automáticamente para reflejar solo esa unidad.
 
