@@ -3,136 +3,196 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitor Gerencial GORE Lambayeque</title>
+    <title>Seguimiento de Inversiones - GORE Lambayeque</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
-        :root { --gore-brown: #703020; --gore-orange: #d35400; --bg-light: #f4f6f9; }
-        body { background-color: var(--bg-light); font-family: 'Segoe UI', Roboto, sans-serif; font-size: 0.82rem; }
-        .header-gore { background: var(--gore-brown); color: white; padding: 12px; border-bottom: 4px solid var(--gore-orange); }
-        .main-card { background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); height: calc(100vh - 110px); display: flex; flex-direction: column; }
-        .table-container { flex-grow: 1; overflow-y: auto; border: 1px solid #dee2e6; }
-        .thead-gore { position: sticky; top: 0; background: var(--gore-brown); color: white; z-index: 10; font-size: 0.75rem; text-transform: uppercase; }
-        .table-main tr { cursor: pointer; border-bottom: 1px solid #eee; }
-        .table-main tr:hover { background-color: #fdf2f0; }
-        .selected-row { background-color: #fff5f2 !important; border-left: 5px solid var(--gore-orange) !important; }
+        :root { --gore-brown: #703020; --gore-orange: #d35400; --bg-sidebar: #ffffff; }
+        body { background-color: #f4f4f4; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 0.75rem; }
         
-        /* Ajuste de Grid para 5 Gauges */
-        .gauge-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 15px; }
-        .gauge-box { text-align: center; background: #fff; padding: 8px; border-radius: 8px; border: 1px solid #eee; }
-        .gauge-full-width { grid-column: span 2; } /* Para el último o el más importante */
-        
-        .gauge-svg { width: 90px; height: 50px; }
-        .gauge-bg { fill: none; stroke: #e9ecef; stroke-width: 10; stroke-linecap: round; }
-        .gauge-fill { fill: none; stroke-width: 10; stroke-linecap: round; stroke-dasharray: 157; stroke-dashoffset: 157; transition: stroke-dashoffset 0.8s ease-out; }
-        
-        /* Colores de la Cadena de Gasto */
-        .color-cert { stroke: #6c757d; } /* Gris */
-        .color-comp-a { stroke: #fd7e14; } /* Naranja */
-        .color-comp-m { stroke: #6610f2; } /* Morado (Mensual) */
-        .color-dev { stroke: #198754; } /* Verde */
-        .color-gir { stroke: #0d6efd; } /* Azul */
+        /* Cabecera */
+        .header-gore { background: white; border-bottom: 3px solid var(--gore-orange); padding: 8px 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .title-main { color: var(--gore-brown); font-weight: 800; font-size: 1.3rem; margin: 0; text-transform: uppercase; }
 
-        .gauge-val { font-size: 0.85rem; font-weight: 800; display: block; margin-top: -12px; }
-        .dot-avance { height: 10px; width: 10px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+        /* Filtros */
+        .filter-section { background: #e9ecef; padding: 10px; border-radius: 4px; margin-bottom: 10px; border: 1px solid #dee2e6; }
+        .form-select-sm, .form-control-sm { font-size: 0.75rem; }
+
+        /* Tabla Ejecutora (Resumen) */
+        .table-resumen { background: white; border: 1px solid var(--gore-brown); margin-bottom: 15px; }
+        .table-resumen thead { background: var(--gore-brown); color: white; text-align: center; font-size: 0.7rem; }
+        .table-resumen td { font-weight: bold; text-align: right; border: 1px solid #dee2e6; padding: 4px 8px; }
+
+        /* Contenedor Principal */
+        .main-card { background: white; border-radius: 4px; border: 1px solid #ddd; height: calc(100vh - 320px); display: flex; flex-direction: column; }
+        .table-container { flex-grow: 1; overflow-y: auto; }
+        .thead-dark { background: #555; color: white; position: sticky; top: 0; z-index: 10; }
+        
+        /* Estilos de Tabla */
+        .table-main tr { cursor: pointer; }
+        .table-main tr:hover { background-color: #fff4f2; }
+        .selected-row { background-color: #ffe8e3 !important; border-left: 4px solid var(--gore-orange) !important; }
+
+        /* Gauges Laterales */
+        .sidebar-gauges { background: white; border: 1px solid #ddd; border-radius: 4px; padding: 10px; height: 100%; overflow-y: auto; }
+        .gauge-item { text-align: center; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px dashed #eee; }
+        .gauge-label { font-weight: bold; color: var(--gore-brown); font-size: 0.65rem; margin-bottom: 4px; display: block; text-transform: uppercase; }
+        .gauge-svg { width: 110px; height: 60px; }
+        .gauge-bg { fill: none; stroke: #eee; stroke-width: 12; stroke-linecap: round; }
+        .gauge-fill { fill: none; stroke-width: 12; stroke-linecap: round; stroke-dasharray: 157; stroke-dashoffset: 157; transition: 0.8s ease-out; }
+        .gauge-percent { font-size: 1rem; font-weight: 800; display: block; margin-top: -15px; }
+
+        /* Semáforo */
+        .dot { height: 10px; width: 10px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+        .bg-alto { background-color: #198754; }
+        .bg-medio { background-color: #ffc107; }
+        .bg-bajo { background-color: #dc3545; }
     </style>
 </head>
 <body>
 
-<header class="header-gore mb-3 shadow-sm">
-    <div class="container-fluid d-flex justify-content-between align-items-center px-4">
-        <div>
-            <h6 class="mb-0 fw-bold text-uppercase"><i class="bi bi-shield-check me-2"></i>Monitor de Inversiones - GORE Lambayeque</h6>
-            <small class="opacity-75" id="sync-time">Cargando...</small>
+<header class="header-gore d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center">
+        <i class="bi bi-bar-chart-line-fill fs-3 me-2" style="color: var(--gore-brown)"></i>
+        <h1 class="title-main">Consulta de Ejecución de Inversiones - Lambayeque</h1>
+    </div>
+    <div class="d-flex gap-3 align-items-center">
+        <div class="text-end">
+            <small class="text-muted d-block">TOTAL PROY/ACT</small>
+            <span class="h5 fw-bold" id="total-items" style="color: var(--gore-brown)">0</span>
         </div>
-        <a href="index.html" class="btn btn-warning btn-sm fw-bold shadow-sm px-3"><i class="bi bi-arrow-left-circle me-1"></i> VOLVER</a>
+        <a href="index.html" class="btn btn-warning btn-sm fw-bold shadow-sm px-3"><i class="bi bi-house-door"></i> INICIO</a>
     </div>
 </header>
 
-<div class="container-fluid px-4">
+<div class="container-fluid px-4 mt-3">
+    <div class="filter-section shadow-sm">
+        <div class="row align-items-end g-2">
+            <div class="col-md-2">
+                <div class="bg-white p-2 border rounded">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="checkProyecto" checked onchange="aplicarFiltros()">
+                        <label class="form-check-label fw-bold" for="checkProyecto">PROYECTO</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="checkActividad" onchange="aplicarFiltros()">
+                        <label class="form-check-label fw-bold" for="checkActividad">ACTIVIDAD / PRODUCTO</label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-1">
+                <label class="fw-bold d-block mb-1">AÑO</label>
+                <select class="form-select form-select-sm"><option>2026</option></select>
+            </div>
+            <div class="col-md-3">
+                <label class="fw-bold d-block mb-1">UNIDAD EJECUTORA</label>
+                <select class="form-select form-select-sm" id="filtroUE">
+                    <option value="452">452 - GOBIERNO REGIONAL LAMBAYEQUE</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="fw-bold d-block mb-1">BUSCAR POR NOMBRE O CUI</label>
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                    <input type="text" id="searchBox" class="form-control" placeholder="Ej: 2534120..." onkeyup="aplicarFiltros()">
+                </div>
+            </div>
+            <div class="col-md-2 text-end">
+                <small class="text-muted d-block" id="fecha-actualizacion">Actualizando...</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-sm table-resumen">
+            <thead>
+                <tr>
+                    <th style="width: 25%;">NOMBRE UNIDAD EJECUTORA</th>
+                    <th>PIA (S/)</th>
+                    <th>PIM (S/)</th>
+                    <th>CERTIFICADO</th>
+                    <th>% CERT</th>
+                    <th>COMP. ANUAL</th>
+                    <th>% COMP</th>
+                    <th>DEVENGADO</th>
+                    <th>% DEV</th>
+                </tr>
+            </thead>
+            <tbody id="resumen-body">
+                </tbody>
+        </table>
+    </div>
+
     <div class="row g-3">
         <div class="col-lg-9">
-            <div class="main-card p-3">
-                <input type="text" id="searchBox" class="form-control form-control-sm mb-3 shadow-sm" placeholder="Buscar por CUI o Nombre..." onkeyup="filtrar()">
-                <div class="table-container rounded">
-                    <table class="table table-sm table-main mb-0">
-                        <thead class="thead-gore text-center">
+            <div class="main-card shadow-sm">
+                <div class="table-container">
+                    <table class="table table-sm table-hover table-main mb-0">
+                        <thead class="thead-dark text-center">
                             <tr>
                                 <th>CUI</th>
-                                <th class="text-start">PROYECTO</th>
-                                <th>PIM (S/)</th>
-                                <th>CERTIF. (S/)</th>
-                                <th>DEVENG. (S/)</th>
-                                <th>% DEV</th>
+                                <th class="text-start">NOMBRE DEL PROYECTO / ACTIVIDAD</th>
+                                <th>PIM</th>
+                                <th>CERTIF.</th>
+                                <th>%</th>
+                                <th>DEVENG.</th>
+                                <th>%</th>
                                 <th>AVANCE</th>
                             </tr>
                         </thead>
-                        <tbody id="lista-proyectos"></tbody>
+                        <tbody id="main-tbody"></tbody>
                     </table>
                 </div>
             </div>
         </div>
 
         <div class="col-lg-3">
-            <div class="main-card p-3 shadow-sm">
-                <h6 class="fw-bold border-bottom pb-2 mb-3 text-uppercase text-center" style="color: var(--gore-brown)">Cadena de Ejecución</h6>
+            <div class="sidebar-gauges shadow-sm">
+                <h6 class="text-center fw-bold border-bottom pb-2 mb-3" style="color: var(--gore-brown)">AVANCE FÍSICO-FINANCIERO</h6>
                 
-                <div class="gauge-grid">
-                    <div class="gauge-box">
-                        <small class="d-block fw-bold text-muted" style="font-size:0.55rem">CERTIFICACIÓN</small>
-                        <svg class="gauge-svg" viewBox="0 0 120 70">
-                            <path class="gauge-bg" d="M 10 60 A 50 50 0 0 1 110 60" />
-                            <path id="g-cert" class="gauge-fill color-cert" d="M 10 60 A 50 50 0 0 1 110 60" />
-                        </svg>
-                        <span class="gauge-val" id="v-cert">0%</span>
-                    </div>
-
-                    <div class="gauge-box">
-                        <small class="d-block fw-bold text-muted" style="font-size:0.55rem">COMP. ANUAL</small>
-                        <svg class="gauge-svg" viewBox="0 0 120 70">
-                            <path class="gauge-bg" d="M 10 60 A 50 50 0 0 1 110 60" />
-                            <path id="g-comp-a" class="gauge-fill color-comp-a" d="M 10 60 A 50 50 0 0 1 110 60" />
-                        </svg>
-                        <span class="gauge-val" id="v-comp-a">0%</span>
-                    </div>
-
-                    <div class="gauge-box">
-                        <small class="d-block fw-bold text-muted" style="font-size:0.55rem">COMP. MENSUAL</small>
-                        <svg class="gauge-svg" viewBox="0 0 120 70">
-                            <path class="gauge-bg" d="M 10 60 A 50 50 0 0 1 110 60" />
-                            <path id="g-comp-m" class="gauge-fill color-comp-m" d="M 10 60 A 50 50 0 0 1 110 60" />
-                        </svg>
-                        <span class="gauge-val" id="v-comp-m" style="color:#6610f2">0%</span>
-                    </div>
-
-                    <div class="gauge-box">
-                        <small class="d-block fw-bold text-success" style="font-size:0.55rem">DEVENGADO</small>
-                        <svg class="gauge-svg" viewBox="0 0 120 70">
-                            <path class="gauge-bg" d="M 10 60 A 50 50 0 0 1 110 60" />
-                            <path id="g-dev" class="gauge-fill color-dev" d="M 10 60 A 50 50 0 0 1 110 60" />
-                        </svg>
-                        <span class="gauge-val text-success" id="v-dev">0%</span>
-                    </div>
-
-                    <div class="gauge-box gauge-full-width">
-                        <small class="d-block fw-bold text-primary" style="font-size:0.55rem">GIRADO (PAGADO TOTAL)</small>
-                        <svg class="gauge-svg" viewBox="0 0 120 70" style="width:140px; height:60px">
-                            <path class="gauge-bg" d="M 10 60 A 50 50 0 0 1 110 60" />
-                            <path id="g-gir" class="gauge-fill color-gir" d="M 10 60 A 50 50 0 0 1 110 60" />
-                        </svg>
-                        <span class="gauge-val text-primary" id="v-gir">0%</span>
-                    </div>
+                <div class="gauge-item">
+                    <span class="gauge-label">Certificación</span>
+                    <svg class="gauge-svg" viewBox="0 0 120 70">
+                        <path class="gauge-bg" d="M 10 60 A 50 50 0 0 1 110 60" />
+                        <path id="g-cert" class="gauge-fill" style="stroke: #6c757d" d="M 10 60 A 50 50 0 0 1 110 60" />
+                    </svg>
+                    <span class="gauge-percent" id="v-cert">0%</span>
                 </div>
 
-                <div class="mt-auto p-3 border rounded bg-light">
-                    <div class="d-flex justify-content-between mb-1">
-                        <span class="small fw-bold">PIM Total:</span>
-                        <span class="small" id="txt-pim">S/ 0.00</span>
-                    </div>
-                    <div class="d-flex justify-content-between text-success fw-bold">
-                        <span class="small">Devengado:</span>
-                        <span class="small" id="txt-dev">S/ 0.00</span>
-                    </div>
+                <div class="gauge-item">
+                    <span class="gauge-label">Compromiso Anual</span>
+                    <svg class="gauge-svg" viewBox="0 0 120 70">
+                        <path class="gauge-bg" d="M 10 60 A 50 50 0 0 1 110 60" />
+                        <path id="g-comp-a" class="gauge-fill" style="stroke: #fd7e14" d="M 10 60 A 50 50 0 0 1 110 60" />
+                    </svg>
+                    <span class="gauge-percent" id="v-comp-a">0%</span>
+                </div>
+
+                <div class="gauge-item">
+                    <span class="gauge-label">Compromiso Mensual</span>
+                    <svg class="gauge-svg" viewBox="0 0 120 70">
+                        <path class="gauge-bg" d="M 10 60 A 50 50 0 0 1 110 60" />
+                        <path id="g-comp-m" class="gauge-fill" style="stroke: #6610f2" d="M 10 60 A 50 50 0 0 1 110 60" />
+                    </svg>
+                    <span class="gauge-percent" id="v-comp-m">0%</span>
+                </div>
+
+                <div class="gauge-item">
+                    <span class="gauge-label">Devengado (Gasto)</span>
+                    <svg class="gauge-svg" viewBox="0 0 120 70">
+                        <path class="gauge-bg" d="M 10 60 A 50 50 0 0 1 110 60" />
+                        <path id="g-dev" class="gauge-fill" style="stroke: #198754" d="M 10 60 A 50 50 0 0 1 110 60" />
+                    </svg>
+                    <span class="gauge-percent text-success" id="v-dev">0%</span>
+                </div>
+
+                <div class="gauge-item border-0">
+                    <span class="gauge-label">Girado (Pagado)</span>
+                    <svg class="gauge-svg" viewBox="0 0 120 70">
+                        <path class="gauge-bg" d="M 10 60 A 50 50 0 0 1 110 60" />
+                        <path id="g-gir" class="gauge-fill" style="stroke: #0d6efd" d="M 10 60 A 50 50 0 0 1 110 60" />
+                    </svg>
+                    <span class="gauge-percent text-primary" id="v-gir">0%</span>
                 </div>
             </div>
         </div>
@@ -145,34 +205,81 @@
     async function loadData() {
         try {
             const res = await fetch('data_proyectos.json');
-            const data = await res.json();
-            document.getElementById('sync-time').innerText = "Corte: " + data.fecha_extraccion;
-            allData = data.proyectos;
-            renderTable(allData);
-        } catch (e) { console.error("Error cargando JSON", e); }
+            const json = await res.json();
+            allData = json.proyectos;
+            document.getElementById('fecha-actualizacion').innerText = "Corte: " + json.fecha_extraccion;
+            aplicarFiltros();
+        } catch (e) { console.error("Error al cargar JSON", e); }
+    }
+
+    function aplicarFiltros() {
+        const verProyectos = document.getElementById('checkProyecto').checked;
+        const verActividades = document.getElementById('checkActividad').checked;
+        const query = document.getElementById('searchBox').value.toLowerCase();
+
+        const filtrados = allData.filter(p => {
+            const esProy = p.TIPO.toUpperCase().includes("PROYECTO");
+            const esAct = p.TIPO.toUpperCase().includes("PRODUCTO") || p.TIPO.toUpperCase().includes("ACTIVIDAD");
+            const matchQuery = p.PRODUCTO_PROYECTO_NOMBRE.toLowerCase().includes(query) || p.PRODUCTO_PROYECTO.toString().includes(query);
+            
+            let tipoValido = false;
+            if (verProyectos && esProy) tipoValido = true;
+            if (verActividades && esAct) tipoValido = true;
+            
+            return tipoValido && matchQuery;
+        });
+
+        renderResumen(filtrados);
+        renderTable(filtrados);
+        document.getElementById('total-items').innerText = filtrados.length;
+    }
+
+    function renderResumen(data) {
+        let t = { pia:0, pim:0, cer:0, can:0, dev:0 };
+        data.forEach(p => {
+            t.pia += p.MONTO_PIA; t.pim += p.MONTO_PIM;
+            t.cer += p.MONTO_CERTIFICADO; t.can += p.MONTO_COMPROMETIDO_ANUAL;
+            t.dev += p.MONTO_DEVENGADO;
+        });
+
+        const prc = (v) => t.pim > 0 ? (v/t.pim*100).toFixed(1) + '%' : '0%';
+
+        document.getElementById('resumen-body').innerHTML = `
+            <tr>
+                <td class="text-start">452 - GOBIERNO REGIONAL DEL DEPARTAMENTO DE LAMBAYEQUE</td>
+                <td>${t.pia.toLocaleString()}</td>
+                <td>${t.pim.toLocaleString()}</td>
+                <td>${t.cer.toLocaleString()}</td>
+                <td class="bg-light">${prc(t.cer)}</td>
+                <td>${t.can.toLocaleString()}</td>
+                <td class="bg-light">${prc(t.can)}</td>
+                <td>${t.dev.toLocaleString()}</td>
+                <td class="bg-light">${prc(t.dev)}</td>
+            </tr>`;
     }
 
     function renderTable(data) {
-        const tbody = document.getElementById('lista-proyectos');
+        const tbody = document.getElementById('main-tbody');
         tbody.innerHTML = data.map(p => {
-            const pim = parseFloat(p.MONTO_PIM) || 0;
-            const cert = parseFloat(p.MONTO_CERTIFICADO) || 0;
-            const dev = parseFloat(p.MONTO_DEVENGADO) || 0;
-            const pDev = pim > 0 ? (dev/pim*100).toFixed(1) : 0;
+            const pim = p.MONTO_PIM || 0;
+            const pDev = pim > 0 ? (p.MONTO_DEVENGADO/pim*100).toFixed(1) : 0;
+            const pCert = pim > 0 ? (p.MONTO_CERTIFICADO/pim*100).toFixed(1) : 0;
             
-            let color = 'bg-danger'; let txt = 'BAJO';
-            if(pDev > 75) { color = 'bg-success'; txt = 'ALTO'; }
-            else if(pDev >= 40) { color = 'bg-warning'; txt = 'MEDIO'; }
+            let semaforo = pDev > 75 ? 'bg-alto' : (pDev >= 40 ? 'bg-medio' : 'bg-bajo');
+            let txt = pDev > 75 ? 'ALTO' : (pDev >= 40 ? 'MEDIO' : 'BAJO');
 
             return `
                 <tr onclick="seleccionar('${p.PRODUCTO_PROYECTO}', this)">
-                    <td class="text-center fw-bold">${p.PRODUCTO_PROYECTO}</td>
-                    <td class="text-start small">${p.PRODUCTO_PROYECTO_NOMBRE}</td>
-                    <td class="text-end">${pim.toLocaleString('es-PE')}</td>
-                    <td class="text-end">${cert.toLocaleString('es-PE')}</td>
-                    <td class="text-end fw-bold text-success">${dev.toLocaleString('es-PE')}</td>
-                    <td class="text-center">${pDev}%</td>
-                    <td class="text-center"><span class="dot-avance ${color}"></span><small class="fw-bold">${txt}</small></td>
+                    <td class="text-center fw-bold text-muted">${p.PRODUCTO_PROYECTO}</td>
+                    <td class="text-start small fw-bold">${p.PRODUCTO_PROYECTO_NOMBRE}</td>
+                    <td class="text-end">${pim.toLocaleString()}</td>
+                    <td class="text-end">${p.MONTO_CERTIFICADO.toLocaleString()}</td>
+                    <td class="text-center">${pCert}%</td>
+                    <td class="text-end text-success fw-bold">${p.MONTO_DEVENGADO.toLocaleString()}</td>
+                    <td class="text-center fw-bold">${pDev}%</td>
+                    <td class="text-center">
+                        <span class="dot ${semaforo}"></span> <small class="fw-bold">${txt}</small>
+                    </td>
                 </tr>`;
         }).join('');
     }
@@ -181,41 +288,29 @@
         document.querySelectorAll('tr').forEach(r => r.classList.remove('selected-row'));
         fila.classList.add('selected-row');
         
+        // Sumar por CUI por si hay metas duplicadas
         const registros = allData.filter(i => i.PRODUCTO_PROYECTO.toString() === cui.toString());
+        let t = { pim:0, cer:0, can:0, cme:0, dev:0, gir:0 };
         
-        let pim = 0, cert = 0, compA = 0, compM = 0, dev = 0, gir = 0;
         registros.forEach(r => {
-            pim += parseFloat(r.MONTO_PIM) || 0;
-            cert += parseFloat(r.MONTO_CERTIFICADO) || 0;
-            compA += parseFloat(r.MONTO_COMPROMETIDO_ANUAL) || 0;
-            compM += parseFloat(r.MONTO_COMPROMETIDO) || 0; // MENSUAL
-            dev += parseFloat(r.MONTO_DEVENGADO) || 0;
-            gir += parseFloat(r.MONTO_GIRADO) || 0;
+            t.pim += r.MONTO_PIM; t.cer += r.MONTO_CERTIFICADO;
+            t.can += r.MONTO_COMPROMETIDO_ANUAL; t.cme += r.MONTO_COMPROMETIDO;
+            t.dev += r.MONTO_DEVENGADO; t.gir += r.MONTO_GIRADO;
         });
 
-        const perc = (val) => pim > 0 ? (val/pim*100).toFixed(1) : 0;
+        const perc = (v) => t.pim > 0 ? (v/t.pim*100).toFixed(1) : 0;
 
-        updateGauge('g-cert', 'v-cert', perc(cert));
-        updateGauge('g-comp-a', 'v-comp-a', perc(compA));
-        updateGauge('g-comp-m', 'v-comp-m', perc(compM));
-        updateGauge('g-dev', 'v-dev', perc(dev));
-        updateGauge('g-gir', 'v-gir', perc(gir));
-
-        document.getElementById('txt-pim').innerText = 'S/ ' + pim.toLocaleString('es-PE', {minimumFractionDigits: 2});
-        document.getElementById('txt-dev').innerText = 'S/ ' + dev.toLocaleString('es-PE', {minimumFractionDigits: 2});
+        updateGauge('g-cert', 'v-cert', perc(t.cer));
+        updateGauge('g-comp-a', 'v-comp-a', perc(t.can));
+        updateGauge('g-comp-m', 'v-comp-m', perc(t.cme));
+        updateGauge('g-dev', 'v-dev', perc(t.dev));
+        updateGauge('g-gir', 'v-gir', perc(t.gir));
     }
 
-    function updateGauge(id, textId, value) {
-        const path = document.getElementById(id);
-        const offset = 157 - (157 * (Math.min(value, 100) / 100));
-        path.style.strokeDashoffset = offset;
-        document.getElementById(textId).innerText = value + '%';
-    }
-
-    function filtrar() {
-        const q = document.getElementById('searchBox').value.toLowerCase();
-        const filtered = allData.filter(p => p.PRODUCTO_PROYECTO.toString().includes(q) || p.PRODUCTO_PROYECTO_NOMBRE.toLowerCase().includes(q));
-        renderTable(filtered);
+    function updateGauge(id, textId, val) {
+        const offset = 157 - (157 * (Math.min(val, 100) / 100));
+        document.getElementById(id).style.strokeDashoffset = offset;
+        document.getElementById(textId).innerText = val + '%';
     }
 
     window.onload = loadData;
