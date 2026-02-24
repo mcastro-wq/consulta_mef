@@ -270,58 +270,63 @@
     let timeoutBusqueda;
 
     // 2. FUNCIÓN CARGAR DATOS CON SPINNER
-    async function fetchData(anio = "2026") {
-        const overlay = document.getElementById('loader-overlay');
-        overlay.style.display = 'flex'; // Mostrar Spinner
+async function fetchData(anio = "2026") {
+    const overlay = document.getElementById('loader-overlay');
+    if (overlay) overlay.style.display = 'flex';
 
-        try {
-            let rawRecords = [];
-            if (anio === "2026") {
-                const res = await fetch('data_proyectos.json');
-                const json = await res.json();
-                rawRecords = json.proyectos;
-                document.getElementById('txt-corte').innerText = "LOCAL: " + (json.fecha_extraccion || '2026');
-            } else {
-                const resourceId = MEF_RESOURCES[anio];
-                const sql = `SELECT * FROM "${resourceId}" WHERE "SEC_EJEC" = '452'`;
-                const url = `https://api.datosabiertos.mef.gob.pe/DatosAbiertos/v1/datastore_search_sql?sql=${encodeURIComponent(sql)}`;
-
-                const res = await fetch(url);
-                const json = await res.json();
-                if (json.success) {
-                    rawRecords = json.result.records;
-                    document.getElementById('txt-corte').innerText = "API MEF - " + anio;
-                }
+    try {
+        let rawRecords = [];
+        if (anio === "2026") {
+            // Para 2026 sigue buscando tu archivo local
+            const res = await fetch('data_proyectos.json');
+            if (!res.ok) throw new Error("Archivo 2026 no encontrado");
+            const json = await res.json();
+            rawRecords = json.proyectos;
+            document.getElementById('txt-corte').innerText = "LOCAL: " + (json.fecha_extraccion || '2026');
+        } else {
+            const resourceId = MEF_RESOURCES[anio];
+            const sql = `SELECT * FROM "${resourceId}" WHERE "SEC_EJEC" = '452'`;
+            
+            // --- SOLUCIÓN CORS ---
+            // Usamos un proxy para saltar el bloqueo del MEF
+            const proxy = "https://corsproxy.io/?"; 
+            const apiTarget = `https://api.datosabiertos.mef.gob.pe/DatosAbiertos/v1/datastore_search_sql?sql=${encodeURIComponent(sql)}`;
+            
+            const res = await fetch(proxy + apiTarget);
+            if (!res.ok) throw new Error("Error en la respuesta del Proxy/MEF");
+            
+            const json = await res.json();
+            if (json.success) {
+                rawRecords = json.result.records;
+                document.getElementById('txt-corte').innerText = "API MEF - " + anio;
             }
-
-            // NORMALIZACIÓN DE CAMPOS
-            allData = rawRecords.map(r => {
-                const tipo = (r.TIPO_ACT_PROY_NOMBRE || r.TIPO || "").toUpperCase();
-                const esProyecto = tipo.includes("PROYECTO") || tipo.includes("INVERSION");
-                
-                return {
-                    CUI: r.PRODUCTO_PROYECTO || r.CUI,
-                    NOMBRE: r.PRODUCTO_PROYECTO_NOMBRE || r.NOMBRE,
-                    TIPO: esProyecto ? "PROYECTO" : "ACTIVIDAD",
-                    PIA: parseFloat(r.MONTO_PIA || r.PIA || 0),
-                    PIM: parseFloat(r.MONTO_PIM || r.PIM || 0),
-                    CERTIFICADO: parseFloat(r.MONTO_CERTIFICADO || r.CERTIFICADO || 0),
-                    COMPROMISO_ANUAL: parseFloat(r.MONTO_COMPROMETIDO_ANUAL || r.COMPROMISO_ANUAL || 0),
-                    COMPROMISO_MENSUAL: parseFloat(r.MONTO_COMPROMETIDO || r.COMPROMISO_MENSUAL || 0),
-                    DEVENGADO: parseFloat(r.MONTO_DEVENGADO || r.DEVENGADO || 0),
-                    GIRADO: parseFloat(r.MONTO_GIRADO || r.GIRADO || 0)
-                };
-            });
-
-            filtrar();
-
-        } catch (e) {
-            console.error("Error:", e);
-            document.getElementById('txt-corte').innerText = "ERROR DE CONEXIÓN";
-        } finally {
-            overlay.style.display = 'none'; // Ocultar Spinner
         }
+
+        // NORMALIZACIÓN (Mantenemos esta lógica para que la tabla no se rompa)
+        allData = rawRecords.map(r => ({
+            CUI: r.PRODUCTO_PROYECTO || r.CUI || "0",
+            NOMBRE: r.PRODUCTO_PROYECTO_NOMBRE || r.NOMBRE || "SIN NOMBRE",
+            TIPO: (r.TIPO_ACT_PROY_NOMBRE || "").toUpperCase().includes("PROYECTO") ? "PROYECTO" : "ACTIVIDAD",
+            PIA: parseFloat(r.MONTO_PIA || r.PIA || 0),
+            PIM: parseFloat(r.MONTO_PIM || r.PIM || 0),
+            CERTIFICADO: parseFloat(r.MONTO_CERTIFICADO || r.CERTIFICADO || 0),
+            COMPROMISO_ANUAL: parseFloat(r.MONTO_COMPROMETIDO_ANUAL || r.COMPROMISO_ANUAL || 0),
+            COMPROMISO_MENSUAL: parseFloat(r.MONTO_COMPROMETIDO || r.COMPROMISO_MENSUAL || 0),
+            DEVENGADO: parseFloat(r.MONTO_DEVENGADO || r.DEVENGADO || 0),
+            GIRADO: parseFloat(r.MONTO_GIRADO || r.GIRADO || 0)
+        }));
+
+        filtrar();
+
+    } catch (e) {
+        console.error("Error detectado:", e);
+        document.getElementById('txt-corte').innerText = "ERROR: " + e.message;
+        // Limpiar tabla en caso de error para que no se vea data vieja
+        document.getElementById('tbody-main').innerHTML = `<tr><td colspan="8" class="text-center text-danger">Error al cargar datos de ${anio}. Es posible que el proxy esté saturado.</td></tr>`;
+    } finally {
+        if (overlay) overlay.style.display = 'none';
     }
+}
 
     function cambiarAnio() {
         const anio = document.getElementById('selectAnio').value;
