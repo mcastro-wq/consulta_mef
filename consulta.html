@@ -3,54 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Historial GORE Lambayeque</title>
+    <title>Historial de Gestión - GORE</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        :root { --gore: #7a3321; }
-        body { background: #f4f7f6; font-size: 0.9rem; }
-        .table-container { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        thead { background: #f8f9fa; }
-        th { color: var(--gore); cursor: pointer; text-transform: uppercase; font-size: 0.75rem; }
+        body { background-color: #f8f9fa; font-family: 'Segoe UI', sans-serif; }
+        .container-main { background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 20px; margin-top: 20px; }
+        .header-title { color: #7a3321; font-weight: bold; border-bottom: 2px solid #7a3321; padding-bottom: 10px; margin-bottom: 20px; }
+        .table thead th { background: #f2f2f2; font-size: 0.75rem; text-transform: uppercase; cursor: pointer; }
+        .table td { font-size: 0.85rem; vertical-align: middle; }
         .btn-excel { background: #1d6f42; color: white; border: none; }
         .btn-excel:hover { background: #155a35; color: white; }
     </style>
 </head>
 <body>
 
-<div class="container-fluid py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="fw-bold" style="color: var(--gore)"><i class="bi bi-clock-history"></i> HISTORIAL DE TRAZABILIDAD</h3>
-        <div class="d-flex gap-2">
-            <button onclick="exportarExcel()" class="btn btn-excel btn-sm px-3"><i class="bi bi-file-earmark-excel"></i> Exportar</button>
-            <a href="index.html" class="btn btn-secondary btn-sm">Volver</a>
+<div class="container-fluid px-4">
+    <div class="container-main">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="header-title m-0"><i class="bi bi-journal-text"></i> Historial de Gestión</h4>
+            <div class="d-flex gap-2">
+                <button class="btn btn-excel btn-sm px-3" onclick="exportarExcel()"><i class="bi bi-file-earmark-excel"></i> Exportar Excel</button>
+                <a href="index.html" class="btn btn-outline-secondary btn-sm">Volver</a>
+            </div>
         </div>
-    </div>
 
-    <div class="table-container">
         <div class="row mb-3">
-            <div class="col-md-4">
-                <input type="text" id="buscador" class="form-control form-control-sm" placeholder="Buscar por CUI o Palabra Clave..." onkeyup="filtrar()">
+            <div class="col-md-5">
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                    <input type="text" id="busqueda" class="form-control" placeholder="Buscar por CUI, Estado o Palabra..." onkeyup="filtrar()">
+                </div>
             </div>
         </div>
 
         <div class="table-responsive">
-            <table class="table table-sm table-hover table-bordered" id="tablaHistorial">
+            <table class="table table-bordered table-hover">
                 <thead>
                     <tr>
-                        <th onclick="ordenar(0)">Fecha Registro</th>
-                        <th onclick="ordenar(1)">CUI</th>
-                        <th onclick="ordenar(2)">Estado Gral</th>
+                        <th onclick="ordenar(0)">Fecha Registro <i class="bi bi-arrow-down-up"></i></th>
+                        <th onclick="ordenar(1)">CUI <i class="bi bi-arrow-down-up"></i></th>
+                        <th>Estado Gral.</th>
                         <th>Detalle Gestión</th>
-                        <th>Estado Específico</th>
+                        <th>Estado Esp.</th>
                         <th>Timeline Inversión</th>
                         <th>Acciones</th>
                         <th>SISGEDO</th>
                     </tr>
                 </thead>
-                <tbody id="res-body">
-                    <tr><td colspan="8" class="text-center">Cargando datos...</td></tr>
+                <tbody id="tablaBody">
+                    <tr><td colspan="8" class="text-center py-4"><div class="spinner-border spinner-border-sm"></div> Cargando historial...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -58,61 +61,67 @@
 </div>
 
 <script>
-    let rawData = [];
-    const url = 'https://script.google.com/macros/s/AKfycbwwVZjEMpICtkt-EFsLJ2mg9V7NPfHd5cpWfj2LbLCn3M3MKKvHVu3c4RWOFWwHgR3Z/exec';
+    let cacheDatos = [];
+    const API_URL = 'https://script.google.com/macros/s/AKfycbzJ8wJlhZ9w-aAtl_1bsZPyy9OhnFp_cB4Sa_Ovt-hijyN8MS-dloEU8cChQIxTD2bG/exec';
 
     async function cargar() {
         try {
-            const r = await fetch(url + "?modo=todo");
+            const r = await fetch(`${API_URL}?modo=todo`);
             const res = await r.json();
-            if(res.status === "success") {
-                rawData = res.data;
-                renderizar(rawData);
+            if (res.status === "success") {
+                cacheDatos = res.data;
+                renderizar(cacheDatos);
             }
-        } catch(e) { 
-            document.getElementById('res-body').innerHTML = '<tr><td colspan="8" class="text-center text-danger">Error de conexión</td></tr>';
+        } catch (e) {
+            document.getElementById('tablaBody').innerHTML = '<tr><td colspan="8" class="text-center text-danger">Error al obtener datos</td></tr>';
         }
     }
 
     function renderizar(datos) {
-        const body = document.getElementById('res-body');
+        const body = document.getElementById('tablaBody');
         body.innerHTML = datos.map(item => `
             <tr>
-                <td class="fw-bold text-muted">${item.fecha_registro || 'N/R'}</td>
-                <td class="fw-bold">${item.codigo_cui || ''}</td>
-                <td class="text-uppercase fw-bold text-danger">${item.estado_general || ''}</td>
+                <td class="fw-bold text-muted">${formatearFecha(item.fecha_registro)}</td>
+                <td><span class="badge bg-secondary">${item.codigo_cui || ''}</span></td>
+                <td class="fw-bold text-uppercase" style="color:#d35400">${item.estado_general || ''}</td>
                 <td><small>${item.detalle_estado_general || ''}</small></td>
                 <td>
                     <div class="fw-bold text-primary">${item.estado_especifico || ''}</div>
-                    <small class="text-muted">${item.detalle_estado_especifico || ''}</small>
+                    <div class="text-muted" style="font-size:0.7rem">${item.detalle_estado_especifico || ''}</div>
                 </td>
-                <td class="text-info fw-bold"><small>${item.timeline_inversion || '-'}</small></td>
+                <td class="text-info fw-bold">${item.timeline_inversion || '-'}</td>
                 <td><small>${item.acciones_programadas || ''}</small></td>
-                <td class="text-center fw-bold">${item.sisgedo || '-'}</td>
+                <td class="fw-bold text-center">${item.sisgedo || '-'}</td>
             </tr>
         `).join('');
     }
 
+    function formatearFecha(str) {
+        if (!str || str === "Sin Fecha") return "---";
+        // Limpiar el formato que a veces manda Apps Script
+        const d = new Date(str);
+        return isNaN(d.getTime()) ? str : d.toLocaleDateString('es-PE') + ' ' + d.toLocaleTimeString('es-PE', {hour:'2-digit', minute:'2-digit'});
+    }
+
     function filtrar() {
-        const q = document.getElementById('buscador').value.toLowerCase();
-        const f = rawData.filter(i => Object.values(i).some(v => String(v).toLowerCase().includes(q)));
+        const q = document.getElementById('busqueda').value.toLowerCase();
+        const f = cacheDatos.filter(i => Object.values(i).some(v => String(v).toLowerCase().includes(q)));
         renderizar(f);
     }
 
     function exportarExcel() {
-        const ws = XLSX.utils.json_to_sheet(rawData);
+        const ws = XLSX.utils.json_to_sheet(cacheDatos);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Historial");
-        XLSX.writeFile(wb, "Reporte_GORE.xlsx");
+        XLSX.writeFile(wb, "Historial_GORE.xlsx");
     }
 
-    // Orden simple
-    let asc = true;
+    let dir = true;
     function ordenar(col) {
-        const keys = ['fecha_registro', 'codigo_cui', 'estado_general'];
-        asc = !asc;
-        rawData.sort((a,b) => (a[keys[col]] > b[keys[col]] ? (asc?1:-1) : (asc?-1:1)));
-        renderizar(rawData);
+        const keys = ['fecha_registro', 'codigo_cui'];
+        dir = !dir;
+        cacheDatos.sort((a,b) => (a[keys[col]] > b[keys[col]]) ? (dir?1:-1) : (dir?-1:1));
+        renderizar(cacheDatos);
     }
 
     window.onload = cargar;
