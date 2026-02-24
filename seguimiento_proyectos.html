@@ -3,40 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Gerencial - GORE Lambayeque</title>
+    <title>Monitor Gerencial Pro - GORE Lambayeque</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
         :root { --mef-red: #801616; --mef-gold: #ffc107; --dark-bg: #1e293b; }
-        body { background-color: #f1f5f9; font-family: 'Inter', sans-serif; font-size: 0.85rem; }
+        body { background-color: #f1f5f9; font-family: 'Inter', sans-serif; font-size: 0.82rem; }
         
-        /* Header */
-        .header-dashboard { background: var(--mef-red); color: white; padding: 1rem 0; border-bottom: 4px solid var(--mef-gold); }
+        /* Header Estilo GORE */
+        .header-dashboard { background: var(--mef-red); color: white; padding: 0.8rem 0; border-bottom: 4px solid var(--mef-gold); }
         
-        /* Cards y Layout */
-        .main-card { background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: none; height: calc(100vh - 140px); display: flex; flex-direction: column; }
-        .table-wrapper { flex-grow: 1; overflow-y: auto; }
+        /* Contenedores Principales */
+        .main-card { background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: none; height: calc(100vh - 120px); display: flex; flex-direction: column; }
+        .table-wrapper { flex-grow: 1; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; }
         
-        /* Tabla */
-        .thead-sticky { position: sticky; top: 0; background: var(--mef-red); color: white; z-index: 10; }
-        .table-sm-custom td { padding: 10px 8px; border-bottom: 1px solid #f1f5f9; cursor: pointer; transition: 0.2s; }
-        .table-sm-custom tr:hover { background-color: #f8fafc; }
+        /* Tabla con nuevas columnas */
+        .thead-sticky { position: sticky; top: 0; background: var(--mef-red); color: white; z-index: 10; font-size: 0.75rem; }
+        .table-sm-custom td { padding: 8px; border-bottom: 1px solid #f1f5f9; cursor: pointer; vertical-align: middle; }
         .table-active-mef { background-color: rgba(128, 22, 22, 0.08) !important; border-left: 5px solid var(--mef-red) !important; }
         
-        /* Dashboard Lateral */
-        .indicator-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; text-align: center; }
-        .indicator-label { font-size: 0.65rem; font-weight: bold; color: #64748b; text-transform: uppercase; display: block; }
-        .indicator-value { font-size: 1rem; font-weight: 800; color: var(--dark-bg); }
+        /* Dashboard de la derecha */
+        .side-panel { display: flex; flex-direction: column; gap: 12px; }
+        .indicator-box { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px; text-align: center; }
+        .indicator-label { font-size: 0.6rem; font-weight: 800; color: #64748b; text-transform: uppercase; display: block; margin-bottom: 2px; }
+        .indicator-value { font-size: 0.95rem; font-weight: 800; color: var(--dark-bg); }
 
-        .gauge-wrapper { position: relative; width: 140px; height: 70px; margin: 0 auto; overflow: hidden; }
-        .gauge-body { position: absolute; top: 0; left: 0; width: 140px; height: 140px; border-radius: 50%; border: 12px solid #e2e8f0; border-bottom-color: var(--mef-red); transform: rotate(45deg); }
-        .gauge-text { position: absolute; bottom: 0; width: 100%; text-align: center; font-weight: 800; font-size: 1.1rem; }
+        /* Gauges de tu imagen */
+        .gauge-container { text-align: center; position: relative; }
+        .gauge-label { font-size: 0.7rem; font-weight: bold; color: #475569; }
+        .gauge-visual { height: 10px; background: #e2e8f0; border-radius: 10px; margin: 5px 0; overflow: hidden; }
+        .gauge-bar { height: 100%; background: var(--mef-red); transition: width 0.5s ease; }
 
-        .status-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
-        .status-item { background: white; border: 1px solid #cbd5e1; padding: 8px; border-radius: 6px; min-height: 65px; }
+        .status-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .status-item { background: white; border: 1px solid #cbd5e1; padding: 8px; border-radius: 6px; min-height: 60px; border-top: 3px solid #64748b; }
         
-        .filter-badge { cursor: pointer; font-size: 0.7rem; padding: 4px 10px; border-radius: 20px; border: 1px solid #cbd5e1; background: white; transition: 0.2s; }
-        .filter-badge.active { background: var(--mef-red); color: white; border-color: var(--mef-red); }
         .cui-badge { background: #334155; color: #fff; font-family: monospace; font-weight: bold; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; }
     </style>
 </head>
@@ -45,12 +45,12 @@
 <header class="header-dashboard mb-3">
     <div class="container-fluid px-4 d-flex justify-content-between align-items-center">
         <div>
-            <h5 class="fw-bold mb-0 text-uppercase"><i class="bi bi-cpu-fill me-2"></i>Monitor Gerencial 2026</h5>
-            <small class="opacity-75">Sincronización MEF: <span id="fecha-actualizacion">...</span></small>
+            <h6 class="fw-bold mb-0 text-uppercase"><i class="bi bi-shield-check me-2"></i>Monitor de Alertas de Inversión 2026</h6>
+            <small class="opacity-75">Gobierno Regional de Lambayeque - Reporte de Ejecución</small>
         </div>
         <div class="d-flex gap-2">
-            <button onclick="exportarExcel()" class="btn btn-light btn-sm fw-bold"><i class="bi bi-file-earmark-excel-fill text-success"></i> Excel</button>
-            <a href="index.html" class="btn btn-warning btn-sm fw-bold">Volver</a>
+            <button onclick="exportarExcel()" class="btn btn-light btn-sm fw-bold shadow-sm"><i class="bi bi-file-earmark-excel-fill text-success"></i> Exportar</button>
+            <a href="index.html" class="btn btn-warning btn-sm fw-bold shadow-sm">Volver</a>
         </div>
     </div>
 </header>
@@ -58,27 +58,24 @@
 <div class="container-fluid px-4">
     <div class="row g-3">
         
-        <div class="col-lg-7">
+        <div class="col-lg-8">
             <div class="main-card p-3">
-                <div class="input-group input-group-sm mb-2 shadow-sm">
+                <div class="input-group shadow-sm mb-3">
                     <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
-                    <input type="text" id="mainSearch" class="form-control border-start-0" placeholder="Buscar por CUI o nombre del proyecto..." onkeyup="ejecutarFiltros()">
-                </div>
-                <div class="d-flex gap-2 mb-3">
-                    <div id="btn-all" class="filter-badge active" onclick="setEstadoFiltro('todos')">Todos (<span id="count-all">0</span>)</div>
-                    <div id="btn-zero" class="filter-badge" onclick="setEstadoFiltro('zero')">Avance 0% (<span id="count-zero">0</span>)</div>
-                    <div id="btn-exec" class="filter-badge" onclick="setEstadoFiltro('executing')">En Ejecución (<span id="count-exec">0</span>)</div>
+                    <input type="text" id="mainSearch" class="form-control border-start-0" placeholder="Buscar por CUI o Nombre del Proyecto..." onkeyup="ejecutarFiltros()">
                 </div>
 
-                <div class="table-wrapper border rounded">
+                <div class="table-wrapper">
                     <table class="table table-hover table-sm-custom mb-0">
                         <thead class="thead-sticky">
-                            <tr>
+                            <tr class="text-center">
                                 <th>CUI</th>
-                                <th>DESCRIPCIÓN DEL PROYECTO</th>
-                                <th class="text-end">PIM</th>
-                                <th class="text-center">AVANCE</th>
-                                <th class="text-center"><i class="bi bi-eye"></i></th>
+                                <th class="text-start">PROYECTO</th>
+                                <th>PIM (S/)</th>
+                                <th>CERTIFICADO</th>
+                                <th>% CERT.</th>
+                                <th>DEVENGADO</th>
+                                <th>% DEV.</th>
                             </tr>
                         </thead>
                         <tbody id="lista-proyectos"></tbody>
@@ -87,243 +84,203 @@
             </div>
         </div>
 
-        <div class="col-lg-5">
+        <div class="col-lg-4 side-panel">
             <div class="main-card p-3">
-                <h6 class="fw-bold border-bottom pb-2 mb-3 text-uppercase text-danger">Análisis de Selección</h6>
+                <h6 class="fw-bold border-bottom pb-2 mb-3 text-danger"><i class="bi bi-graph-up-arrow me-2"></i>DETALLE DE EJECUCIÓN</h6>
                 
-                <div class="text-center mb-3">
-                    <div class="gauge-wrapper">
-                        <div class="gauge-body"></div>
-                        <div class="gauge-text" id="gauge-percent">0%</div>
+                <div class="row g-3 mb-3">
+                    <div class="col-6 gauge-container">
+                        <span class="gauge-label">% Certificación</span>
+                        <div class="gauge-visual"><div id="bar-cert" class="gauge-bar" style="width: 0%"></div></div>
+                        <span class="fw-bold" id="txt-cert">0.00%</span>
                     </div>
-                    <small class="fw-bold text-muted d-block mt-1 small">AVANCE DE ESTE PROYECTO</small>
+                    <div class="col-6 gauge-container text-success">
+                        <span class="gauge-label text-success">% Devengado</span>
+                        <div class="gauge-visual"><div id="bar-dev" class="gauge-bar bg-success" style="width: 0%"></div></div>
+                        <span class="fw-bold" id="txt-dev">0.00%</span>
+                    </div>
                 </div>
-                
+
+                <div class="indicator-box mb-2">
+                    <span class="indicator-label">Presupuesto (PIM)</span>
+                    <span class="indicator-value" id="dash-pim">S/ 0.00</span>
+                </div>
                 <div class="row g-2 mb-3">
                     <div class="col-6">
                         <div class="indicator-box">
-                            <span class="indicator-label">PIM 2026</span>
-                            <span class="indicator-value" id="resumen-pim">S/ 0</span>
+                            <span class="indicator-label">Certificado</span>
+                            <span class="indicator-value" id="dash-cert">S/ 0.00</span>
                         </div>
                     </div>
                     <div class="col-6">
-                        <div class="indicator-box border-success shadow-sm">
+                        <div class="indicator-box">
                             <span class="indicator-label">Devengado</span>
-                            <span class="indicator-value text-success" id="resumen-dev">S/ 0</span>
+                            <span class="indicator-value text-success" id="dash-dev">S/ 0.00</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h6 class="fw-bold small text-muted text-uppercase mb-0">Seguimiento de Gestión</h6>
-                    <button class="btn btn-primary btn-sm py-0 shadow-sm" id="btn-abrir-form" disabled onclick="abrirFormulario()">
+                    <span class="fw-bold small text-muted text-uppercase">Seguimiento de Gestión</span>
+                    <button class="btn btn-primary btn-sm py-0 shadow-sm" id="btn-registrar" disabled onclick="abrirModal()">
                         <i class="bi bi-pencil-square"></i> Registrar
                     </button>
                 </div>
 
-                <div class="status-grid">
-                    <div class="status-item border-top border-3 border-dark">
+                <div class="status-grid mb-3">
+                    <div class="status-item" style="border-top-color: #1e293b">
                         <span class="indicator-label">Estado General</span>
-                        <div class="small fw-bold text-dark mt-1" id="disp-estado-gral">Seleccione proyecto</div>
+                        <div class="small fw-bold text-dark mt-1" id="res-estado">Seleccione CUI</div>
                     </div>
-                    <div class="status-item border-top border-3 border-secondary">
+                    <div class="status-item" style="border-top-color: #64748b">
                         <span class="indicator-label">Detalle Estado</span>
-                        <div class="small text-muted mt-1" id="disp-detalle-gral">-</div>
+                        <div class="small text-muted mt-1" id="res-detalle">-</div>
                     </div>
-                    <div class="status-item border-top border-3 border-warning">
+                    <div class="status-item" style="border-top-color: #ffc107">
                         <span class="indicator-label">Estado Específico</span>
-                        <div class="small fw-bold text-dark mt-1" id="disp-estado-esp">-</div>
+                        <div class="small fw-bold text-dark mt-1" id="res-esp">-</div>
                     </div>
-                    <div class="status-item border-top border-3 border-primary">
-                        <span class="indicator-label">Trámite SISGEDO</span>
-                        <div class="small fw-bold text-primary mt-1" id="disp-sisgedo">-</div>
+                    <div class="status-item" style="border-top-color: #0d6efd">
+                        <span class="indicator-label">SISGEDO</span>
+                        <div class="small fw-bold text-primary mt-1" id="res-sisgedo">-</div>
                     </div>
                 </div>
 
-                <div class="mt-auto p-2 bg-light rounded border border-dashed text-center small">
-                    <i class="bi bi-info-circle me-1"></i> Los datos de seguimiento son referenciales del usuario.
+                <div class="alert alert-secondary py-2 small mb-0 mt-auto border-dashed">
+                    <i class="bi bi-info-circle-fill me-1"></i> Haga clic en una fila para cargar datos.
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="modal fade" id="modalFormulario" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="modalRegistro" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content border-0 shadow-lg">
             <div class="modal-header bg-primary text-white py-2">
-                <h6 class="modal-title fw-bold">Actualizar Reporte de Inversión</h6>
+                <h6 class="modal-title fw-bold">Actualizar Seguimiento</h6>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <p class="small mb-3">Actualizando CUI: <strong id="form-cui-label">...</strong></p>
-                <form id="formSeguimiento">
-                    <div class="mb-2">
-                        <label class="form-label small fw-bold mb-1">Estado de Obra</label>
-                        <select class="form-select form-select-sm" id="input-estado-gral">
-                            <option value="EN EJECUCIÓN">EN EJECUCIÓN</option>
-                            <option value="PARALIZADO">PARALIZADO</option>
-                            <option value="SIN INICIO">SIN INICIO</option>
-                            <option value="CONCLUIDO">CONCLUIDO</option>
-                        </select>
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Estado General</label>
+                    <select class="form-select form-select-sm" id="in-estado">
+                        <option value="EN EJECUCIÓN">EN EJECUCIÓN</option>
+                        <option value="PARALIZADO">PARALIZADO</option>
+                        <option value="CONCLUIDO">CONCLUIDO</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Detalle / Justificación</label>
+                    <textarea class="form-control form-control-sm" id="in-detalle" rows="2"></textarea>
+                </div>
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <label class="form-label small fw-bold">Hito Específico</label>
+                        <input type="text" class="form-control form-control-sm" id="in-esp">
                     </div>
-                    <div class="mb-2">
-                        <label class="form-label small fw-bold mb-1">Detalle del Estado</label>
-                        <textarea class="form-control form-control-sm" id="input-detalle-gral" rows="2"></textarea>
+                    <div class="col-6 mb-3">
+                        <label class="form-label small fw-bold">Expediente SISGEDO</label>
+                        <input type="text" class="form-control form-control-sm" id="in-sisgedo">
                     </div>
-                    <div class="mb-2 row">
-                        <div class="col-6">
-                            <label class="form-label small fw-bold mb-1">Hito Específico</label>
-                            <input type="text" class="form-control form-control-sm" id="input-estado-esp">
-                        </div>
-                        <div class="col-6">
-                            <label class="form-label small fw-bold mb-1">N° SISGEDO</label>
-                            <input type="text" class="form-control form-control-sm" id="input-sisgedo">
-                        </div>
-                    </div>
-                </form>
+                </div>
             </div>
             <div class="modal-footer bg-light py-2">
-                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary btn-sm px-4 fw-bold" onclick="guardarSeguimiento()">Guardar</button>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary btn-sm px-4" onclick="guardarDatos()">Guardar Seguimiento</button>
             </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="modalDetalle" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg">
-            <div class="modal-header bg-dark text-white border-0 py-2">
-                <h6 class="modal-title small">Ficha Técnica</h6>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body p-4" id="detalle-body"></div>
         </div>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <script>
     let allData = [];
-    let currentData = [];
-    let cuiSeleccionado = null;
-    let filtroEstado = 'todos';
+    let seleccionadoCUI = null;
 
-    async function fetchData() {
+    async function cargarJSON() {
         try {
-            const response = await fetch('data_proyectos.json'); 
-            const data = await response.json();
-            if(data.fecha_extraccion) document.getElementById('fecha-actualizacion').innerText = data.fecha_extraccion;
-            allData = data.proyectos || []; 
-            ejecutarFiltros();
-        } catch (e) { console.error("Error cargando JSON"); }
+            const res = await fetch('data_proyectos.json');
+            const data = await res.json();
+            allData = data.proyectos || [];
+            renderizarTabla(allData);
+        } catch (e) { console.error("Error al cargar los datos"); }
     }
 
-    function ejecutarFiltros() {
-        const q = document.getElementById('mainSearch').value.toLowerCase();
-        let filtered = allData.filter(i => 
-            i.PRODUCTO_PROYECTO.toString().includes(q) || 
-            i.PRODUCTO_PROYECTO_NOMBRE.toLowerCase().includes(q)
-        );
-        if (filtroEstado === 'zero') filtered = filtered.filter(p => parseFloat(p.MONTO_DEVENGADO) === 0);
-        else if (filtroEstado === 'executing') filtered = filtered.filter(p => parseFloat(p.MONTO_DEVENGADO) > 0);
-        currentData = filtered;
-        actualizarContadores();
-        renderTable(filtered);
-    }
-
-    function actualizarContadores() {
-        document.getElementById('count-all').innerText = allData.length;
-        document.getElementById('count-zero').innerText = allData.filter(p => parseFloat(p.MONTO_DEVENGADO) === 0).length;
-        document.getElementById('count-exec').innerText = allData.filter(p => parseFloat(p.MONTO_DEVENGADO) > 0).length;
-    }
-
-    function renderTable(data) {
+    function renderizarTabla(lista) {
         const tbody = document.getElementById('lista-proyectos');
         tbody.innerHTML = '';
-        data.slice(0, 100).forEach(item => {
-            const pim = parseFloat(item.MONTO_PIM || 0);
-            const dev = parseFloat(item.MONTO_DEVENGADO || 0);
-            const avance = pim > 0 ? (dev / pim * 100).toFixed(1) : 0;
+        lista.slice(0, 100).forEach(p => {
+            const pim = parseFloat(p.MONTO_PIM || 0);
+            const cert = parseFloat(p.MONTO_CERTIFICADO || 0);
+            const dev = parseFloat(p.MONTO_DEVENGADO || 0);
+            
+            const pCert = pim > 0 ? (cert/pim*100).toFixed(1) : 0;
+            const pDev = pim > 0 ? (dev/pim*100).toFixed(1) : 0;
+
             tbody.innerHTML += `
-                <tr onclick="seleccionarCUI('${item.PRODUCTO_PROYECTO}', this)">
-                    <td><span class="cui-badge">${item.PRODUCTO_PROYECTO}</span></td>
-                    <td class="small fw-bold text-truncate" style="max-width: 280px;">${item.PRODUCTO_PROYECTO_NOMBRE}</td>
+                <tr onclick="seleccionarProyecto('${p.PRODUCTO_PROYECTO}', this)">
+                    <td class="text-center"><span class="cui-badge">${p.PRODUCTO_PROYECTO}</span></td>
+                    <td class="text-start" style="max-width:300px"><div class="text-truncate fw-bold">${p.PRODUCTO_PROYECTO_NOMBRE}</div></td>
                     <td class="text-end fw-bold">S/ ${Math.round(pim).toLocaleString()}</td>
-                    <td class="text-center"><span class="badge ${avance == 0 ? 'bg-danger' : 'bg-success'}">${avance}%</span></td>
-                    <td class="text-center">
-                        <button class="btn btn-sm p-0" onclick="event.stopPropagation(); verDetalle('${item.PRODUCTO_PROYECTO}')">
-                            <i class="bi bi-eye text-primary"></i>
-                        </button>
-                    </td>
+                    <td class="text-end">S/ ${Math.round(cert).toLocaleString()}</td>
+                    <td class="text-center"><span class="badge bg-secondary">${pCert}%</span></td>
+                    <td class="text-end text-success fw-bold">S/ ${Math.round(dev).toLocaleString()}</td>
+                    <td class="text-center"><span class="badge ${pDev > 50 ? 'bg-success' : 'bg-danger'}">${pDev}%</span></td>
                 </tr>`;
         });
     }
 
-    // ESTA ES LA FUNCIÓN QUE CONECTA TODO
-    function seleccionarCUI(cui, fila) {
-        cuiSeleccionado = cui;
-        
-        // Efecto visual en tabla
-        document.querySelectorAll('tr').forEach(tr => tr.classList.remove('table-active-mef'));
+    function seleccionarProyecto(cui, fila) {
+        seleccionadoCUI = cui;
+        document.querySelectorAll('tr').forEach(r => r.classList.remove('table-active-mef'));
         fila.classList.add('table-active-mef');
-
-        // Buscar data del proyecto
+        
         const p = allData.find(i => i.PRODUCTO_PROYECTO.toString() === cui.toString());
-        if (p) {
-            document.getElementById('btn-abrir-form').disabled = false;
+        if(p) {
             const pim = parseFloat(p.MONTO_PIM || 0);
+            const cert = parseFloat(p.MONTO_CERTIFICADO || 0);
             const dev = parseFloat(p.MONTO_DEVENGADO || 0);
-            const avance = pim > 0 ? (dev / pim * 100).toFixed(1) : 0;
+            const pCert = pim > 0 ? (cert/pim*100).toFixed(1) : 0;
+            const pDev = pim > 0 ? (dev/pim*100).toFixed(1) : 0;
 
-            // Actualizar Dash Derecho
-            document.getElementById('resumen-pim').innerText = 'S/ ' + Math.round(pim).toLocaleString();
-            document.getElementById('resumen-dev').innerText = 'S/ ' + Math.round(dev).toLocaleString();
-            document.getElementById('gauge-percent').innerText = avance + '%';
+            // Actualizar Dash
+            document.getElementById('dash-pim').innerText = 'S/ ' + pim.toLocaleString();
+            document.getElementById('dash-cert').innerText = 'S/ ' + cert.toLocaleString();
+            document.getElementById('dash-dev').innerText = 'S/ ' + dev.toLocaleString();
             
-            document.getElementById('disp-estado-gral').innerText = "PROYECTO ACTIVO";
-            document.getElementById('disp-detalle-gral').innerText = p.PRODUCTO_PROYECTO_NOMBRE;
+            // Actualizar Gauges
+            document.getElementById('txt-cert').innerText = pCert + '%';
+            document.getElementById('bar-cert').style.width = pCert + '%';
+            document.getElementById('txt-dev').innerText = pDev + '%';
+            document.getElementById('bar-dev').style.width = pDev + '%';
+
+            document.getElementById('btn-registrar').disabled = false;
+            document.getElementById('res-estado').innerText = "VINCULADO";
+            document.getElementById('res-detalle').innerText = p.PRODUCTO_PROYECTO_NOMBRE;
         }
     }
 
-    function setEstadoFiltro(est) {
-        filtroEstado = est;
-        document.querySelectorAll('.filter-badge').forEach(b => b.classList.remove('active'));
-        document.getElementById(est === 'todos' ? 'btn-all' : est === 'zero' ? 'btn-zero' : 'btn-exec').classList.add('active');
-        ejecutarFiltros();
+    function abrirModal() {
+        new bootstrap.Modal(document.getElementById('modalRegistro')).show();
     }
 
-    function abrirFormulario() {
-        document.getElementById('form-cui-label').innerText = cuiSeleccionado;
-        new bootstrap.Modal(document.getElementById('modalFormulario')).show();
+    function guardarDatos() {
+        document.getElementById('res-estado').innerText = document.getElementById('in-estado').value;
+        document.getElementById('res-detalle').innerText = document.getElementById('in-detalle').value || "-";
+        document.getElementById('res-esp').innerText = document.getElementById('in-esp').value || "-";
+        document.getElementById('res-sisgedo').innerText = document.getElementById('in-sisgedo').value || "-";
+        bootstrap.Modal.getInstance(document.getElementById('modalRegistro')).hide();
     }
 
-    function guardarSeguimiento() {
-        document.getElementById('disp-estado-gral').innerText = document.getElementById('input-estado-gral').value;
-        document.getElementById('disp-detalle-gral').innerText = document.getElementById('input-detalle-gral').value || "-";
-        document.getElementById('disp-estado-esp').innerText = document.getElementById('input-estado-esp').value || "-";
-        document.getElementById('disp-sisgedo').innerText = document.getElementById('input-sisgedo').value || "-";
-        bootstrap.Modal.getInstance(document.getElementById('modalFormulario')).hide();
+    function ejecutarFiltros() {
+        const q = document.getElementById('mainSearch').value.toLowerCase();
+        const filtrados = allData.filter(p => p.PRODUCTO_PROYECTO.toString().includes(q) || p.PRODUCTO_PROYECTO_NOMBRE.toLowerCase().includes(q));
+        renderizarTabla(filtrados);
     }
 
-    function verDetalle(cui) {
-        const p = allData.find(i => i.PRODUCTO_PROYECTO.toString() === cui.toString());
-        const pim = parseFloat(p.MONTO_PIM || 0), dev = parseFloat(p.MONTO_DEVENGADO || 0);
-        const html = `<h6 class="fw-bold">${p.PRODUCTO_PROYECTO_NOMBRE}</h6><hr><p class="small"><b>EJECUTORA:</b> ${p.EJECUTORA_NOMBRE}<br><b>SALDO:</b> S/ ${(pim-dev).toLocaleString()}</p>`;
-        document.getElementById('detalle-body').innerHTML = html;
-        new bootstrap.Modal(document.getElementById('modalDetalle')).show();
-    }
-
-    function exportarExcel() {
-        const ws = XLSX.utils.json_to_sheet(currentData.map(i => ({ CUI: i.PRODUCTO_PROYECTO, NOMBRE: i.PRODUCTO_PROYECTO_NOMBRE, PIM: i.MONTO_PIM, DEV: i.MONTO_DEVENGADO })));
-        const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Data");
-        XLSX.writeFile(wb, "Reporte_Alertas_2026.xlsx");
-    }
-
-    document.addEventListener('DOMContentLoaded', fetchData);
+    window.onload = cargarJSON;
 </script>
 </body>
 </html>
