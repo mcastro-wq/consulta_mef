@@ -9,8 +9,21 @@
     <style>
         :root { --mef-red: #801616; --mef-gold: #ffc107; }
         body { background-color: #f4f7f6; font-family: 'Inter', sans-serif; }
-        .header-top { background: var(--mef-red); color: white; padding: 25px 0; border-bottom: 5px solid var(--mef-gold); }
-        .search-container { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); margin-top: -40px; }
+        .header-top { 
+    background: var(--mef-red); 
+    color: white; 
+    padding: 40px 0 60px 0; /* Más espacio abajo para que el rojo abrace al buscador */
+    border-bottom: 5px solid var(--mef-gold); 
+}
+       .search-container { 
+    background: white; 
+    border-radius: 15px; 
+    padding: 20px; 
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+    margin-top: 20px; /* Cambiamos de -40px a 20px positivos para que baje */
+    position: relative;
+    z-index: 10;
+}
         
         .filter-badge { cursor: pointer; transition: all 0.3s; border: 1px solid #dee2e6; padding: 8px 15px; border-radius: 50px; background: white; font-weight: 600; font-size: 0.85rem; }
         .filter-badge.active { background: var(--mef-red); color: white; border-color: var(--mef-red); }
