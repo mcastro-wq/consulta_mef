@@ -29,6 +29,7 @@ def generate_seguimiento_detallado():
 
                         # Aquí usamos EXACTAMENTE los nombres de tu diccionario
                         proyectos_data.append({
+                            "TIPO": r.get('TIPO_ACT_PROY_NOMBRE', ''), # PROYECTO o PRODUCTO/ACTIVIDAD
                             "PRODUCTO_PROYECTO": r.get('PRODUCTO_PROYECTO', '0'),
                             "PRODUCTO_PROYECTO_NOMBRE": r.get('PRODUCTO_PROYECTO_NOMBRE', 'SIN NOMBRE'),
                             "EJECUTORA_NOMBRE": r.get('EJECUTORA_NOMBRE', 'SIN EJECUTORA'),
