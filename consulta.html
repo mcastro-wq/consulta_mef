@@ -53,23 +53,39 @@
     </div>
 </div>
 
-<script>
+
+
+    <script>
     let historialCompleto = [];
+    // VERIFICA: Esta debe ser la misma URL que usas en el monitor que SÍ funciona
     const urlApi = 'https://script.google.com/macros/s/AKfycbxHsULfzbMQtpRoNUUJKQDY-4f4NLXoFCthAgIGAselxxUxv7xsKeyZiB7Si4n9dLrP/exec';
 
     async function cargarTodoElHistorial() {
+        const contenedor = document.getElementById('contenedor-historial');
         try {
-            // En el script de Google, si no enviamos CUI, debe devolver TODO
-            const response = await fetch(`${urlApi}?modo=todo`);
-            const res = await response.json();
+            console.log("1. Iniciando petición a:", urlApi + "?modo=todo");
             
-            if (res.status === "success") {
+            const response = await fetch(`${urlApi}?modo=todo`);
+            if (!response.ok) throw new Error("Error en la respuesta de red");
+            
+            const res = await response.json();
+            console.log("2. Respuesta recibida:", res);
+
+            // Validamos que 'res.data' exista y sea una lista
+            if (res.status === "success" && res.data && Array.isArray(res.data)) {
                 historialCompleto = res.data;
+                console.log("3. Datos cargados. Total registros:", historialCompleto.length);
                 renderizarHistorial();
+            } else {
+                console.warn("La API no devolvió una lista de datos válida:", res);
+                contenedor.innerHTML = `<div class="alert alert-warning text-center">No hay datos registrados en la tabla actualmente.</div>`;
             }
         } catch (error) {
-            console.error("Error:", error);
-            document.getElementById('contenedor-historial').innerHTML = `<div class="alert alert-danger">Error al conectar con la base de datos.</div>`;
+            console.error("ERROR CRÍTICO:", error);
+            contenedor.innerHTML = `<div class="alert alert-danger text-center">
+                <strong>Error de conexión:</strong> No se pudo obtener el historial.<br>
+                <small>${error.message}</small>
+            </div>`;
         }
     }
 
@@ -77,14 +93,18 @@
         const query = document.getElementById('inputFiltro').value.toLowerCase();
         const contenedor = document.getElementById('contenedor-historial');
         
-        const filtrados = historialCompleto.filter(item => 
-            item.codigo_cui.includes(query) || 
-            item.detalle_estado_general.toLowerCase().includes(query) ||
-            item.estado_general.toLowerCase().includes(query)
-        );
+        console.log("4. Renderizando con filtro:", query);
+
+        const filtrados = historialCompleto.filter(item => {
+            // Aseguramos que los campos existan antes de comparar
+            const cui = String(item.codigo_cui || "");
+            const detGral = String(item.detalle_estado_general || "").toLowerCase();
+            const estGral = String(item.estado_general || "").toLowerCase();
+            return cui.includes(query) || detGral.includes(query) || estGral.includes(query);
+        });
 
         if(filtrados.length === 0) {
-            contenedor.innerHTML = `<div class="text-center text-muted p-5">No se encontraron registros.</div>`;
+            contenedor.innerHTML = `<div class="text-center text-muted p-5">No se encontraron registros que coincidan con la búsqueda.</div>`;
             return;
         }
 
@@ -93,11 +113,10 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start mb-2">
                         <div>
-                            <span class="badge cui-badge">CUI: ${item.codigo_cui}</span>
-                            <span class="ms-2 fw-bold text-uppercase" style="color: var(--gore-orange)">${item.estado_general}</span>
-                        </div>
-                        <div class="timestamp">
-                            <i class="bi bi-calendar3"></i> ${item.fecha_registro || 'Reciente'}
+                            <span class="badge cui-badge">CUI: ${item.codigo_cui || 'S/N'}</span>
+                            <span class="ms-2 fw-bold text-uppercase" style="color: var(--gore-orange)">
+                                ${item.estado_general || '-'}
+                            </span>
                         </div>
                     </div>
                     <div class="row">
@@ -105,7 +124,10 @@
                             <p class="mb-1 text-muted small">DETALLE GENERAL:</p>
                             <p class="fw-medium">${item.detalle_estado_general || '-'}</p>
                             <p class="mb-1 text-muted small">ESTADO ESPECÍFICO:</p>
-                            <p class="fw-bold text-primary">${item.estado_especifico || '-'} <small class="text-dark fw-normal">(${item.detalle_estado_especifico})</small></p>
+                            <p class="fw-bold text-primary">
+                                ${item.estado_especifico || '-'} 
+                                <small class="text-dark fw-normal">(${item.detalle_estado_especifico || '-'})</small>
+                            </p>
                         </div>
                         <div class="col-md-6">
                             <p class="mb-1 text-muted small">ACCIONES PROGRAMADAS:</p>
@@ -122,8 +144,9 @@
         `).join('');
     }
 
-    // Cargar al iniciar
     window.onload = cargarTodoElHistorial;
 </script>
+
+    
 </body>
 </html>
