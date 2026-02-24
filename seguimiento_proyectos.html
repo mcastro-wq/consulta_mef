@@ -50,11 +50,6 @@
         <a href="index.html" class="btn btn-warning fw-bold rounded-pill px-4">
             <i class="bi bi-arrow-left"></i> Volver al Monitor
         </a>
-
-        
-        <button onclick="exportarExcel()" class="btn btn-excel rounded-pill px-4 shadow-sm">
-            <i class="bi bi-file-earmark-excel-fill me-2"></i> Exportar Reporte
-        </button>
     </div>
 </div>
 
@@ -77,6 +72,12 @@
                     <div id="btn-exec" class="filter-badge text-success border-success" onclick="setEstadoFiltro('executing')">
                         En Ejecución <span class="badge bg-success ms-1" id="count-exec">0</span>
                     </div>
+
+                            <button onclick="exportarExcel()" class="btn btn-excel rounded-pill px-4 shadow-sm">
+            <i class="bi bi-file-earmark-excel-fill me-2"></i> Exportar Reporte
+        </button>
+
+                    
                 </div>
             </div>
         </div>
