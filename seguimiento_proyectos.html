@@ -9,33 +9,20 @@
     <style>
         :root { --gore-brown: #703020; --gore-orange: #d35400; --bg-light: #f4f6f9; }
         body { background-color: var(--bg-light); font-family: 'Segoe UI', Roboto, sans-serif; font-size: 0.82rem; }
-        
         .header-gore { background: var(--gore-brown); color: white; padding: 12px; border-bottom: 4px solid var(--gore-orange); }
         .main-card { background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); height: calc(100vh - 110px); display: flex; flex-direction: column; }
-        
-        /* Tabla Principal */
         .table-container { flex-grow: 1; overflow-y: auto; border: 1px solid #dee2e6; }
         .thead-gore { position: sticky; top: 0; background: var(--gore-brown); color: white; z-index: 10; font-size: 0.75rem; }
-        .table-main tr { cursor: pointer; transition: 0.2s; border-bottom: 1px solid #eee; }
+        .table-main tr { cursor: pointer; border-bottom: 1px solid #eee; }
         .table-main tr:hover { background-color: #fdf2f0; }
         .selected-row { background-color: #fff5f2 !important; border-left: 5px solid var(--gore-orange) !important; }
-
-        /* Gauges / Velocímetros */
         .gauge-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
         .gauge-box { text-align: center; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #eee; }
-        .gauge-title { font-size: 0.62rem; font-weight: bold; color: var(--gore-brown); text-transform: uppercase; margin-bottom: 5px; display: block; }
         .gauge-svg { width: 100px; height: 55px; }
         .gauge-bg { fill: none; stroke: #e9ecef; stroke-width: 10; stroke-linecap: round; }
         .gauge-fill { fill: none; stroke-width: 10; stroke-linecap: round; stroke-dasharray: 157; stroke-dashoffset: 157; transition: stroke-dashoffset 0.8s ease-out; }
-        
-        /* Colores de Fases */
-        .color-cert { stroke: #6c757d; }
-        .color-comp { stroke: #fd7e14; }
-        .color-dev { stroke: #198754; }
-        .color-gir { stroke: #0d6efd; }
-
+        .color-cert { stroke: #6c757d; } .color-comp { stroke: #fd7e14; } .color-dev { stroke: #198754; } .color-gir { stroke: #0d6efd; }
         .gauge-val { font-size: 0.9rem; font-weight: 800; display: block; margin-top: -15px; }
-        .cui-text { font-family: monospace; font-weight: bold; color: #333; background: #eee; padding: 2px 5px; border-radius: 4px; }
         .amt-text { font-weight: 600; color: #444; }
     </style>
 </head>
@@ -44,8 +31,8 @@
 <header class="header-gore mb-3 shadow-sm">
     <div class="container-fluid d-flex justify-content-between align-items-center px-4">
         <div>
-            <h6 class="mb-0 fw-bold text-uppercase"><i class="bi bi-shield-check me-2"></i>Monitor Gerencial de Ejecución 2026</h6>
-            <small class="opacity-75" id="sync-time">Cargando datos del MEF...</small>
+            <h6 class="mb-0 fw-bold"><i class="bi bi-shield-check me-2"></i>MONITOR GERENCIAL DE EJECUCIÓN 2026</h6>
+            <small class="opacity-75" id="sync-time">Cargando datos...</small>
         </div>
         <a href="index.html" class="btn btn-warning btn-sm fw-bold shadow-sm px-3">
             <i class="bi bi-arrow-left-circle me-1"></i> VOLVER
@@ -57,11 +44,7 @@
     <div class="row g-3">
         <div class="col-lg-9">
             <div class="main-card p-3">
-                <div class="input-group input-group-sm mb-3 shadow-sm">
-                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
-                    <input type="text" id="searchBox" class="form-control border-start-0" placeholder="Buscar por CUI o nombre del proyecto..." onkeyup="filtrar()">
-                </div>
-                
+                <input type="text" id="searchBox" class="form-control form-control-sm mb-3" placeholder="Buscar por CUI o Nombre..." onkeyup="filtrar()">
                 <div class="table-container rounded">
                     <table class="table table-sm table-main mb-0">
                         <thead class="thead-gore text-center">
@@ -83,40 +66,34 @@
 
         <div class="col-lg-3">
             <div class="main-card p-3">
-                <h6 class="fw-bold text-uppercase border-bottom pb-2 mb-3" style="color: var(--gore-brown)">
-                    <i class="bi bi-speedometer2 me-2"></i>Avance Financiero
-                </h6>
-
+                <h6 class="fw-bold border-bottom pb-2 mb-3" style="color: var(--gore-brown)">AVANCE FINANCIERO</h6>
                 <div class="gauge-grid">
                     <div class="gauge-box">
-                        <span class="gauge-title">Certificado</span>
+                        <small class="d-block fw-bold" style="font-size:0.6rem">CERTIFICADO</small>
                         <svg class="gauge-svg" viewBox="0 0 120 70">
                             <path class="gauge-bg" d="M 10 60 A 50 50 0 0 1 110 60" />
                             <path id="g-cert" class="gauge-fill color-cert" d="M 10 60 A 50 50 0 0 1 110 60" />
                         </svg>
                         <span class="gauge-val" id="v-cert">0%</span>
                     </div>
-
                     <div class="gauge-box">
-                        <span class="gauge-title">Comp. Anual</span>
+                        <small class="d-block fw-bold" style="font-size:0.6rem">COMP. ANUAL</small>
                         <svg class="gauge-svg" viewBox="0 0 120 70">
                             <path class="gauge-bg" d="M 10 60 A 50 50 0 0 1 110 60" />
                             <path id="g-comp" class="gauge-fill color-comp" d="M 10 60 A 50 50 0 0 1 110 60" />
                         </svg>
                         <span class="gauge-val" id="v-comp">0%</span>
                     </div>
-
                     <div class="gauge-box">
-                        <span class="gauge-title">Devengado</span>
+                        <small class="d-block fw-bold" style="font-size:0.6rem">DEVENGADO</small>
                         <svg class="gauge-svg" viewBox="0 0 120 70">
                             <path class="gauge-bg" d="M 10 60 A 50 50 0 0 1 110 60" />
                             <path id="g-dev" class="gauge-fill color-dev" d="M 10 60 A 50 50 0 0 1 110 60" />
                         </svg>
                         <span class="gauge-val text-success" id="v-dev">0%</span>
                     </div>
-
                     <div class="gauge-box">
-                        <span class="gauge-title">Girado</span>
+                        <small class="d-block fw-bold" style="font-size:0.6rem">GIRADO</small>
                         <svg class="gauge-svg" viewBox="0 0 120 70">
                             <path class="gauge-bg" d="M 10 60 A 50 50 0 0 1 110 60" />
                             <path id="g-gir" class="gauge-fill color-gir" d="M 10 60 A 50 50 0 0 1 110 60" />
@@ -136,8 +113,8 @@
                     </div>
                 </div>
 
-                <button class="btn btn-primary btn-sm w-100 fw-bold mt-3 shadow-sm" id="btn-modal" disabled onclick="alert('Funcionalidad de registro en desarrollo')">
-                    <i class="bi bi-pencil-square me-1"></i> REGISTRAR SEGUIMIENTO
+                <button class="btn btn-primary w-100 fw-bold mt-3 shadow-sm" id="btn-modal" disabled>
+                    <i class="bi bi-pencil-square me-2"></i> REGISTRAR SEGUIMIENTO
                 </button>
             </div>
         </div>
@@ -151,31 +128,29 @@
         try {
             const res = await fetch('data_proyectos.json');
             const data = await res.json();
-            document.getElementById('sync-time').innerText = "Última sincronización: " + data.fecha_extraccion;
+            document.getElementById('sync-time').innerText = "Corte: " + data.fecha_extraccion;
             allData = data.proyectos;
             renderTable(allData);
-        } catch (e) {
-            document.getElementById('sync-time').innerText = "Error al cargar data_proyectos.json";
-        }
+        } catch (e) { console.error(e); }
     }
 
     function renderTable(data) {
         const tbody = document.getElementById('lista-proyectos');
         tbody.innerHTML = data.map(p => {
-            const pim = p.MONTO_PIM || 0;
-            const cert = p.MONTO_CERTIFICADO || 0;
-            const dev = p.MONTO_DEVENGADO || 0;
+            const pim = parseFloat(p.MONTO_PIM) || 0;
+            const cert = parseFloat(p.MONTO_CERTIFICADO) || 0;
+            const dev = parseFloat(p.MONTO_DEVENGADO) || 0;
             const pCert = pim > 0 ? (cert/pim*100).toFixed(1) : 0;
             const pDev = pim > 0 ? (dev/pim*100).toFixed(1) : 0;
             
             return `
                 <tr onclick="seleccionar('${p.PRODUCTO_PROYECTO}', this)">
-                    <td class="text-center"><span class="cui-text">${p.PRODUCTO_PROYECTO}</span></td>
-                    <td class="text-start small" style="max-width:280px">${p.PRODUCTO_PROYECTO_NOMBRE}</td>
-                    <td class="text-end amt-text">${pim.toLocaleString('es-PE', {minimumFractionDigits: 0})}</td>
-                    <td class="text-end">${cert.toLocaleString('es-PE', {minimumFractionDigits: 0})}</td>
+                    <td class="text-center fw-bold">${p.PRODUCTO_PROYECTO}</td>
+                    <td class="text-start small">${p.PRODUCTO_PROYECTO_NOMBRE}</td>
+                    <td class="text-end">${pim.toLocaleString('es-PE')}</td>
+                    <td class="text-end">${cert.toLocaleString('es-PE')}</td>
                     <td class="text-center"><span class="badge bg-secondary">${pCert}%</span></td>
-                    <td class="text-end text-success fw-bold">${dev.toLocaleString('es-PE', {minimumFractionDigits: 0})}</td>
+                    <td class="text-end text-success fw-bold">${dev.toLocaleString('es-PE')}</td>
                     <td class="text-center"><span class="badge bg-success">${pDev}%</span></td>
                 </tr>`;
         }).join('');
@@ -187,19 +162,22 @@
         
         const p = allData.find(i => i.PRODUCTO_PROYECTO.toString() === cui.toString());
         if(p) {
-            const pim = p.MONTO_PIM || 0;
-            const cAnual = p.MONTO_COMPROMETIDO_ANUAL || 0;
-            const gir = p.MONTO_GIRADO || 0;
-            
+            const pim = parseFloat(p.MONTO_PIM) || 0;
+            const cert = parseFloat(p.MONTO_CERTIFICADO) || 0;
+            const comp = parseFloat(p.MONTO_COMPROMETIDO_ANUAL) || 0;
+            const dev = parseFloat(p.MONTO_DEVENGADO) || 0;
+            const gir = parseFloat(p.MONTO_GIRADO) || 0;
+
             const perc = (val) => pim > 0 ? (val/pim*100).toFixed(1) : 0;
 
-            updateGauge('g-cert', 'v-cert', perc(p.MONTO_CERTIFICADO));
-            updateGauge('g-comp', 'v-comp', perc(cAnual));
-            updateGauge('g-dev', 'v-dev', perc(p.MONTO_DEVENGADO));
+            updateGauge('g-cert', 'v-cert', perc(cert));
+            updateGauge('g-comp', 'v-comp', perc(comp));
+            updateGauge('g-dev', 'v-dev', perc(dev));
             updateGauge('g-gir', 'v-gir', perc(gir));
 
+            // CORRECCIÓN AQUÍ: Se asegura que el texto informativo use los números del JSON
             document.getElementById('txt-pim').innerText = 'S/ ' + pim.toLocaleString('es-PE');
-            document.getElementById('txt-dev').innerText = 'S/ ' + p.MONTO_DEVENGADO.toLocaleString('es-PE');
+            document.getElementById('txt-dev').innerText = 'S/ ' + dev.toLocaleString('es-PE');
             document.getElementById('btn-modal').disabled = false;
         }
     }
@@ -213,10 +191,7 @@
 
     function filtrar() {
         const q = document.getElementById('searchBox').value.toLowerCase();
-        const filtered = allData.filter(p => 
-            p.PRODUCTO_PROYECTO.toString().includes(q) || 
-            p.PRODUCTO_PROYECTO_NOMBRE.toLowerCase().includes(q)
-        );
+        const filtered = allData.filter(p => p.PRODUCTO_PROYECTO.toString().includes(q) || p.PRODUCTO_PROYECTO_NOMBRE.toLowerCase().includes(q));
         renderTable(filtered);
     }
 
