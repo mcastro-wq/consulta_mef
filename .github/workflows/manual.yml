@@ -23,7 +23,7 @@ jobs:
         run: |
           python script.py
           python ranking.py # Ejecuta el nuevo script del ranking
-          python segumiento.py
+          python seguimiento.py
       # ... dentro de los pasos de tu workflow
 
       - name: Guardar cambios
