@@ -116,13 +116,25 @@
     let currentData = [];
     let filtroEstado = 'todos';
 
-    async function fetchData() {
-        try {
-            const response = await fetch('data_proyectos.json'); 
-            allData = await response.json();
-            ejecutarFiltros();
-        } catch (e) { console.error(e); }
+async function fetchData() {
+    try {
+        const response = await fetch('data_proyectos.json'); 
+        const data = await response.json();
+        
+        // 1. Mostramos la fecha global de extracción
+        if(data.fecha_extraccion) {
+            document.getElementById('fecha-actualizacion').innerText = data.fecha_extraccion;
+        }
+
+        // 2. Cargamos la lista de proyectos (que ahora está dentro de data.proyectos)
+        allData = data.proyectos || []; 
+        
+        ejecutarFiltros();
+    } catch (e) { 
+        console.error("Error al cargar:", e); 
+        document.getElementById('fecha-actualizacion').innerText = "Error de carga";
     }
+}
 
     function ejecutarFiltros() {
         const q = document.getElementById('mainSearch').value.toLowerCase();
