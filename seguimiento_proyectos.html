@@ -50,7 +50,7 @@
     </div>
     <div class="d-flex align-items-center gap-4">
         <div class="text-end">
-            <small class="text-muted d-block fw-bold">TOTAL REGISTROS</small>
+            <small class="text-muted d-block fw-bold">REGISTROS FILTRADOS</small>
             <span class="h5 fw-bold" id="txt-contador" style="color: var(--gore-brown)">0</span>
         </div>
         <a href="index.html" class="btn btn-warning btn-sm fw-bold px-4 shadow-sm border-2"><i class="bi bi-house"></i> VOLVER</a>
@@ -125,13 +125,15 @@
                         <tbody id="tbody-main"></tbody>
                     </table>
                 </div>
+                <div id="msg-limit" class="bg-light text-center py-1 border-top d-none">
+                    <small class="text-muted">Se muestran los primeros 100 resultados para mejorar el rendimiento.</small>
+                </div>
             </div>
         </div>
 
         <div class="col-lg-3">
             <div class="sidebar-panel shadow-sm">
                 <h6 class="text-center fw-bold text-uppercase border-bottom pb-2 mb-3" style="color: var(--gore-brown); font-size: 0.75rem;">Fases de Ejecución</h6>
-                
                 <div class="gauge-wrapper"><span class="gauge-label">Certificación</span><svg class="gauge-svg" viewBox="0 0 120 70"><path class="gauge-bg" d="M 10 60 A 50 50 0 0 1 110 60" /><path id="g-cer" class="gauge-fill" style="stroke: #6c757d" d="M 10 60 A 50 50 0 0 1 110 60" /></svg><span class="gauge-val" id="v-cer">0%</span></div>
                 <div class="gauge-wrapper"><span class="gauge-label">Compromiso Anual</span><svg class="gauge-svg" viewBox="0 0 120 70"><path class="gauge-bg" d="M 10 60 A 50 50 0 0 1 110 60" /><path id="g-can" class="gauge-fill" style="stroke: #fd7e14" d="M 10 60 A 50 50 0 0 1 110 60" /></svg><span class="gauge-val" id="v-can">0%</span></div>
                 <div class="gauge-wrapper"><span class="gauge-label">Compromiso Mensual</span><svg class="gauge-svg" viewBox="0 0 120 70"><path class="gauge-bg" d="M 10 60 A 50 50 0 0 1 110 60" /><path id="g-cme" class="gauge-fill" style="stroke: #6610f2" d="M 10 60 A 50 50 0 0 1 110 60" /></svg><span class="gauge-val" id="v-cme" style="color:#6610f2">0%</span></div>
@@ -144,6 +146,7 @@
 
 <script>
     let allData = [];
+    let timeoutBusqueda;
 
     async function fetchData() {
         try {
@@ -156,26 +159,36 @@
     }
 
     function filtrar() {
-        const query = document.getElementById('inputBusqueda').value.toLowerCase();
-        const verProyecto = document.getElementById('checkProyecto').checked;
-        const verActividad = document.getElementById('checkActividad').checked;
+        // Debounce: Evita procesar cada letra instantáneamente
+        clearTimeout(timeoutBusqueda);
+        timeoutBusqueda = setTimeout(() => {
+            const query = document.getElementById('inputBusqueda').value.toLowerCase();
+            const verProyecto = document.getElementById('checkProyecto').checked;
+            const verActividad = document.getElementById('checkActividad').checked;
 
-        const filtered = allData.filter(p => {
-            const tipo = (p.TIPO || "").toUpperCase();
-            
-            // Lógica según tu aclaración:
-            const esProyecto = tipo === "PROYECTO";
-            const esProductoActividad = tipo === "PRODUCTO"; // "Actividad" en la etiqueta es "Producto" en data
+            const filtered = allData.filter(p => {
+                const tipo = (p.TIPO || "").toUpperCase();
+                const esProyecto = tipo === "PROYECTO";
+                const esProductoActividad = tipo === "PRODUCTO";
 
-            const matchTipo = (verProyecto && esProyecto) || (verActividad && esProductoActividad);
-            const matchBusqueda = p.PRODUCTO_PROYECTO_NOMBRE.toLowerCase().includes(query) || p.PRODUCTO_PROYECTO.toString().includes(query);
+                const matchTipo = (verProyecto && esProyecto) || (verActividad && esProductoActividad);
+                const matchBusqueda = p.PRODUCTO_PROYECTO_NOMBRE.toLowerCase().includes(query) || p.PRODUCTO_PROYECTO.toString().includes(query);
 
-            return matchTipo && matchBusqueda;
-        });
+                return matchTipo && matchBusqueda;
+            });
 
-        renderTable(filtered);
-        renderResumen(filtered);
-        document.getElementById('txt-contador').innerText = filtered.length;
+            // Actualizar totales y contador sobre el total de filtrados
+            renderResumen(filtered);
+            document.getElementById('txt-contador').innerText = filtered.length;
+
+            // Limitar renderizado de tabla a los primeros 100 para fluidez total
+            const limit = 100;
+            const topData = filtered.slice(0, limit);
+            renderTable(topData);
+
+            // Mostrar aviso si hay más de 100
+            document.getElementById('msg-limit').classList.toggle('d-none', filtered.length <= limit);
+        }, 250);
     }
 
     function renderResumen(data) {
@@ -198,14 +211,21 @@
 
     function renderTable(data) {
         const tbody = document.getElementById('tbody-main');
-        tbody.innerHTML = data.map(p => {
+        if(data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" class="text-center p-4 text-muted">Sin coincidencias</td></tr>';
+            return;
+        }
+
+        // Optimización: Construcción en un solo string
+        let html = '';
+        data.forEach(p => {
             const pim = p.MONTO_PIM || 0;
             const pDev = pim > 0 ? (p.MONTO_DEVENGADO/pim*100).toFixed(1) : 0;
             const pCer = pim > 0 ? (p.MONTO_CERTIFICADO/pim*100).toFixed(1) : 0;
             let sem = pDev > 75 ? 'status-alto' : (pDev >= 40 ? 'status-medio' : 'status-bajo');
             let txt = pDev > 75 ? 'ALTO' : (pDev >= 40 ? 'MEDIO' : 'BAJO');
 
-            return `
+            html += `
                 <tr class="row-item" onclick="seleccionar('${p.PRODUCTO_PROYECTO}', this)">
                     <td class="text-center fw-bold text-muted">${p.PRODUCTO_PROYECTO}</td>
                     <td class="text-start fw-bold" style="width:35%">${p.PRODUCTO_PROYECTO_NOMBRE}</td>
@@ -216,7 +236,8 @@
                     <td class="text-center fw-bold text-success">${pDev}%</td>
                     <td class="text-center"><span class="semaforo ${sem}"></span> <small class="fw-bold">${txt}</small></td>
                 </tr>`;
-        }).join('');
+        });
+        tbody.innerHTML = html;
     }
 
     function seleccionar(cui, fila) {
@@ -239,8 +260,10 @@
 
     function updateG(id, tid, val) {
         const off = 157 - (157 * (Math.min(val, 100) / 100));
-        document.getElementById(id).style.strokeDashoffset = off;
-        document.getElementById(tid).innerText = val + '%';
+        const el = document.getElementById(id);
+        if(el) el.style.strokeDashoffset = off;
+        const txt = document.getElementById(tid);
+        if(txt) txt.innerText = val + '%';
     }
 
     fetchData();
