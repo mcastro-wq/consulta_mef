@@ -55,7 +55,7 @@
 
 <script>
     let dataLocal = [];
-    const API = 'https://script.google.com/macros/s/AKfycbxqqxihw0dQiZrAg0oUEa-PsJox3yOytCrMW9STJJqOUekOEtmXi4kqxJnYWZNRC9fp/exec';
+    const API = 'https://script.google.com/macros/s/AKfycbxAl94yDWcNJzGUx0Q2mpJyRE_OiXVjzw4F8iQJrDdWCjHmIYWaHFhObrFHX_JxCh3p/exec';
 
     async function cargar() {
         try {
@@ -70,24 +70,24 @@
         }
     }
 
-    function dibujar(lista) {
-        const trs = lista.map(item => `
-            <tr>
-                <td class="fw-bold text-secondary">${item.fecha_registro || '---'}</td>
-                <td class="text-center"><b>${item.codigo_cui || ''}</b></td>
-                <td class="fw-bold" style="color:#d35400">${item.estado_general || ''}</td>
-                <td style="max-width:200px"><small>${item.detalle_estado_general || ''}</small></td>
-                <td>
-                    <div class="fw-bold text-primary">${item.estado_especifico || ''}</div>
-                    <div class="text-muted" style="font-size:0.75rem">${item.detalle_estado_especifico || ''}</div>
-                </td>
-                <td class="text-info fw-bold">${item.timeline_inversion || '-'}</td>
-                <td><small>${item.acciones_programadas || ''}</small></td>
-                <td class="text-center"><b>${item.sisgedo || '-'}</b></td>
-            </tr>
-        `).join('');
-        document.getElementById('cuerpoTabla').innerHTML = trs || '<tr><td colspan="8" class="text-center">No hay datos</td></tr>';
-    }
+  function dibujar(lista) {
+    const trs = lista.map(item => `
+        <tr>
+            <td class="fw-bold text-secondary text-nowrap">${item.fecha_registro}</td>
+            <td class="text-center"><b>${item.codigo_cui || ''}</b></td>
+            <td class="fw-bold" style="color:#d35400">${item.estado_general || ''}</td>
+            <td><small>${item.detalle_estado_general || ''}</small></td>
+            <td>
+                <div class="fw-bold text-primary">${item.estado_especifico || ''}</div>
+                <div class="text-muted" style="font-size:0.7rem">${item.detalle_estado_especifico || ''}</div>
+            </td>
+            <td class="text-info fw-bold">${item.timeline_inversion || '-'}</td>
+            <td><small>${item.acciones_programadas || ''}</small></td>
+            <td class="text-center fw-bold">${item.sisgedo || '-'}</td>
+        </tr>
+    `).join('');
+    document.getElementById('cuerpoTabla').innerHTML = trs;
+}
 
     function filtrarTabla() {
         const busqueda = document.getElementById('filtroGlobal').value.toLowerCase();
