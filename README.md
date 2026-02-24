@@ -1,6 +1,6 @@
 # 📊 Monitor de Ejecución Presupuestal - GORE Lambayeque 2026
 
-![Estado del Despliegue](https://img.shields.io/github/deployments/[TU_USUARIO]/[TU_REPOSITORIO]/github-pages?label=Status&logo=github&color=success)
+![Estado del Despliegue](https://img.shields.io/github/deployments/mcastro-wq/consulta_mef/github-pages?label=Status&logo=github&color=success)
 ![Python](https://img.shields.io/badge/Python-3.10+-blue?logo=python&logoColor=white)
 ![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-purple?logo=bootstrap&logoColor=white)
 
