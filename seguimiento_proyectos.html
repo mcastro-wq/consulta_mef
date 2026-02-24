@@ -8,71 +8,58 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
         :root { --mef-red: #801616; --mef-gold: #ffc107; }
-        body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f4f7f6; font-family: 'Inter', sans-serif; }
+        .header-top { background: var(--mef-red); color: white; padding: 25px 0; border-bottom: 5px solid var(--mef-gold); }
+        .search-container { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); margin-top: -40px; }
         
-        .header-top { background: var(--mef-red); color: white; padding: 20px 0; border-bottom: 4px solid var(--mef-gold); }
-        .search-container { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-top: -30px; }
+        .filter-badge { cursor: pointer; transition: all 0.3s; border: 1px solid #dee2e6; padding: 8px 15px; border-radius: 50px; background: white; font-weight: 600; font-size: 0.85rem; }
+        .filter-badge.active { background: var(--mef-red); color: white; border-color: var(--mef-red); }
         
-        .kpi-card { border: none; border-radius: 12px; transition: transform 0.2s; }
-        .kpi-card:hover { transform: translateY(-5px); }
+        .table-resumen { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        .thead-mef { background: var(--mef-red); color: white; font-size: 0.85rem; text-transform: uppercase; }
+        .cui-badge { background: #334155; color: #fff; font-family: monospace; font-weight: bold; padding: 4px 8px; border-radius: 6px; }
+        .ejecutora-text { font-size: 0.75rem; color: #64748b; display: block; margin-top: 4px; }
+        .monto-num { font-family: monospace; font-weight: 600; }
         
-        .table-resumen { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .thead-mef { background: var(--mef-red); color: white; }
-        
-        .cui-badge { background: #e9ecef; color: #495057; font-family: monospace; font-weight: bold; padding: 4px 8px; border-radius: 4px; }
-        .monto-num { font-family: 'Consolas', monospace; font-weight: 600; }
-        
-        /* Animación de carga */
-        .spinner-border { width: 3rem; height: 3rem; color: var(--mef-red); }
+        .status-zero { color: #dc3545; background-color: #fff5f5; border: 1px solid #feb2b2; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; }
+        .btn-excel { background-color: #1D6F42; color: white; border: none; font-weight: bold; }
+        .btn-excel:hover { background-color: #155231; color: white; }
     </style>
 </head>
 <body>
 
 <div class="header-top">
-    <div class="container">
-        <div class="d-flex justify-content-between align-items-center">
-            <div>
-                <h2 class="fw-bold mb-0"><i class="bi bi-search-heart me-2"></i>SEGUIMIENTO DE PROYECTOS</h2>
-                <p class="mb-0 opacity-75">Consulta Amigable MEF - Datos 2026</p>
-            </div>
-            <div class="text-end">
-                <span class="badge bg-white text-dark p-2">Actualización Diaria</span>
-            </div>
+    <div class="container d-flex justify-content-between align-items-center">
+        <div>
+            <h2 class="fw-bold mb-0"><i class="bi bi-shield-exclamation me-2"></i>MONITOR DE ALERTAS DE INVERSIÓN</h2>
+            <p class="mb-0 text-white-50">Gobierno Regional de Lambayeque - Reporte de Ejecución</p>
         </div>
+        <button onclick="exportarExcel()" class="btn btn-excel rounded-pill px-4 shadow-sm">
+            <i class="bi bi-file-earmark-excel-fill me-2"></i> Exportar Reporte
+        </button>
     </div>
 </div>
 
 <div class="container mb-5">
-    <div class="row justify-content-center mb-4">
-        <div class="col-md-10">
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-11">
             <div class="search-container">
-                <div class="input-group input-group-lg">
-                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
-                    <input type="text" id="mainSearch" class="form-control border-start-0" 
-                           placeholder="Buscar por CUI (ej. 234567) o nombre del proyecto (ej. Hospital)..."
-                           onkeyup="filtrarProyectos()">
+                <div class="input-group input-group-lg mb-3">
+                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
+                    <input type="text" id="mainSearch" class="form-control border-start-0 bg-light" placeholder="Buscar por CUI o Nombre del Proyecto..." onkeyup="ejecutarFiltros()">
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row g-3 mb-4">
-        <div class="col-md-4">
-            <div class="card kpi-card bg-primary text-white p-3">
-                <small class="opacity-75 uppercase fw-bold">PIM TOTAL FILTRADO</small>
-                <h3 id="kpi-pim" class="monto-num mb-0">S/ 0.00</h3>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card kpi-card bg-success text-white p-3">
-                <small class="opacity-75 uppercase fw-bold">DEVENGADO TOTAL</small>
-                <h3 id="kpi-dev" class="monto-num mb-0">S/ 0.00</h3>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card kpi-card bg-warning text-dark p-3">
-                <small class="opacity-75 uppercase fw-bold">SALDO PENDIENTE</small>
-                <h3 id="kpi-saldo" class="monto-num mb-0">S/ 0.00</h3>
+                
+                <div class="d-flex flex-wrap gap-2">
+                    <div id="btn-all" class="filter-badge active" onclick="setEstadoFiltro('todos')">
+                        Todos <span class="badge bg-secondary ms-1" id="count-all">0</span>
+                    </div>
+                    <div id="btn-zero" class="filter-badge text-danger border-danger" onclick="setEstadoFiltro('zero')">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i> Avance 0% <span class="badge bg-danger ms-1" id="count-zero">0</span>
+                    </div>
+                    <div id="btn-exec" class="filter-badge text-success border-success" onclick="setEstadoFiltro('executing')">
+                        En Ejecución <span class="badge bg-success ms-1" id="count-exec">0</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -82,95 +69,123 @@
             <table class="table table-hover align-middle mb-0" id="tablaProyectos">
                 <thead class="thead-mef">
                     <tr>
-                        <th width="100">CUI</th>
-                        <th>NOMBRE DEL PROYECTO / PRODUCTO</th>
+                        <th class="ps-3">ID / CUI</th>
+                        <th>Descripción del Proyecto / Ejecutora</th>
                         <th class="text-end">PIM (S/)</th>
-                        <th class="text-end">DEVENGADO (S/)</th>
-                        <th width="180">AVANCE</th>
+                        <th class="text-center" width="200">Avance Real</th>
+                        <th class="text-center">Detalle</th>
                     </tr>
                 </thead>
-                <tbody id="lista-proyectos">
-                    </tbody>
+                <tbody id="lista-proyectos"></tbody>
             </table>
         </div>
     </div>
-    
-    <div id="loader" class="text-center py-5 d-none">
-        <div class="spinner-border" role="status"></div>
-        <p class="mt-2 text-muted">Consultando base de datos del MEF...</p>
-    </div>
 </div>
+
+<div class="modal fade" id="modalDetalle" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog"><div class="modal-content">
+        <div class="modal-header bg-dark text-white">
+            <h5 class="modal-title">Cronograma de Ejecución</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="detalle-body"></div>
+    </div></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <script>
     let allData = [];
+    let currentData = [];
+    let filtroEstado = 'todos';
 
-    // Función para simular o conectar con la API
     async function fetchData() {
-        document.getElementById('loader').classList.remove('d-none');
         try {
-            // Aquí iría tu URL de la API con el SQL que armamos arriba
-            // Por ahora usaremos un fetch al archivo local si lo tienes, o a la API directamente
             const response = await fetch('data_proyectos.json'); 
             allData = await response.json();
-            
-            renderTable(allData);
-        } catch (error) {
-            console.error("Error cargando datos:", error);
-        } finally {
-            document.getElementById('loader').classList.add('d-none');
+            ejecutarFiltros();
+        } catch (e) { console.error(e); }
+    }
+
+    function ejecutarFiltros() {
+        const q = document.getElementById('mainSearch').value.toLowerCase();
+        let filtered = allData.filter(i => 
+            i.PRODUCTO_PROYECTO.toString().includes(q) || 
+            i.PRODUCTO_PROYECTO_NOMBRE.toLowerCase().includes(q)
+        );
+
+        if (filtroEstado === 'zero') {
+            filtered = filtered.filter(p => parseFloat(p.MONTO_DEVENGADO) === 0);
+        } else if (filtroEstado === 'executing') {
+            filtered = filtered.filter(p => parseFloat(p.MONTO_DEVENGADO) > 0);
         }
+
+        currentData = filtered;
+        updateCounters();
+        renderTable(filtered);
+    }
+
+    function updateCounters() {
+        document.getElementById('count-all').innerText = allData.length;
+        document.getElementById('count-zero').innerText = allData.filter(p => parseFloat(p.MONTO_DEVENGADO) === 0).length;
+        document.getElementById('count-exec').innerText = allData.filter(p => parseFloat(p.MONTO_DEVENGADO) > 0).length;
+    }
+
+    function setEstadoFiltro(estado) {
+        filtroEstado = estado;
+        document.querySelectorAll('.filter-badge').forEach(b => b.classList.remove('active'));
+        const btnId = estado === 'todos' ? 'btn-all' : estado === 'zero' ? 'btn-zero' : 'btn-exec';
+        document.getElementById(btnId).classList.add('active');
+        ejecutarFiltros();
     }
 
     function renderTable(data) {
-        const container = document.getElementById('lista-proyectos');
-        container.innerHTML = '';
-        
-        let sumPim = 0; let sumDev = 0;
-
+        const tbody = document.getElementById('lista-proyectos');
+        tbody.innerHTML = '';
         data.forEach(item => {
-            const pim = parseFloat(item.MONTO_PIM);
-            const dev = parseFloat(item.MONTO_DEVENGADO);
-            const avance = (dev / pim * 100).toFixed(1);
-            const cui = item.PRODUCTO_PROYECTO;
+            const pim = parseFloat(item.MONTO_PIM || 0);
+            const dev = parseFloat(item.MONTO_DEVENGADO || 0);
+            const avance = pim > 0 ? (dev / pim * 100).toFixed(1) : 0;
+            const isZero = dev === 0;
 
-            sumPim += pim; sumDev += dev;
-
-            container.innerHTML += `
-                <tr>
-                    <td><span class="cui-badge">${cui}</span></td>
-                    <td class="small fw-bold text-uppercase">${item.PRODUCTO_PROYECTO_NOMBRE}</td>
-                    <td class="text-end monto-num">${pim.toLocaleString('es-PE', {minimumFractionDigits:2})}</td>
-                    <td class="text-end monto-num text-primary">${dev.toLocaleString('es-PE', {minimumFractionDigits:2})}</td>
+            tbody.innerHTML += `
+                <tr class="${isZero ? 'table-light' : ''}">
+                    <td class="ps-3"><span class="cui-badge">${item.PRODUCTO_PROYECTO}</span></td>
                     <td>
-                        <div class="d-flex align-items-center">
-                            <div class="progress flex-grow-1" style="height: 10px;">
-                                <div class="progress-bar ${avance > 80 ? 'bg-success' : 'bg-warning'}" 
-                                     style="width: ${avance}%"></div>
-                            </div>
-                            <span class="ms-2 small fw-bold">${avance}%</span>
-                        </div>
+                        <div class="fw-bold" style="font-size:0.8rem">${item.PRODUCTO_PROYECTO_NOMBRE}</div>
+                        <span class="ejecutora-text text-uppercase">${item.EJECUTORA_NOMBRE}</span>
+                        ${isZero ? '<span class="status-zero">SIN AVANCE</span>' : ''}
                     </td>
-                </tr>
-            `;
+                    <td class="text-end monto-num">S/ ${pim.toLocaleString()}</td>
+                    <td>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar ${isZero ? 'bg-danger opacity-25' : 'bg-success'}" style="width: ${avance}%"></div>
+                        </div>
+                        <div class="text-center small fw-bold mt-1">${avance}%</div>
+                    </td>
+                    <td class="text-center">
+                        <button class="btn btn-sm btn-outline-dark" onclick="verDetalle('${item.PRODUCTO_PROYECTO}')"><i class="bi bi-eye"></i></button>
+                    </td>
+                </tr>`;
         });
-
-        // Actualizar KPIs
-        document.getElementById('kpi-pim').innerText = 'S/ ' + sumPim.toLocaleString('es-PE', {minimumFractionDigits:2});
-        document.getElementById('kpi-dev').innerText = 'S/ ' + sumDev.toLocaleString('es-PE', {minimumFractionDigits:2});
-        document.getElementById('kpi-saldo').innerText = 'S/ ' + (sumPim - sumDev).toLocaleString('es-PE', {minimumFractionDigits:2});
     }
 
-    function filtrarProyectos() {
-        const query = document.getElementById('mainSearch').value.toLowerCase();
-        const filtered = allData.filter(item => 
-            item.PRODUCTO_PROYECTO.toString().includes(query) || 
-            item.PRODUCTO_PROYECTO_NOMBRE.toLowerCase().includes(query)
-        );
-        renderTable(filtered);
+    function exportarExcel() {
+        const ws = XLSX.utils.json_to_sheet(currentData.map(item => ({
+            CUI: item.PRODUCTO_PROYECTO,
+            PROYECTO: item.PRODUCTO_PROYECTO_NOMBRE,
+            EJECUTORA: item.EJECUTORA_NOMBRE,
+            PIM: item.MONTO_PIM,
+            DEVENGADO: item.MONTO_DEVENGADO,
+            AVANCE: (item.MONTO_DEVENGADO / item.MONTO_PIM * 100).toFixed(2) + '%'
+        })));
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Reporte_Inversiones");
+        XLSX.writeFile(wb, `Reporte_Inversiones_${filtroEstado}.xlsx`);
     }
 
     document.addEventListener('DOMContentLoaded', fetchData);
 </script>
-
 </body>
 </html>
