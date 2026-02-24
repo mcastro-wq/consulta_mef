@@ -239,19 +239,58 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+
+    // 1. Diccionario con los IDs exactos que proporcionaste
+const MEF_RESOURCES = {
+    "2025": "749cb9b6-604f-485b-bb06-4b906b44034f",
+    "2024": "cb6d4f8b-94b3-4f7e-ae6d-3d6ee75e03e8",
+    "2023": "759d6b36-2582-4486-ae61-dc0311462bb7",
+    "2022": "f075d8af-1352-4f16-a3da-61f45fa4d502",
+    "2021": "5b3d4d5c-abeb-49f6-9e37-c7d8d1162cb5"
+};
+
+    
     let allData = [];
     let timeoutBusqueda;
     let cuiSeleccionadoActual = "";
 
-    async function fetchData() {
-        try {
+// 2. Función fetchData que decide si ir a la API o al Local JSON
+async function fetchData(anio = "2026") {
+    const overlay = document.getElementById('loader-overlay');
+    if(overlay) overlay.style.display = 'flex';
+
+    try {
+        if (anio === "2026") {
+            // CARGA LOCAL (Tu script actual)
             const res = await fetch('data_proyectos.json');
             const json = await res.json();
             allData = json.proyectos;
-            document.getElementById('txt-corte').innerText = json.fecha_extraccion;
-            filtrar();
-        } catch (e) { console.error("Error cargando JSON", e); }
+            document.getElementById('txt-corte').innerText = "Local: " + json.fecha_extraccion;
+        } else {
+            // CONSULTA SERIA A LA API DEL MEF (Históricos)
+            const resourceId = MEF_RESOURCES[anio];
+            // SQL optimizado para Lambayeque (Ejecutora 452 o similar según el campo del MEF)
+            const sql = `SELECT * FROM "${resourceId}" WHERE "EJECUTORA_NOMBRE" LIKE 'REGION LAMBAYEQUE%'`;
+            const url = `https://api.datosabiertos.mef.gob.pe/DatosAbiertos/v1/datastore_search_sql?sql=${encodeURIComponent(sql)}`;
+
+            const res = await fetch(url);
+            const json = await res.json();
+            
+            if (json.success) {
+                allData = json.result.records;
+                document.getElementById('txt-corte').innerText = "Sincro MEF API - " + anio;
+            } else {
+                throw new Error("API falló");
+            }
+        }
+        filtrar(); // Procesar y mostrar los datos cargados
+    } catch (e) {
+        console.error("Error cargando datos:", e);
+        document.getElementById('txt-corte').innerText = "ERROR EN CARGA";
+    } finally {
+        if(overlay) overlay.style.display = 'none';
     }
+}
 
     function filtrar() {
         clearTimeout(timeoutBusqueda);
