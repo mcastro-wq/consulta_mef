@@ -20,7 +20,7 @@
         .table-resumen thead { background: var(--gore-brown); color: white; }
         .table-resumen td { font-weight: 700; text-align: right; border: 1px solid #eee; padding: 6px 10px; }
 
-        .card-table { background: white; border-radius: 4px; border: 1px solid #ddd; height: calc(100vh - 310px); display: flex; flex-direction: column; }
+        .card-table { background: white; border-radius: 4px; border: 1px solid #ddd; height: 400px; display: flex; flex-direction: column; }
         .scroll-area { flex-grow: 1; overflow-y: auto; }
         .table-gore-head { background: #666; color: white; position: sticky; top: 0; z-index: 10; font-size: 0.7rem; }
         
@@ -35,6 +35,13 @@
         .gauge-bg { fill: none; stroke: #eee; stroke-width: 12; stroke-linecap: round; }
         .gauge-fill { fill: none; stroke-width: 12; stroke-linecap: round; stroke-dasharray: 157; stroke-dashoffset: 157; transition: 0.8s; }
         .gauge-val { font-size: 1.1rem; font-weight: 800; display: block; margin-top: -12px; }
+
+        /* NUEVA SECCIÓN: TRAZABILIDAD */
+        .tracking-section { margin-top: 20px; background: #fff; padding: 15px; border: 1px solid #ddd; border-radius: 4px; }
+        .tracking-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
+        .tracking-card { border: 1px solid #eee; padding: 10px; text-align: center; min-height: 100px; display: flex; flex-direction: column; justify-content: flex-start; }
+        .tracking-header { color: var(--gore-orange); font-weight: 800; font-size: 0.65rem; text-transform: uppercase; margin-bottom: 8px; border-bottom: 1px solid #f9f9f9; padding-bottom: 5px; }
+        .tracking-body { font-size: 0.7rem; color: #555; line-height: 1.2; }
 
         .semaforo { height: 10px; width: 10px; border-radius: 50%; display: inline-block; margin-right: 4px; }
         .status-alto { background-color: #198754; }
@@ -61,7 +68,7 @@
     <div class="filter-box shadow-sm">
         <div class="row align-items-end g-3">
             <div class="col-md-3">
-                <label class="label-filter text-primary">Tipo de Registro (Etiqueta)</label>
+                <label class="label-filter text-primary">Tipo de Registro</label>
                 <div class="p-2 border rounded bg-light">
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="checkbox" id="checkProyecto" checked onchange="filtrar()">
@@ -69,7 +76,7 @@
                     </div>
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="checkbox" id="checkActividad" onchange="filtrar()">
-                        <label class="form-check-label fw-bold" for="checkActividad">ACTIVIDAD (PRODUCTO)</label>
+                        <label class="form-check-label fw-bold" for="checkActividad">ACTIVIDAD</label>
                     </div>
                 </div>
             </div>
@@ -126,7 +133,48 @@
                     </table>
                 </div>
                 <div id="msg-limit" class="bg-light text-center py-1 border-top d-none">
-                    <small class="text-muted">Se muestran los primeros 100 resultados para mejorar el rendimiento.</small>
+                    <small class="text-muted">Mostrando primeros 100 resultados.</small>
+                </div>
+            </div>
+
+            <div class="tracking-section shadow-sm">
+                <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                    <h6 class="m-0 fw-bold" style="color: var(--gore-brown)"><i class="bi bi-clock-history"></i> TRAZABILIDAD Y ESTADO DE GESTIÓN</h6>
+                    <span id="selected-cui-label" class="badge bg-secondary">Seleccione un proyecto para ver detalle</span>
+                </div>
+                
+                <div class="tracking-grid">
+                    <div class="tracking-card">
+                        <div class="tracking-header">Estado General</div>
+                        <div class="tracking-body fw-bold" id="track-est-gral">-</div>
+                    </div>
+                    <div class="tracking-card">
+                        <div class="tracking-header">Detalle Est. Gral.</div>
+                        <div class="tracking-body" id="track-det-gral">-</div>
+                    </div>
+                    <div class="tracking-card">
+                        <div class="tracking-header">Estado Específico</div>
+                        <div class="tracking-body fw-bold" id="track-est-esp">-</div>
+                    </div>
+                    <div class="tracking-card">
+                        <div class="tracking-header">Detalle Est. Espc.</div>
+                        <div class="tracking-body" id="track-det-esp">-</div>
+                    </div>
+                    <div class="tracking-card">
+                        <div class="tracking-header">SISGEDO</div>
+                        <div class="tracking-body fw-bold text-primary" id="track-sisgedo">-</div>
+                    </div>
+                    <div class="tracking-card" style="grid-column: span 2;">
+                        <div class="tracking-header">Timeline Inversión</div>
+                        <div class="tracking-body text-start" id="track-timeline">-</div>
+                    </div>
+                    <div class="tracking-card" style="grid-column: span 2;">
+                        <div class="tracking-header">Acciones Programadas</div>
+                        <div class="tracking-body text-start" id="track-acciones">-</div>
+                    </div>
+                </div>
+                <div class="mt-3 text-end">
+                    <button class="btn btn-primary btn-sm fw-bold px-3"><i class="bi bi-pencil-square"></i> REGISTRAR SEGUIMIENTO</button>
                 </div>
             </div>
         </div>
@@ -159,7 +207,6 @@
     }
 
     function filtrar() {
-        // Debounce: Evita procesar cada letra instantáneamente
         clearTimeout(timeoutBusqueda);
         timeoutBusqueda = setTimeout(() => {
             const query = document.getElementById('inputBusqueda').value.toLowerCase();
@@ -170,23 +217,15 @@
                 const tipo = (p.TIPO || "").toUpperCase();
                 const esProyecto = tipo === "PROYECTO";
                 const esProductoActividad = tipo === "PRODUCTO";
-
                 const matchTipo = (verProyecto && esProyecto) || (verActividad && esProductoActividad);
                 const matchBusqueda = p.PRODUCTO_PROYECTO_NOMBRE.toLowerCase().includes(query) || p.PRODUCTO_PROYECTO.toString().includes(query);
-
                 return matchTipo && matchBusqueda;
             });
 
-            // Actualizar totales y contador sobre el total de filtrados
             renderResumen(filtered);
             document.getElementById('txt-contador').innerText = filtered.length;
-
-            // Limitar renderizado de tabla a los primeros 100 para fluidez total
             const limit = 100;
-            const topData = filtered.slice(0, limit);
-            renderTable(topData);
-
-            // Mostrar aviso si hay más de 100
+            renderTable(filtered.slice(0, limit));
             document.getElementById('msg-limit').classList.toggle('d-none', filtered.length <= limit);
         }, 250);
     }
@@ -215,8 +254,6 @@
             tbody.innerHTML = '<tr><td colspan="8" class="text-center p-4 text-muted">Sin coincidencias</td></tr>';
             return;
         }
-
-        // Optimización: Construcción en un solo string
         let html = '';
         data.forEach(p => {
             const pim = p.MONTO_PIM || 0;
@@ -243,7 +280,15 @@
     function seleccionar(cui, fila) {
         document.querySelectorAll('.row-item').forEach(r => r.classList.remove('selected-row'));
         fila.classList.add('selected-row');
+        
         const regs = allData.filter(i => i.PRODUCTO_PROYECTO.toString() === cui.toString());
+        if(regs.length === 0) return;
+
+        // Actualizar etiqueta CUI
+        document.getElementById('selected-cui-label').innerText = "CUI SELECCIONADO: " + cui;
+        document.getElementById('selected-cui-label').className = "badge bg-primary";
+
+        // Lógica de Velocímetros
         let s = { pim:0, cer:0, can:0, cme:0, dev:0, gir:0 };
         regs.forEach(r => {
             s.pim += r.MONTO_PIM; s.cer += r.MONTO_CERTIFICADO;
@@ -256,14 +301,22 @@
         updateG('g-cme', 'v-cme', getP(s.cme));
         updateG('g-dev', 'v-dev', getP(s.dev));
         updateG('g-gir', 'v-gir', getP(s.gir));
+
+        // Lógica de Trazabilidad (Simulada para que veas cómo se vería)
+        // Cuando tengas el formulario, estos datos vendrán de una BD
+        document.getElementById('track-est-gral').innerText = "EJECUCION FISICA";
+        document.getElementById('track-det-gral').innerText = "En ejecución física";
+        document.getElementById('track-est-esp').innerText = "EJECUCION FISICA - OBRA";
+        document.getElementById('track-det-esp').innerText = "En ejecución física";
+        document.getElementById('track-sisgedo').innerText = "515814329-12";
+        document.getElementById('track-timeline').innerText = "El proyecto consta de la ejecución de dos ítems presupuestales...";
+        document.getElementById('track-acciones').innerText = "1.- Realizar visita técnica a la obra.\n2.- Recepción de obra programada.";
     }
 
     function updateG(id, tid, val) {
         const off = 157 - (157 * (Math.min(val, 100) / 100));
-        const el = document.getElementById(id);
-        if(el) el.style.strokeDashoffset = off;
-        const txt = document.getElementById(tid);
-        if(txt) txt.innerText = val + '%';
+        document.getElementById(id).style.strokeDashoffset = off;
+        document.getElementById(tid).innerText = val + '%';
     }
 
     fetchData();
