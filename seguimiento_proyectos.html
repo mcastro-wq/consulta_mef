@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seguimiento de Proyectos (CUI) - GORE Lambayeque</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        :root { --mef-red: #801616; --mef-gold: #ffc107; }
+        body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        .header-top { background: var(--mef-red); color: white; padding: 20px 0; border-bottom: 4px solid var(--mef-gold); }
+        .search-container { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-top: -30px; }
+        
+        .kpi-card { border: none; border-radius: 12px; transition: transform 0.2s; }
+        .kpi-card:hover { transform: translateY(-5px); }
+        
+        .table-resumen { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .thead-mef { background: var(--mef-red); color: white; }
+        
+        .cui-badge { background: #e9ecef; color: #495057; font-family: monospace; font-weight: bold; padding: 4px 8px; border-radius: 4px; }
+        .monto-num { font-family: 'Consolas', monospace; font-weight: 600; }
+        
+        /* Animación de carga */
+        .spinner-border { width: 3rem; height: 3rem; color: var(--mef-red); }
+    </style>
+</head>
+<body>
+
+<div class="header-top">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="fw-bold mb-0"><i class="bi bi-search-heart me-2"></i>SEGUIMIENTO DE PROYECTOS</h2>
+                <p class="mb-0 opacity-75">Consulta Amigable MEF - Datos 2026</p>
+            </div>
+            <div class="text-end">
+                <span class="badge bg-white text-dark p-2">Actualización Diaria</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-10">
+            <div class="search-container">
+                <div class="input-group input-group-lg">
+                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" id="mainSearch" class="form-control border-start-0" 
+                           placeholder="Buscar por CUI (ej. 234567) o nombre del proyecto (ej. Hospital)..."
+                           onkeyup="filtrarProyectos()">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card kpi-card bg-primary text-white p-3">
+                <small class="opacity-75 uppercase fw-bold">PIM TOTAL FILTRADO</small>
+                <h3 id="kpi-pim" class="monto-num mb-0">S/ 0.00</h3>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card kpi-card bg-success text-white p-3">
+                <small class="opacity-75 uppercase fw-bold">DEVENGADO TOTAL</small>
+                <h3 id="kpi-dev" class="monto-num mb-0">S/ 0.00</h3>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card kpi-card bg-warning text-dark p-3">
+                <small class="opacity-75 uppercase fw-bold">SALDO PENDIENTE</small>
+                <h3 id="kpi-saldo" class="monto-num mb-0">S/ 0.00</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-resumen">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="tablaProyectos">
+                <thead class="thead-mef">
+                    <tr>
+                        <th width="100">CUI</th>
+                        <th>NOMBRE DEL PROYECTO / PRODUCTO</th>
+                        <th class="text-end">PIM (S/)</th>
+                        <th class="text-end">DEVENGADO (S/)</th>
+                        <th width="180">AVANCE</th>
+                    </tr>
+                </thead>
+                <tbody id="lista-proyectos">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div id="loader" class="text-center py-5 d-none">
+        <div class="spinner-border" role="status"></div>
+        <p class="mt-2 text-muted">Consultando base de datos del MEF...</p>
+    </div>
+</div>
+
+<script>
+    let allData = [];
+
+    // Función para simular o conectar con la API
+    async function fetchData() {
+        document.getElementById('loader').classList.remove('d-none');
+        try {
+            // Aquí iría tu URL de la API con el SQL que armamos arriba
+            // Por ahora usaremos un fetch al archivo local si lo tienes, o a la API directamente
+            const response = await fetch('data_proyectos.json'); 
+            allData = await response.json();
+            
+            renderTable(allData);
+        } catch (error) {
+            console.error("Error cargando datos:", error);
+        } finally {
+            document.getElementById('loader').classList.add('d-none');
+        }
+    }
+
+    function renderTable(data) {
+        const container = document.getElementById('lista-proyectos');
+        container.innerHTML = '';
+        
+        let sumPim = 0; let sumDev = 0;
+
+        data.forEach(item => {
+            const pim = parseFloat(item.MONTO_PIM);
+            const dev = parseFloat(item.MONTO_DEVENGADO);
+            const avance = (dev / pim * 100).toFixed(1);
+            const cui = item.PRODUCTO_PROYECTO;
+
+            sumPim += pim; sumDev += dev;
+
+            container.innerHTML += `
+                <tr>
+                    <td><span class="cui-badge">${cui}</span></td>
+                    <td class="small fw-bold text-uppercase">${item.PRODUCTO_PROYECTO_NOMBRE}</td>
+                    <td class="text-end monto-num">${pim.toLocaleString('es-PE', {minimumFractionDigits:2})}</td>
+                    <td class="text-end monto-num text-primary">${dev.toLocaleString('es-PE', {minimumFractionDigits:2})}</td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="progress flex-grow-1" style="height: 10px;">
+                                <div class="progress-bar ${avance > 80 ? 'bg-success' : 'bg-warning'}" 
+                                     style="width: ${avance}%"></div>
+                            </div>
+                            <span class="ms-2 small fw-bold">${avance}%</span>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        });
+
+        // Actualizar KPIs
+        document.getElementById('kpi-pim').innerText = 'S/ ' + sumPim.toLocaleString('es-PE', {minimumFractionDigits:2});
+        document.getElementById('kpi-dev').innerText = 'S/ ' + sumDev.toLocaleString('es-PE', {minimumFractionDigits:2});
+        document.getElementById('kpi-saldo').innerText = 'S/ ' + (sumPim - sumDev).toLocaleString('es-PE', {minimumFractionDigits:2});
+    }
+
+    function filtrarProyectos() {
+        const query = document.getElementById('mainSearch').value.toLowerCase();
+        const filtered = allData.filter(item => 
+            item.PRODUCTO_PROYECTO.toString().includes(query) || 
+            item.PRODUCTO_PROYECTO_NOMBRE.toLowerCase().includes(query)
+        );
+        renderTable(filtered);
+    }
+
+    document.addEventListener('DOMContentLoaded', fetchData);
+</script>
+
+</body>
+</html>
