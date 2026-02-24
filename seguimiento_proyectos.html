@@ -89,16 +89,6 @@
                     <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
                     <input type="text" id="inputBusqueda" class="form-control border-start-0" placeholder="Escriba código o nombre..." onkeyup="filtrar()">
                 </div>
-
-<select id="selectAnio" class="form-select form-select-sm fw-bold border-danger" onchange="cambiarAnio()">
-    <option value="2026">2026 (Actual)</option>
-    <option value="2025">2025 (Cierre)</option>
-    <option value="2024">2024</option>
-    <option value="2023">2023</option>
-    <option value="2022">2022</option>
-    <option value="2021">2021</option>
-</select>
-                
             </div>
         </div>
     </div>
@@ -249,81 +239,19 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-
-    // 1. Diccionario con los IDs exactos que proporcionaste
-const MEF_RESOURCES = {
-    "2025": "35bdc5b5-017c-42c1-ba20-8820bf1248b7",
-    "2024": "0b938fa8-f18c-4685-88ae-a9d7e392cafa",
-    "2023": "9e9a6d67-2687-4056-9b59-e170b945182f",
-    "2022": "1904862a-a8c8-4b0f-ae2e-49e577996588",
-    "2021": "f87e302c-bc93-4dd3-bfb0-60df1d6bf41c"
-};
-
-    
     let allData = [];
     let timeoutBusqueda;
     let cuiSeleccionadoActual = "";
 
-// 2. Función fetchData que decide si ir a la API o al Local JSON
-async function fetchData(anio = "2026") {
-    const overlay = document.getElementById('loader-overlay');
-    if(overlay) overlay.style.display = 'flex';
-
-    try {
-        let rawRecords = [];
-        
-        if (anio === "2026") {
-            // Tu carga local para el año actual
+    async function fetchData() {
+        try {
             const res = await fetch('data_proyectos.json');
             const json = await res.json();
-            rawRecords = json.proyectos;
-            document.getElementById('txt-corte').innerText = "LOCAL: " + (json.fecha_extraccion || '2026');
-        } else {
-            // Consulta SQL a la API del MEF usando el diccionario de datos proporcionado
-            const resourceId = MEF_RESOURCES[anio];
-            // Filtramos por SEC_EJEC '452' (GORE Lambayeque)
-            const sql = `SELECT * FROM "${resourceId}" WHERE "SEC_EJEC" = '452'`;
-            const url = `https://api.datosabiertos.mef.gob.pe/DatosAbiertos/v1/datastore_search_sql?sql=${encodeURIComponent(sql)}`;
-
-            const res = await fetch(url);
-            const json = await res.json();
-            
-            if (json.success) {
-                rawRecords = json.result.records;
-                document.getElementById('txt-corte').innerText = "API MEF - " + anio;
-            }
-        }
-
-        // --- NORMALIZACIÓN BASADA EN TU DICCIONARIO ---
-        allData = rawRecords.map(r => {
-            // Determinamos si es PROYECTO o ACTIVIDAD basado en el campo TIPO_ACT_PROY_NOMBRE
-            // En el MEF: 2 usualmente es Proyecto, 3 es Actividad (pero usamos el nombre para seguridad)
-            const tipoNombre = (r.TIPO_ACT_PROY_NOMBRE || "").toUpperCase();
-            const esProyecto = tipoNombre.includes("PROYECTO") || tipoNombre.includes("INVERSION");
-
-            return {
-                CUI: r.PRODUCTO_PROYECTO,
-                NOMBRE: r.PRODUCTO_PROYECTO_NOMBRE,
-                TIPO: esProyecto ? "PROYECTO" : "ACTIVIDAD",
-                PIA: parseFloat(r.MONTO_PIA || 0),
-                PIM: parseFloat(r.MONTO_PIM || 0),
-                CERTIFICADO: parseFloat(r.MONTO_CERTIFICADO || 0),
-                COMPROMISO_ANUAL: parseFloat(r.MONTO_COMPROMETIDO_ANUAL || 0),
-                DEVENGADO: parseFloat(r.MONTO_DEVENGADO || 0),
-                GIRADO: parseFloat(r.MONTO_GIRADO || 0)
-            };
-        });
-
-        // Una vez normalizado, ejecutamos el filtro y dibujo de tabla
-        filtrar(); 
-
-    } catch (e) {
-        console.error("Error cargando datos del MEF:", e);
-        document.getElementById('txt-corte').innerText = "ERROR DE CONEXIÓN";
-    } finally {
-        if(overlay) overlay.style.display = 'none';
+            allData = json.proyectos;
+            document.getElementById('txt-corte').innerText = json.fecha_extraccion;
+            filtrar();
+        } catch (e) { console.error("Error cargando JSON", e); }
     }
-}
 
     function filtrar() {
         clearTimeout(timeoutBusqueda);
