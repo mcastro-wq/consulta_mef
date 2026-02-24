@@ -10,153 +10,161 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
-        :root { --gore-brown: #703020; }
-        body { background-color: #f4f6f9; font-family: 'Inter', system-ui, sans-serif; }
+        :root { --gore-brown: #7a3321; }
+        body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         
-        .main-container { background: white; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); padding: 25px; margin-top: 20px; }
+        .header-simple { background: var(--gore-brown); color: white; padding: 15px 0; border-bottom: 4px solid #d35400; }
+        .content-card { background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 20px; margin-top: 20px; }
         
-        /* Tabla Estilizada */
-        .table { border-collapse: separate; border-spacing: 0; border: 1px solid #eef0f3; }
+        /* Estilo de Tabla Sencilla */
+        .table { font-size: 0.88rem; }
         .table thead th { 
-            background-color: #f8f9fa; 
-            color: #495057; 
-            font-weight: 600; 
+            background-color: #f2f2f2; 
+            cursor: pointer; 
             text-transform: uppercase; 
             font-size: 0.75rem; 
-            letter-spacing: 0.5px;
-            padding: 12px;
-            cursor: pointer;
-            border-bottom: 2px solid #dee2e6;
+            color: #555;
+            vertical-align: middle;
         }
-        .table thead th:hover { background-color: #eceef1; }
-        .table tbody td { padding: 12px; vertical-align: middle; font-size: 0.85rem; border-bottom: 1px solid #f1f1f1; }
-        
-        /* Buscador y Botones */
-        .search-bar { max-width: 400px; border-radius: 20px; padding-left: 40px; }
-        .search-icon { position: absolute; left: 25px; top: 50%; transform: translateY(-50%); color: #adb5bd; }
-        .btn-excel { background-color: #1d6f42; color: white; border: none; }
-        .btn-excel:hover { background-color: #155a35; color: white; }
+        .table thead th:hover { background-color: #e9ecef; }
+        .badge-cui { background-color: var(--gore-brown); color: white; font-weight: 500; }
+        .fecha-col { color: #666; font-weight: bold; min-width: 140px; }
     </style>
 </head>
 <body>
 
-<div class="container-fluid px-4">
-    <div class="d-flex justify-content-between align-items-center py-3">
-        <h4 class="fw-bold m-0" style="color: var(--gore-brown)">
-            <i class="bi bi-journal-text me-2"></i>Historial de Gestión
-        </h4>
+<div class="header-simple">
+    <div class="container d-flex justify-content-between align-items-center">
+        <h4 class="m-0"><i class="bi bi-table me-2"></i> HISTORIAL DE GESTIÓN</h4>
         <div class="d-flex gap-2">
-            <button class="btn btn-excel btn-sm px-3" onclick="exportarExcel()">
-                <i class="bi bi-file-earmark-excel me-1"></i> Exportar Excel
+            <button class="btn btn-success btn-sm px-3" onclick="exportarExcel()">
+                <i class="bi bi-file-earmark-excel"></i> Excel
             </button>
-            <a href="index.html" class="btn btn-outline-secondary btn-sm px-3">Volver</a>
+            <a href="index.html" class="btn btn-warning btn-sm fw-bold">Volver</a>
         </div>
     </div>
+</div>
 
-    <div class="main-container">
-        <div class="row mb-4">
-            <div class="col-md-6 position-relative">
-                <i class="bi bi-search search-icon"></i>
-                <input type="text" id="globalSearch" class="form-control search-bar" 
-                       placeholder="Buscar por CUI o palabra clave..." onkeyup="filtrarYRenderizar()">
+<div class="container-fluid px-4">
+    <div class="content-card">
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" id="inputBusqueda" class="form-control" placeholder="Buscar por CUI o Nombre..." onkeyup="ejecutarFiltro()">
+                </div>
+            </div>
+            <div class="col text-end">
+                <small class="text-muted" id="totalRegistros">Cargando datos...</small>
             </div>
         </div>
 
         <div class="table-responsive">
-            <table class="table" id="tablaPrincipal">
+            <table class="table table-hover table-bordered" id="tablaDatos">
                 <thead>
                     <tr>
-                        <th onclick="ordenar(0)">Fecha <i class="bi bi-arrow-down-up ms-1"></i></th>
-                        <th onclick="ordenar(1)">CUI <i class="bi bi-arrow-down-up ms-1"></i></th>
-                        <th onclick="ordenar(2)">Estado General</th>
-                        <th onclick="ordenar(3)">Detalle</th>
-                        <th onclick="ordenar(4)">Estado Específico</th>
-                        <th onclick="ordenar(5)">SISGEDO</th>
+                        <th onclick="ordenarTabla(0)">Fecha Registro <i class="bi bi-arrow-down-up ms-1"></i></th>
+                        <th onclick="ordenarTabla(1)">CUI <i class="bi bi-arrow-down-up ms-1"></i></th>
+                        <th onclick="ordenarTabla(2)">Estado Gral.</th>
+                        <th>Detalle de Gestión</th>
+                        <th>Estado Específico</th>
+                        <th>Acciones / Timeline</th>
+                        <th>SISGEDO</th>
                     </tr>
                 </thead>
-                <tbody id="tableBody">
-                    <tr>
-                        <td colspan="6" class="text-center py-5">
-                            <div class="spinner-border text-secondary spinner-border-sm" role="status"></div>
-                            <span class="ms-2">Cargando registros...</span>
-                        </td>
-                    </tr>
-                </tbody>
+                <tbody id="cuerpoTabla">
+                    </tbody>
             </table>
         </div>
     </div>
 </div>
 
 <script>
-    let rawData = [];
+    let datosOriginales = [];
     const urlApi = 'https://script.google.com/macros/s/AKfycbzJ8wJlhZ9w-aAtl_1bsZPyy9OhnFp_cB4Sa_Ovt-hijyN8MS-dloEU8cChQIxTD2bG/exec';
 
-    async function cargarDatos() {
+    async function obtenerDatos() {
+        const cuerpo = document.getElementById('cuerpoTabla');
         try {
-            const response = await fetch(`${urlApi}?modo=todo`);
-            const res = await response.json();
-            if (res.status === "success") {
-                rawData = res.data;
-                filtrarYRenderizar();
+            const respuesta = await fetch(`${urlApi}?modo=todo`);
+            const json = await respuesta.json();
+            
+            if (json.status === "success") {
+                datosOriginales = json.data;
+                // Ordenar por fecha automáticamente (más reciente primero)
+                datosOriginales.sort((a, b) => new Date(b.fecha_registro) - new Date(a.fecha_registro));
+                renderizarTabla(datosOriginales);
             }
-        } catch (e) {
-            document.getElementById('tableBody').innerHTML = `<tr><td colspan="6" class="text-center text-danger">Error al cargar datos</td></tr>`;
+        } catch (error) {
+            cuerpo.innerHTML = `<tr><td colspan="7" class="text-center text-danger">Error: No se pudo conectar con la base de datos.</td></tr>`;
         }
     }
 
-    function filtrarYRenderizar() {
-        const query = document.getElementById('globalSearch').value.toLowerCase();
-        const filtered = rawData.filter(item => {
-            return Object.values(item).some(val => String(val).toLowerCase().includes(query));
-        });
-
-        const html = filtered.map(item => `
+    function renderizarTabla(lista) {
+        const cuerpo = document.getElementById('cuerpoTabla');
+        document.getElementById('totalRegistros').innerText = `Total: ${lista.length} registros`;
+        
+        cuerpo.innerHTML = lista.map(item => `
             <tr>
-                <td class="text-nowrap fw-bold text-muted">${formatearFecha(item.fecha_registro)}</td>
-                <td><span class="badge bg-light text-dark border">${item.codigo_cui || ''}</span></td>
-                <td class="fw-bold" style="color: var(--gore-brown)">${item.estado_general || ''}</td>
-                <td class="text-muted small">${item.detalle_estado_general || ''}</td>
+                <td class="fecha-col">${formatearFecha(item.fecha_registro)}</td>
+                <td><span class="badge badge-cui">${item.codigo_cui || ''}</span></td>
+                <td class="fw-bold text-uppercase" style="color:#d35400">${item.estado_general || ''}</td>
+                <td style="max-width:300px"><small>${item.detalle_estado_general || '-'}</small></td>
                 <td>
                     <div class="fw-bold text-primary">${item.estado_especifico || ''}</div>
-                    <div class="text-muted" style="font-size: 0.75rem;">${item.detalle_estado_especifico || ''}</div>
+                    <div class="text-muted" style="font-size:0.7rem">${item.detalle_estado_especifico || ''}</div>
                 </td>
-                <td class="fw-bold">${item.sisgedo || '-'}</td>
+                <td>
+                    <div class="text-success small fw-bold">ACCIONES: ${item.acciones_programadas || '-'}</div>
+                    <div class="text-secondary small">TIMELINE: ${item.timeline_inversion || '-'}</div>
+                </td>
+                <td class="fw-bold text-center">${item.sisgedo || '-'}</td>
             </tr>
         `).join('');
-
-        document.getElementById('tableBody').innerHTML = html || '<tr><td colspan="6" class="text-center">No hay resultados</td></tr>';
     }
 
-    function formatearFecha(fechaStr) {
-        if (!fechaStr) return '---';
-        const d = new Date(fechaStr);
-        if (isNaN(d.getTime())) return fechaStr; // Retorna original si falla
-        return d.toLocaleDateString('es-PE') + ' ' + d.toLocaleTimeString('es-PE', {hour: '2-digit', minute:'2-digit'});
+    function formatearFecha(isoStr) {
+        if (!isoStr) return '---';
+        try {
+            const d = new Date(isoStr);
+            if (isNaN(d.getTime())) return isoStr; 
+            return d.toLocaleDateString('es-PE') + ' ' + d.toLocaleTimeString('es-PE', {hour: '2-digit', minute:'2-digit'});
+        } catch(e) { return isoStr; }
     }
 
-    // Lógica de Ordenamiento
-    let sortAsc = true;
-    function ordenar(colIndex) {
-        sortAsc = !sortAsc;
-        rawData.sort((a, b) => {
-            const keys = ['fecha_registro', 'codigo_cui', 'estado_general', 'detalle_estado_general', 'estado_especifico', 'sisgedo'];
-            let valA = a[keys[colIndex]] || '';
-            let valB = b[keys[colIndex]] || '';
-            return sortAsc ? (valA > valB ? 1 : -1) : (valA < valB ? 1 : -1);
-        });
-        filtrarYRenderizar();
+    function ejecutarFiltro() {
+        const busqueda = document.getElementById('inputBusqueda').value.toLowerCase();
+        const filtrados = datosOriginales.filter(item => 
+            String(item.codigo_cui).includes(busqueda) || 
+            String(item.detalle_estado_general).toLowerCase().includes(busqueda) ||
+            String(item.estado_general).toLowerCase().includes(busqueda)
+        );
+        renderizarTabla(filtrados);
     }
 
-    // Exportar a Excel
+    // Exportación a Excel
     function exportarExcel() {
-        const wb = XLSX.utils.book_new();
-        const ws = XLSX.utils.json_to_sheet(rawData);
-        XLSX.utils.book_append_sheet(wb, ws, "Historial");
-        XLSX.writeFile(wb, "Historial_Gestion_GORE.xlsx");
+        const hoja = XLSX.utils.json_to_sheet(datosOriginales);
+        const libro = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(libro, hoja, "Historial");
+        XLSX.writeFile(libro, "Historial_GORE_Lambayeque.xlsx");
     }
 
-    window.onload = cargarDatos;
-</script>
+    // Ordenamiento Sencillo
+    let asc = true;
+    function ordenarTabla(colIndex) {
+        const claves = ['fecha_registro', 'codigo_cui', 'estado_general'];
+        const clave = claves[colIndex];
+        asc = !asc;
+        datosOriginales.sort((a, b) => {
+            if (a[clave] < b[clave]) return asc ? -1 : 1;
+            if (a[clave] > b[clave]) return asc ? 1 : -1;
+            return 0;
+        });
+        renderizarTabla(datosOriginales);
+    }
 
+    window.onload = obtenerDatos;
+</script>
 </body>
 </html>
