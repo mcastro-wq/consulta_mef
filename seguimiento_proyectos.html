@@ -276,42 +276,53 @@ async function fetchData(anio = "2026") {
 
     try {
         let rawRecords = [];
+        // Definir qué archivo cargar
         let fileName = (anio === "2026") ? 'data_proyectos.json' : `data_${anio}.json`;
         
         const res = await fetch(fileName);
-        if (!res.ok) throw new Error(`Archivo ${fileName} no encontrado en el servidor.`);
+        if (!res.ok) throw new Error(`El archivo ${fileName} no está en tu GitHub.`);
         
         const json = await res.json();
         
-        // Estructura según si es tu JSON manual o el formato directo de la API MEF
+        // El JSON del MEF guarda los datos en json.result.records
+        // Tu JSON de 2026 los guarda en json.proyectos
         if (anio === "2026") {
-            rawRecords = json.proyectos;
+            rawRecords = json.proyectos || [];
         } else {
-            // El JSON descargado del MEF viene dentro de result.records
-            rawRecords = json.result ? json.result.records : json; 
+            rawRecords = (json.result && json.result.records) ? json.result.records : (Array.isArray(json) ? json : []);
         }
 
-        document.getElementById('txt-corte').innerText = "ARCHIVO LOCAL - " + anio;
+        document.getElementById('txt-corte').innerText = (anio === "2026") ? "DATA ACTUAL" : `HISTÓRICO ${anio}`;
 
-        // NORMALIZACIÓN
-        allData = rawRecords.map(r => ({
-            CUI: r.PRODUCTO_PROYECTO || r.CUI || "0",
-            NOMBRE: r.PRODUCTO_PROYECTO_NOMBRE || r.NOMBRE || "SIN NOMBRE",
-            TIPO: (r.TIPO_ACT_PROY_NOMBRE || "").toUpperCase().includes("PROYECTO") ? "PROYECTO" : "ACTIVIDAD",
-            PIA: parseFloat(r.MONTO_PIA || r.PIA || 0),
-            PIM: parseFloat(r.MONTO_PIM || r.PIM || 0),
-            CERTIFICADO: parseFloat(r.MONTO_CERTIFICADO || r.CERTIFICADO || 0),
-            COMPROMISO_ANUAL: parseFloat(r.MONTO_COMPROMETIDO_ANUAL || r.COMPROMISO_ANUAL || 0),
-            COMPROMISO_MENSUAL: parseFloat(r.MONTO_COMPROMETIDO || r.COMPROMISO_MENSUAL || 0),
-            DEVENGADO: parseFloat(r.MONTO_DEVENGADO || r.DEVENGADO || 0),
-            GIRADO: parseFloat(r.MONTO_GIRADO || r.GIRADO || 0)
-        }));
+        // NORMALIZACIÓN DE CAMPOS (Mapea todos los años a un solo formato)
+        allData = rawRecords.map(r => {
+            const pim = parseFloat(r.MONTO_PIM || r.PIM || 0);
+            const dev = parseFloat(r.MONTO_DEVENGADO || r.DEVENGADO || 0);
+            
+            return {
+                CUI: r.PRODUCTO_PROYECTO || r.CUI || "0",
+                NOMBRE: r.PRODUCTO_PROYECTO_NOMBRE || r.NOMBRE || "SIN NOMBRE",
+                TIPO: (r.TIPO_ACT_PROY_NOMBRE || "").toUpperCase().includes("PROYECTO") ? "PROYECTO" : "ACTIVIDAD",
+                PIA: parseFloat(r.MONTO_PIA || r.PIA || 0),
+                PIM: pim,
+                CERTIFICADO: parseFloat(r.MONTO_CERTIFICADO || r.CERTIFICADO || 0),
+                COMPROMISO_ANUAL: parseFloat(r.MONTO_COMPROMETIDO_ANUAL || r.COMPROMISO_ANUAL || 0),
+                COMPROMISO_MENSUAL: parseFloat(r.MONTO_COMPROMETIDO || r.COMPROMISO_MENSUAL || 0),
+                DEVENGADO: dev,
+                GIRADO: parseFloat(r.MONTO_GIRADO || r.GIRADO || 0)
+            };
+        });
 
         filtrar();
 
     } catch (e) {
-        console.error("Fallo de carga:", e);
-        document.getElementById('tbody-main').innerHTML = `<tr><td colspan="8" class="text-center text-danger">Error: ${e.message}</td></tr>`;
+        console.error("Error cargando archivo:", e);
+        document.getElementById('tbody-main').innerHTML = `
+            <tr><td colspan="8" class="text-center p-4">
+                <div class="alert alert-warning d-inline-block">
+                    <i class="bi bi-exclamation-triangle"></i> No se encontró el archivo <b>data_${anio}.json</b> en tu repositorio.
+                </div>
+            </td></tr>`;
     } finally {
         if (overlay) overlay.style.display = 'none';
     }
