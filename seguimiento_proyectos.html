@@ -20,10 +20,19 @@
         .table-resumen thead { background: var(--gore-brown); color: white; }
         .table-resumen td { font-weight: 700; text-align: right; border: 1px solid #eee; padding: 6px 10px; }
 
-        .card-table { background: white; border-radius: 4px; border: 1px solid #ddd; height: 400px; display: flex; flex-direction: column; }
+        /* CARD TABLA CON LOADER */
+        .card-table { background: white; border-radius: 4px; border: 1px solid #ddd; height: 400px; display: flex; flex-direction: column; position: relative; }
         .scroll-area { flex-grow: 1; overflow-y: auto; }
         .table-gore-head { background: #666; color: white; position: sticky; top: 0; z-index: 10; font-size: 0.7rem; }
         
+        /* OVERLAY LOADER */
+        #loader-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.85); z-index: 1000;
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            border-radius: 4px;
+        }
+
         .row-item { cursor: pointer; transition: 0.1s; }
         .row-item:hover { background-color: #fef5f3 !important; }
         .selected-row { background-color: #fff0ed !important; border-left: 4px solid var(--gore-orange) !important; }
@@ -56,7 +65,7 @@
 
 <header class="header-gore d-flex justify-content-between align-items-center">
     <div class="d-flex align-items-center">
-        <h1 class="title-main">Monitor de Ejecución Presupuestal 2026</h1>
+        <h1 class="title-main" id="header-title">Monitor de Ejecución Presupuestal 2026</h1>
     </div>
     <div class="d-flex align-items-center gap-4">
         <div class="text-end">
@@ -70,6 +79,17 @@
 <div class="container-fluid px-4 mt-3">
     <div class="filter-box shadow-sm">
         <div class="row align-items-end g-3">
+            <div class="col-md-2">
+                <label class="label-filter text-danger">Año Fiscal</label>
+                <select id="selectAnio" class="form-select form-select-sm fw-bold border-danger shadow-sm" onchange="cambiarAnio()">
+                    <option value="2026" selected>2026 (Actual)</option>
+                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                    <option value="2023">2023</option>
+                    <option value="2022">2022</option>
+                    <option value="2021">2021</option>
+                </select>
+            </div>
             <div class="col-md-3">
                 <label class="label-filter text-primary">Tipo de Registro</label>
                 <div class="p-2 border rounded bg-light">
@@ -83,27 +103,17 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-9">
+            <div class="col-md-7">
                 <label class="label-filter">Buscar por Código CUI o Nombre</label>
                 <div class="input-group input-group-sm">
                     <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
                     <input type="text" id="inputBusqueda" class="form-control border-start-0" placeholder="Escriba código o nombre..." onkeyup="filtrar()">
                 </div>
-
-<select id="selectAnio" class="form-select form-select-sm fw-bold border-danger" onchange="cambiarAnio()">
-    <option value="2026">2026 (Actual)</option>
-    <option value="2025">2025 (Cierre)</option>
-    <option value="2024">2024</option>
-    <option value="2023">2023</option>
-    <option value="2022">2022</option>
-    <option value="2021">2021</option>
-</select>
-                
             </div>
         </div>
     </div>
 
-<div class="d-flex mb-2">
+    <div class="d-flex mb-2">
         <span class="badge bg-light text-dark border fw-bold shadow-sm px-3 py-2" style="font-size: 0.85rem; letter-spacing: 0.5px;">
             <i class="bi bi-database-check text-primary me-1"></i> 
             SINCRO MEF: <span id="txt-corte" class="text-secondary ms-1">...</span>
@@ -115,16 +125,9 @@
             <thead>
                 <tr>
                     <th style="width: 25%;">UNIDAD EJECUTORA</th>
-                    <th>PIA</th>
-                    <th>PIM</th>
-                    <th>CERTIFICADO</th>
-                    <th>% CERT</th>
-                    <th>COMP. ANUAL</th>
-                    <th>% CA</th>
-                    <th>COMP. MENSUAL</th>
-                    <th>% CM</th>
-                    <th>DEVENGADO</th>
-                    <th>% DEV</th>
+                    <th>PIA</th><th>PIM</th><th>CERTIFICADO</th><th>% CERT</th>
+                    <th>COMP. ANUAL</th><th>% CA</th><th>COMP. MENSUAL</th><th>% CM</th>
+                    <th>DEVENGADO</th><th>% DEV</th>
                 </tr>
             </thead>
             <tbody id="resumen-ejecutora"></tbody>
@@ -134,6 +137,11 @@
     <div class="row g-3">
         <div class="col-lg-9">
             <div class="card-table shadow-sm">
+                <div id="loader-overlay">
+                    <div class="spinner-border text-danger" role="status"></div>
+                    <span class="mt-2 fw-bold text-dark">Sincronizando con API MEF...</span>
+                </div>
+
                 <div class="scroll-area">
                     <table class="table table-sm table-hover mb-0" style="font-size: 0.7rem;">
                         <thead class="table-gore-head text-center">
@@ -204,7 +212,7 @@
             <div class="row g-3">
                 <div class="col-md-4">
                     <label class="form-label">Código CUI / Producto</label>
-                    <input type="text" id="form-cui" class="form-control form-control-sm border-primary fw-bold">
+                    <input type="text" id="form-cui" class="form-control form-control-sm border-primary fw-bold" readonly>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Estado General</label>
@@ -228,11 +236,11 @@
                 </div>
                 <div class="col-12">
                     <label class="form-label">Timeline Inversión</label>
-                    <textarea id="form-timeline" class="form-control form-control-sm" rows="3"></textarea>
+                    <textarea id="form-timeline" class="form-control form-control-sm" rows="2"></textarea>
                 </div>
                 <div class="col-12">
                     <label class="form-label">Acciones Programadas</label>
-                    <textarea id="form-acciones" class="form-control form-control-sm" rows="3"></textarea>
+                    <textarea id="form-acciones" class="form-control form-control-sm" rows="2"></textarea>
                 </div>
             </div>
         </form>
@@ -249,81 +257,77 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    // 1. DICCIONARIO MEF CORREGIDO
+    const MEF_RESOURCES = {
+        "2025": "35bdc5b5-017c-42c1-ba20-8820bf1248b7",
+        "2024": "0b938fa8-f18c-4685-88ae-a9d7e392cafa",
+        "2023": "9e9a6d67-2687-4056-9b59-e170b945182f",
+        "2022": "1904862a-a8c8-4b0f-ae2e-49e577996588",
+        "2021": "f87e302c-bc93-4dd3-bfb0-60df1d6bf41c"
+    };
 
-    // 1. Diccionario con los IDs exactos que proporcionaste
-const MEF_RESOURCES = {
-    "2025": "35bdc5b5-017c-42c1-ba20-8820bf1248b7",
-    "2024": "0b938fa8-f18c-4685-88ae-a9d7e392cafa",
-    "2023": "9e9a6d67-2687-4056-9b59-e170b945182f",
-    "2022": "1904862a-a8c8-4b0f-ae2e-49e577996588",
-    "2021": "f87e302c-bc93-4dd3-bfb0-60df1d6bf41c"
-};
-
-    
     let allData = [];
     let timeoutBusqueda;
-    let cuiSeleccionadoActual = "";
 
-// 2. Función fetchData que decide si ir a la API o al Local JSON
-async function fetchData(anio = "2026") {
-    const overlay = document.getElementById('loader-overlay');
-    if(overlay) overlay.style.display = 'flex';
+    // 2. FUNCIÓN CARGAR DATOS CON SPINNER
+    async function fetchData(anio = "2026") {
+        const overlay = document.getElementById('loader-overlay');
+        overlay.style.display = 'flex'; // Mostrar Spinner
 
-    try {
-        let rawRecords = [];
-        
-        if (anio === "2026") {
-            // Tu carga local para el año actual
-            const res = await fetch('data_proyectos.json');
-            const json = await res.json();
-            rawRecords = json.proyectos;
-            document.getElementById('txt-corte').innerText = "LOCAL: " + (json.fecha_extraccion || '2026');
-        } else {
-            // Consulta SQL a la API del MEF usando el diccionario de datos proporcionado
-            const resourceId = MEF_RESOURCES[anio];
-            // Filtramos por SEC_EJEC '452' (GORE Lambayeque)
-            const sql = `SELECT * FROM "${resourceId}" WHERE "SEC_EJEC" = '452'`;
-            const url = `https://api.datosabiertos.mef.gob.pe/DatosAbiertos/v1/datastore_search_sql?sql=${encodeURIComponent(sql)}`;
+        try {
+            let rawRecords = [];
+            if (anio === "2026") {
+                const res = await fetch('data_proyectos.json');
+                const json = await res.json();
+                rawRecords = json.proyectos;
+                document.getElementById('txt-corte').innerText = "LOCAL: " + (json.fecha_extraccion || '2026');
+            } else {
+                const resourceId = MEF_RESOURCES[anio];
+                const sql = `SELECT * FROM "${resourceId}" WHERE "SEC_EJEC" = '452'`;
+                const url = `https://api.datosabiertos.mef.gob.pe/DatosAbiertos/v1/datastore_search_sql?sql=${encodeURIComponent(sql)}`;
 
-            const res = await fetch(url);
-            const json = await res.json();
-            
-            if (json.success) {
-                rawRecords = json.result.records;
-                document.getElementById('txt-corte').innerText = "API MEF - " + anio;
+                const res = await fetch(url);
+                const json = await res.json();
+                if (json.success) {
+                    rawRecords = json.result.records;
+                    document.getElementById('txt-corte').innerText = "API MEF - " + anio;
+                }
             }
+
+            // NORMALIZACIÓN DE CAMPOS
+            allData = rawRecords.map(r => {
+                const tipo = (r.TIPO_ACT_PROY_NOMBRE || r.TIPO || "").toUpperCase();
+                const esProyecto = tipo.includes("PROYECTO") || tipo.includes("INVERSION");
+                
+                return {
+                    CUI: r.PRODUCTO_PROYECTO || r.CUI,
+                    NOMBRE: r.PRODUCTO_PROYECTO_NOMBRE || r.NOMBRE,
+                    TIPO: esProyecto ? "PROYECTO" : "ACTIVIDAD",
+                    PIA: parseFloat(r.MONTO_PIA || r.PIA || 0),
+                    PIM: parseFloat(r.MONTO_PIM || r.PIM || 0),
+                    CERTIFICADO: parseFloat(r.MONTO_CERTIFICADO || r.CERTIFICADO || 0),
+                    COMPROMISO_ANUAL: parseFloat(r.MONTO_COMPROMETIDO_ANUAL || r.COMPROMISO_ANUAL || 0),
+                    COMPROMISO_MENSUAL: parseFloat(r.MONTO_COMPROMETIDO || r.COMPROMISO_MENSUAL || 0),
+                    DEVENGADO: parseFloat(r.MONTO_DEVENGADO || r.DEVENGADO || 0),
+                    GIRADO: parseFloat(r.MONTO_GIRADO || r.GIRADO || 0)
+                };
+            });
+
+            filtrar();
+
+        } catch (e) {
+            console.error("Error:", e);
+            document.getElementById('txt-corte').innerText = "ERROR DE CONEXIÓN";
+        } finally {
+            overlay.style.display = 'none'; // Ocultar Spinner
         }
-
-        // --- NORMALIZACIÓN BASADA EN TU DICCIONARIO ---
-        allData = rawRecords.map(r => {
-            // Determinamos si es PROYECTO o ACTIVIDAD basado en el campo TIPO_ACT_PROY_NOMBRE
-            // En el MEF: 2 usualmente es Proyecto, 3 es Actividad (pero usamos el nombre para seguridad)
-            const tipoNombre = (r.TIPO_ACT_PROY_NOMBRE || "").toUpperCase();
-            const esProyecto = tipoNombre.includes("PROYECTO") || tipoNombre.includes("INVERSION");
-
-            return {
-                CUI: r.PRODUCTO_PROYECTO,
-                NOMBRE: r.PRODUCTO_PROYECTO_NOMBRE,
-                TIPO: esProyecto ? "PROYECTO" : "ACTIVIDAD",
-                PIA: parseFloat(r.MONTO_PIA || 0),
-                PIM: parseFloat(r.MONTO_PIM || 0),
-                CERTIFICADO: parseFloat(r.MONTO_CERTIFICADO || 0),
-                COMPROMISO_ANUAL: parseFloat(r.MONTO_COMPROMETIDO_ANUAL || 0),
-                DEVENGADO: parseFloat(r.MONTO_DEVENGADO || 0),
-                GIRADO: parseFloat(r.MONTO_GIRADO || 0)
-            };
-        });
-
-        // Una vez normalizado, ejecutamos el filtro y dibujo de tabla
-        filtrar(); 
-
-    } catch (e) {
-        console.error("Error cargando datos del MEF:", e);
-        document.getElementById('txt-corte').innerText = "ERROR DE CONEXIÓN";
-    } finally {
-        if(overlay) overlay.style.display = 'none';
     }
-}
+
+    function cambiarAnio() {
+        const anio = document.getElementById('selectAnio').value;
+        document.getElementById('header-title').innerText = "Monitor de Ejecución Presupuestal " + anio;
+        fetchData(anio);
+    }
 
     function filtrar() {
         clearTimeout(timeoutBusqueda);
@@ -333,11 +337,9 @@ async function fetchData(anio = "2026") {
             const verActividad = document.getElementById('checkActividad').checked;
 
             const filtered = allData.filter(p => {
-                const tipo = (p.TIPO || "").toUpperCase();
-                const esProyecto = tipo === "PROYECTO";
-                const esProductoActividad = tipo === "PRODUCTO";
-                return ((verProyecto && esProyecto) || (verActividad && esProductoActividad)) &&
-                       (p.PRODUCTO_PROYECTO_NOMBRE.toLowerCase().includes(query) || p.PRODUCTO_PROYECTO.toString().includes(query));
+                const matchTipo = (verProyecto && p.TIPO === "PROYECTO") || (verActividad && p.TIPO === "ACTIVIDAD");
+                const matchBusqueda = p.NOMBRE.toLowerCase().includes(query) || p.CUI.toString().includes(query);
+                return matchTipo && matchBusqueda;
             });
 
             renderResumen(filtered);
@@ -350,27 +352,19 @@ async function fetchData(anio = "2026") {
     function renderResumen(data) {
         let t = { pia:0, pim:0, cer:0, can:0, cme:0, dev:0 };
         data.forEach(p => {
-            t.pia += p.MONTO_PIA; 
-            t.pim += p.MONTO_PIM;
-            t.cer += p.MONTO_CERTIFICADO; 
-            t.can += p.MONTO_COMPROMETIDO_ANUAL;
-            t.cme += p.MONTO_COMPROMETIDO; // Campo para compromiso mensual
-            t.dev += p.MONTO_DEVENGADO;
+            t.pia += p.PIA; t.pim += p.PIM; t.cer += p.CERTIFICADO;
+            t.can += p.COMPROMISO_ANUAL; t.cme += p.COMPROMISO_MENSUAL; t.dev += p.DEVENGADO;
         });
         const perc = (v) => t.pim > 0 ? (v/t.pim*100).toFixed(1) + '%' : '0%';
+        
         document.getElementById('resumen-ejecutora').innerHTML = `
             <tr>
-                <td class="text-start">452 - GOBIERNO REGIONAL LAMBAYEQUE (FILTRADO)</td>
-                <td>${t.pia.toLocaleString()}</td>
-                <td>${t.pim.toLocaleString()}</td>
-                <td>${t.cer.toLocaleString()}</td>
-                <td class="text-primary">${perc(t.cer)}</td>
-                <td>${t.can.toLocaleString()}</td>
-                <td class="text-primary">${perc(t.can)}</td>
-                <td>${t.cme.toLocaleString()}</td>
-                <td class="text-primary">${perc(t.cme)}</td>
-                <td>${t.dev.toLocaleString()}</td>
-                <td class="text-success">${perc(t.dev)}</td>
+                <td class="text-start">SEDE CENTRAL - GORE LAMBAYEQUE (FILTRADO)</td>
+                <td>${t.pia.toLocaleString()}</td><td>${t.pim.toLocaleString()}</td>
+                <td>${t.cer.toLocaleString()}</td><td class="text-primary">${perc(t.cer)}</td>
+                <td>${t.can.toLocaleString()}</td><td class="text-primary">${perc(t.can)}</td>
+                <td>${t.cme.toLocaleString()}</td><td class="text-primary">${perc(t.cme)}</td>
+                <td>${t.dev.toLocaleString()}</td><td class="text-success">${perc(t.dev)}</td>
             </tr>`;
     }
 
@@ -379,23 +373,20 @@ async function fetchData(anio = "2026") {
         if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="8" class="text-center p-4">Sin datos</td></tr>'; return; }
         
         tbody.innerHTML = data.map(p => {
-            const pim = p.MONTO_PIM || 0;
-            const dev = p.MONTO_DEVENGADO || 0;
-            const pDev = pim > 0 ? (dev / pim * 100).toFixed(1) : 0;
-            const pCer = pim > 0 ? (p.MONTO_CERTIFICADO / pim * 100).toFixed(1) : 0;
-            
+            const pDev = p.PIM > 0 ? (p.DEVENGADO / p.PIM * 100).toFixed(1) : 0;
+            const pCer = p.PIM > 0 ? (p.CERTIFICADO / p.PIM * 100).toFixed(1) : 0;
             let sem = 'status-bajo', txt = 'BAJO', clr = 'text-danger';
             if (pDev > 75) { sem = 'status-alto'; txt = 'ALTO'; clr = 'text-success'; }
             else if (pDev >= 40) { sem = 'status-medio'; txt = 'MEDIO'; clr = 'text-warning'; }
 
             return `
-                <tr class="row-item" onclick="seleccionar('${p.PRODUCTO_PROYECTO}', this)">
-                    <td class="text-center fw-bold text-muted">${p.PRODUCTO_PROYECTO}</td>
-                    <td class="text-start fw-bold" style="width:35%">${p.PRODUCTO_PROYECTO_NOMBRE}</td>
-                    <td class="text-end">${pim.toLocaleString()}</td>
-                    <td class="text-end">${p.MONTO_CERTIFICADO.toLocaleString()}</td>
+                <tr class="row-item" onclick="seleccionar('${p.CUI}', this)">
+                    <td class="text-center fw-bold text-muted">${p.CUI}</td>
+                    <td class="text-start fw-bold" style="width:35%">${p.NOMBRE}</td>
+                    <td class="text-end">${p.PIM.toLocaleString()}</td>
+                    <td class="text-end">${p.CERTIFICADO.toLocaleString()}</td>
                     <td class="text-center text-primary">${pCer}%</td>
-                    <td class="text-end text-success fw-bold">${dev.toLocaleString()}</td>
+                    <td class="text-end text-success fw-bold">${p.DEVENGADO.toLocaleString()}</td>
                     <td class="text-center fw-bold text-success">${pDev}%</td>
                     <td class="text-center">
                         <div class="d-flex align-items-center justify-content-center gap-2">
@@ -408,26 +399,21 @@ async function fetchData(anio = "2026") {
     }
 
     function seleccionar(cui, fila) {
-        cuiSeleccionadoActual = cui;
         document.querySelectorAll('.row-item').forEach(r => r.classList.remove('selected-row'));
         fila.classList.add('selected-row');
         document.getElementById('selected-cui-label').innerText = "CUI: " + cui;
         document.getElementById('selected-cui-label').className = "badge bg-primary";
         document.getElementById('form-cui').value = cui;
 
-        const regs = allData.filter(i => i.PRODUCTO_PROYECTO.toString() === cui.toString());
-        let s = { pim:0, cer:0, can:0, cme:0, dev:0, gir:0 };
-        regs.forEach(r => {
-            s.pim += r.MONTO_PIM; s.cer += r.MONTO_CERTIFICADO;
-            s.can += r.MONTO_COMPROMETIDO_ANUAL; s.cme += r.MONTO_COMPROMETIDO;
-            s.dev += r.MONTO_DEVENGADO; s.gir += r.MONTO_GIRADO;
-        });
-        const getP = (v) => s.pim > 0 ? (v/s.pim*100).toFixed(1) : 0;
-        updateG('g-cer', 'v-cer', getP(s.cer));
-        updateG('g-can', 'v-can', getP(s.can));
-        updateG('g-cme', 'v-cme', getP(s.cme));
-        updateG('g-dev', 'v-dev', getP(s.dev));
-        updateG('g-gir', 'v-gir', getP(s.gir));
+        const p = allData.find(i => i.CUI.toString() === cui.toString());
+        if(p) {
+            const getP = (v) => p.PIM > 0 ? (v/p.PIM*100).toFixed(1) : 0;
+            updateG('g-cer', 'v-cer', getP(p.CERTIFICADO));
+            updateG('g-can', 'v-can', getP(p.COMPROMISO_ANUAL));
+            updateG('g-cme', 'v-cme', getP(p.COMPROMISO_MENSUAL));
+            updateG('g-dev', 'v-dev', getP(p.DEVENGADO));
+            updateG('g-gir', 'v-gir', getP(p.GIRADO));
+        }
     }
 
     function updateG(id, tid, val) {
@@ -438,12 +424,12 @@ async function fetchData(anio = "2026") {
 
     function guardarSeguimiento() {
         const cui = document.getElementById('form-cui').value;
-        if(!cui) { alert("Por favor, ingrese un CUI"); return; }
-        alert("¡Seguimiento capturado para " + cui + "!");
+        if(!cui) { alert("Seleccione un proyecto de la tabla"); return; }
+        alert("Guardado: Trazabilidad registrada para el CUI " + cui);
         bootstrap.Modal.getInstance(document.getElementById('modalRegistro')).hide();
     }
 
-    fetchData();
+    fetchData(); // Carga inicial 2026
 </script>
 </body>
 </html>
