@@ -386,6 +386,9 @@
             updateG('g-dev', 'v-dev', getP(p.MONTO_DEVENGADO));
             updateG('g-gir', 'v-gir', getP(p.MONTO_GIRADO));
         }
+
+        // --- AGREGAR ESTO PARA CARGAR LOS CUADROS ---
+    cargarDetalleSeguimiento(cui);
     }
 
     function actualizarGaugesGlobales(data) {
@@ -411,7 +414,7 @@
 
 
 function guardarSeguimiento(event) { // <--- Agregamos 'event' aquí
-    const urlApi = 'https://script.google.com/macros/s/AKfycby00hg_TS_IOQ0oWPAt8-1cTbad_tree-TKAozfzNpM_y6_RLxN-WNxym6ikEOADwCv/exec';
+    const urlApi = 'https://script.google.com/macros/s/AKfycbwy54w0S_ZZ9Axn355XU18zoOv-MTkuShvXco5Q9_uDN0Y3Nc8NelzBDJvwKTYO6RJS/exec';
     
     const getVal = (id) => {
         const el = document.getElementById(id);
@@ -472,6 +475,49 @@ function guardarSeguimiento(event) { // <--- Agregamos 'event' aquí
     .finally(() => {
         btn.disabled = false;
         btn.innerHTML = originalText;
+    });
+}
+
+
+
+// Esta función se debe llamar cuando haces clic en una fila de tu tabla
+function cargarDetalleSeguimiento(cui) {
+    // URL que me pasaste (la completa)
+    const urlApi = 'https://script.google.com/macros/s/AKfycbwy54w0S_ZZ9Axn355XU18zoOv-MTkuShvXco5Q9_uDN0Y3Nc8NelzBDJvwKTYO6RJS/exec';
+    
+    // Feedback visual: ponemos "..." en los cuadros mientras carga
+    document.querySelectorAll('.tracking-body').forEach(el => el.innerText = "...");
+
+    fetch(`${urlApi}?cui=${cui}`)
+        .then(response => response.json())
+        .then(res => {
+            if (res.status === "success" && res.data) {
+                const d = res.data;
+                // Pintar los datos en los cuadros
+                document.getElementById('track-est-gral').innerText = d.estado_general || "-";
+                document.getElementById('track-det-gral').innerText = d.detalle_estado_general || "-";
+                document.getElementById('track-est-esp').innerText = d.estado_especifico || "-";
+                document.getElementById('track-det-esp').innerText = d.detalle_estado_especifico || "-";
+                document.getElementById('track-sisgedo').innerText = d.sisgedo || "-";
+                document.getElementById('track-timeline').innerText = d.timeline_inversion || "-";
+                document.getElementById('track-acciones').innerText = d.acciones_programadas || "-";
+            } else {
+                limpiarCuadros();
+                console.log("No hay datos previos para este CUI.");
+            }
+        })
+        .catch(error => {
+            console.error('Error al cargar seguimiento:', error);
+            limpiarCuadros();
+        });
+}
+
+function limpiarCuadros() {
+    // Si no hay datos, ponemos un guion en todo
+    const ids = ['track-est-gral', 'track-det-gral', 'track-est-esp', 'track-det-esp', 'track-sisgedo', 'track-timeline', 'track-acciones'];
+    ids.forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.innerText = "-";
     });
 }
 
