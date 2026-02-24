@@ -3,101 +3,150 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Seguimiento de Proyectos (CUI) - GORE Lambayeque</title>
+    <title>Dashboard de Inversiones - GORE Lambayeque</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
-        :root { --mef-red: #801616; --mef-gold: #ffc107; }
-        body { background-color: #f4f7f6; font-family: 'Inter', sans-serif; }
-        .header-top { 
-            background: var(--mef-red); 
-            color: white; 
-            padding: 40px 0 60px 0; 
-            border-bottom: 5px solid var(--mef-gold); 
-        }
-        .search-container { 
-            background: white; 
-            border-radius: 15px; 
-            padding: 20px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
-            margin-top: 20px; 
-            position: relative;
-            z-index: 10;
-        }
-        .filter-badge { cursor: pointer; transition: all 0.3s; border: 1px solid #dee2e6; padding: 8px 15px; border-radius: 50px; background: white; font-weight: 600; font-size: 0.85rem; }
+        :root { --mef-red: #801616; --mef-gold: #ffc107; --dark-bg: #1e293b; }
+        body { background-color: #f1f5f9; font-family: 'Inter', sans-serif; font-size: 0.9rem; }
+        
+        /* Header Estilo Dashboard */
+        .header-dashboard { background: var(--mef-red); color: white; padding: 1.5rem 0; border-bottom: 4px solid var(--mef-gold); }
+        
+        /* Contenedores Principales */
+        .main-card { background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); border: none; height: 100%; }
+        
+        /* Buscador Compacto */
+        .search-container { background: white; padding: 15px; border-radius: 10px; border: 1px solid #e2e8f0; }
+        
+        /* Tabla Lateral Izquierda */
+        .table-wrapper { max-height: 650px; overflow-y: auto; }
+        .thead-sticky { position: sticky; top: 0; background: var(--mef-red); color: white; z-index: 10; }
+        .table-sm-custom td { padding: 8px; font-size: 0.75rem; border-bottom: 1px solid #f1f5f9; }
+        
+        /* Panel Derecho (Indicadores) */
+        .indicator-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; text-align: center; }
+        .indicator-label { font-size: 0.65rem; font-weight: bold; color: #64748b; text-transform: uppercase; display: block; }
+        .indicator-value { font-size: 1.1rem; font-weight: 800; color: var(--dark-bg); }
+
+        /* Gauges Simit */
+        .gauge-wrapper { position: relative; width: 160px; height: 80px; margin: 0 auto; overflow: hidden; }
+        .gauge-body { position: absolute; top: 0; left: 0; width: 160px; height: 160px; border-radius: 50%; border: 15px solid #e2e8f0; border-bottom-color: var(--mef-red); transform: rotate(45deg); }
+        .gauge-text { position: absolute; bottom: 0; width: 100%; text-align: center; font-weight: 800; font-size: 1.2rem; }
+
+        /* Recuadros de Estado (Abajo) */
+        .status-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .status-item { background: white; border: 1px solid #cbd5e1; padding: 10px; border-radius: 6px; min-height: 60px; }
+        
+        .filter-badge { cursor: pointer; font-size: 0.75rem; padding: 5px 12px; border-radius: 20px; border: 1px solid #cbd5e1; transition: 0.2s; }
         .filter-badge.active { background: var(--mef-red); color: white; border-color: var(--mef-red); }
-        .table-resumen { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-        .thead-mef { background: var(--mef-red); color: white; font-size: 0.85rem; text-transform: uppercase; }
-        .cui-badge { background: #334155; color: #fff; font-family: monospace; font-weight: bold; padding: 4px 8px; border-radius: 6px; }
-        .ejecutora-text { font-size: 0.75rem; color: #64748b; display: block; margin-top: 4px; }
-        .monto-num { font-family: monospace; font-weight: 600; }
-        .status-zero { color: #dc3545; background-color: #fff5f5; border: 1px solid #feb2b2; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; }
-        .btn-excel { background-color: #1D6F42; color: white; border: none; font-weight: bold; }
-        .btn-excel:hover { background-color: #155231; color: white; }
     </style>
 </head>
 <body>
 
-<div class="header-top">
-    <div class="container d-flex justify-content-between align-items-center">
+<header class="header-dashboard mb-4">
+    <div class="container-fluid px-4 d-flex justify-content-between align-items-center">
         <div>
-            <h3 class="fw-bold mb-0"><i class="bi bi-shield-exclamation me-2"></i>MONITOR DE ALERTAS DE INVERSIÓN 2026</h3>
-            <span class="badge bg-light text-dark border fw-normal">
-                <i class="bi bi-database-check text-primary"></i> MEF: <span id="fecha-actualizacion">...</span>
-            </span>
+            <h4 class="fw-bold mb-0 text-uppercase tracking-tight">Monitor Gerencial de Inversiones 2026</h4>
+            <small class="opacity-75">Sincronizado con MEF: <span id="fecha-actualizacion">...</span></small>
         </div>
-
-        <a href="index.html" class="btn btn-warning fw-bold rounded-pill px-4">
-            <i class="bi bi-arrow-left"></i> Volver al Monitor
-        </a>
+        <div class="d-flex gap-2">
+            <button onclick="exportarExcel()" class="btn btn-light btn-sm fw-bold shadow-sm">
+                <i class="bi bi-file-earmark-excel-fill text-success"></i> Excel
+            </button>
+            <a href="index.html" class="btn btn-warning btn-sm fw-bold">Volver</a>
+        </div>
     </div>
-</div>
+</header>
 
-<div class="container mb-5">
-    <div class="row justify-content-center mb-5">
-        <div class="col-md-11">
-            <div class="search-container">
-                <div class="input-group input-group-lg mb-3">
-                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
-                    <input type="text" id="mainSearch" class="form-control border-start-0 bg-light" placeholder="Buscar por CUI o Nombre del Proyecto..." onkeyup="ejecutarFiltros()">
+<div class="container-fluid px-4">
+    <div class="row g-4">
+        
+        <div class="col-lg-7">
+            <div class="main-card p-3">
+                <div class="search-container mb-3">
+                    <div class="input-group input-group-sm mb-2">
+                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+                        <input type="text" id="mainSearch" class="form-control border-start-0" placeholder="Buscar CUI o Proyecto..." onkeyup="ejecutarFiltros()">
+                    </div>
+                    <div class="d-flex gap-2 mb-1">
+                        <div id="btn-all" class="filter-badge active" onclick="setEstadoFiltro('todos')">Todos (<span id="count-all">0</span>)</div>
+                        <div id="btn-zero" class="filter-badge" onclick="setEstadoFiltro('zero')">Avance 0% (<span id="count-zero">0</span>)</div>
+                        <div id="btn-exec" class="filter-badge" onclick="setEstadoFiltro('executing')">Ejecución (<span id="count-exec">0</span>)</div>
+                    </div>
                 </div>
-                
-                <div class="d-flex flex-wrap gap-2">
-                    <div id="btn-all" class="filter-badge active" onclick="setEstadoFiltro('todos')">
-                        Todos <span class="badge bg-secondary ms-1" id="count-all">0</span>
-                    </div>
-                    <div id="btn-zero" class="filter-badge text-danger border-danger" onclick="setEstadoFiltro('zero')">
-                        <i class="bi bi-exclamation-triangle-fill me-1"></i> Avance 0% <span class="badge bg-danger ms-1" id="count-zero">0</span>
-                    </div>
-                    <div id="btn-exec" class="filter-badge text-success border-success" onclick="setEstadoFiltro('executing')">
-                        En Ejecución <span class="badge bg-success ms-1" id="count-exec">0</span>
-                    </div>
 
-                            <button onclick="exportarExcel()" class="btn btn-excel rounded-pill px-4 shadow-sm">
-            <i class="bi bi-file-earmark-excel-fill me-2"></i> Exportar Reporte
-        </button>
-
-                    
+                <div class="table-wrapper">
+                    <table class="table table-hover table-sm-custom">
+                        <thead class="thead-sticky">
+                            <tr>
+                                <th>CUI</th>
+                                <th>DESCRIPCIÓN PROYECTO</th>
+                                <th class="text-end">PIM</th>
+                                <th class="text-center">AVANCE</th>
+                                <th class="text-center">VER</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lista-proyectos"></tbody>
+                    </table>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="table-resumen">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0" id="tablaProyectos">
-                <thead class="thead-mef">
-                    <tr>
-                        <th class="ps-3">ID / CUI</th>
-                        <th>Descripción del Proyecto / Ejecutora</th>
-                        <th class="text-end">PIM (S/)</th>
-                        <th class="text-center" width="200">Avance Real</th>
-                        <th class="text-center">Detalle</th>
-                    </tr>
-                </thead>
-                <tbody id="lista-proyectos"></tbody>
-            </table>
+        <div class="col-lg-5">
+            <div class="main-card p-4">
+                <h6 class="fw-bold border-bottom pb-2 mb-3 text-uppercase"><i class="bi bi-graph-up-arrow me-2 text-danger"></i>Resumen de Inversión Regional</h6>
+                
+                <div class="row g-3 mb-4 text-center">
+                    <div class="col-12">
+                        <div class="gauge-wrapper">
+                            <div class="gauge-body"></div>
+                            <div class="gauge-text" id="gauge-percent">0%</div>
+                        </div>
+                        <small class="fw-bold text-muted d-block mt-2">AVANCE DEVENGADO PROMEDIO</small>
+                    </div>
+                    
+                    <div class="col-6">
+                        <div class="indicator-box">
+                            <span class="indicator-label">Total PIM</span>
+                            <span class="indicator-value" id="resumen-pim">S/ 0</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="indicator-box border-success">
+                            <span class="indicator-label">Total Devengado</span>
+                            <span class="indicator-value text-success" id="resumen-dev">S/ 0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <h6 class="fw-bold small text-muted text-uppercase mb-2">Seguimiento de Gestión</h6>
+                <div class="status-grid">
+                    <div class="status-item">
+                        <span class="indicator-label">Estado General</span>
+                        <div class="small fw-bold text-dark mt-1" id="info-estado-gral">-</div>
+                    </div>
+                    <div class="status-item">
+                        <span class="indicator-label">Detalle Estado</span>
+                        <div class="small text-muted mt-1" id="info-detalle-gral">-</div>
+                    </div>
+                    <div class="status-item border-start border-4 border-warning">
+                        <span class="indicator-label">Estado Específico</span>
+                        <div class="small fw-bold text-dark mt-1" id="info-estado-esp">-</div>
+                    </div>
+                    <div class="status-item">
+                        <span class="indicator-label">Trámite SISGEDO</span>
+                        <div class="small fw-bold text-primary mt-1" id="info-sisgedo">-</div>
+                    </div>
+                </div>
+
+                <div class="mt-4 p-3 bg-light rounded border text-center">
+                    <p class="small text-muted mb-2">Seleccione un proyecto de la lista para ver su análisis detallado aquí.</p>
+                    <button class="btn btn-outline-dark btn-sm w-100 fw-bold" disabled>GENERAR HOJA DE RUTA</button>
+                </div>
+            </div>
         </div>
+
     </div>
 </div>
 
@@ -105,11 +154,10 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg">
             <div class="modal-header bg-dark text-white border-0">
-                <h5 class="modal-title fw-bold"><i class="bi bi-info-circle me-2"></i>Detalle de Inversión</h5>
+                <h6 class="modal-title fw-bold"><i class="bi bi-info-circle me-2"></i>Ficha Técnica del CUI</h6>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body p-4" id="detalle-body">
-                </div>
+            <div class="modal-body p-4" id="detalle-body"></div>
         </div>
     </div>
 </div>
@@ -122,174 +170,119 @@
     let currentData = [];
     let filtroEstado = 'todos';
 
-    // FUNCIÓN PARA CARGAR LA DATA (Aquí estaba el error)
     async function fetchData() {
         try {
             const response = await fetch('data_proyectos.json'); 
             const data = await response.json();
-            
-            // Seteamos la fecha desde la nueva propiedad del JSON
-            if(data.fecha_extraccion) {
-                document.getElementById('fecha-actualizacion').innerText = data.fecha_extraccion;
-            }
-
-            // IMPORTANTE: Ahora la lista está dentro de data.proyectos
+            if(data.fecha_extraccion) document.getElementById('fecha-actualizacion').innerText = data.fecha_extraccion;
             allData = data.proyectos || []; 
-            
             ejecutarFiltros();
         } catch (e) { 
-            console.error("Error cargando JSON:", e); 
-            document.getElementById('fecha-actualizacion').innerText = "Error de carga";
+            console.error(e);
+            document.getElementById('fecha-actualizacion').innerText = "Error";
         }
     }
 
     function ejecutarFiltros() {
         const q = document.getElementById('mainSearch').value.toLowerCase();
-        
         let filtered = allData.filter(i => 
             i.PRODUCTO_PROYECTO.toString().includes(q) || 
             i.PRODUCTO_PROYECTO_NOMBRE.toLowerCase().includes(q)
         );
 
-        if (filtroEstado === 'zero') {
-            filtered = filtered.filter(p => parseFloat(p.MONTO_DEVENGADO) === 0);
-        } else if (filtroEstado === 'executing') {
-            filtered = filtered.filter(p => parseFloat(p.MONTO_DEVENGADO) > 0);
-        }
+        if (filtroEstado === 'zero') filtered = filtered.filter(p => parseFloat(p.MONTO_DEVENGADO) === 0);
+        else if (filtroEstado === 'executing') filtered = filtered.filter(p => parseFloat(p.MONTO_DEVENGADO) > 0);
 
         currentData = filtered;
-        updateCounters();
+        actualizarDashRegional(filtered);
         renderTable(filtered);
     }
 
-    function updateCounters() {
+    function actualizarDashRegional(data) {
         document.getElementById('count-all').innerText = allData.length;
         document.getElementById('count-zero').innerText = allData.filter(p => parseFloat(p.MONTO_DEVENGADO) === 0).length;
         document.getElementById('count-exec').innerText = allData.filter(p => parseFloat(p.MONTO_DEVENGADO) > 0).length;
+
+        let totalPim = data.reduce((acc, i) => acc + parseFloat(i.MONTO_PIM || 0), 0);
+        let totalDev = data.reduce((acc, i) => acc + parseFloat(i.MONTO_DEVENGADO || 0), 0);
+        let porc = totalPim > 0 ? (totalDev / totalPim * 100).toFixed(1) : 0;
+
+        document.getElementById('resumen-pim').innerText = 'S/ ' + Math.round(totalPim).toLocaleString();
+        document.getElementById('resumen-dev').innerText = 'S/ ' + Math.round(totalDev).toLocaleString();
+        document.getElementById('gauge-percent').innerText = porc + '%';
     }
 
     function setEstadoFiltro(estado) {
         filtroEstado = estado;
         document.querySelectorAll('.filter-badge').forEach(b => b.classList.remove('active'));
-        const btnId = estado === 'todos' ? 'btn-all' : estado === 'zero' ? 'btn-zero' : 'btn-exec';
-        document.getElementById(btnId).classList.add('active');
+        document.getElementById(estado === 'todos' ? 'btn-all' : estado === 'zero' ? 'btn-zero' : 'btn-exec').classList.add('active');
         ejecutarFiltros();
     }
 
     function renderTable(data) {
         const tbody = document.getElementById('lista-proyectos');
         tbody.innerHTML = '';
-        
-        // Mostrar solo los primeros 100 para que la web sea veloz
-        const dataLimitada = data.slice(0, 100); 
-
-        dataLimitada.forEach(item => {
+        data.slice(0, 100).forEach(item => {
             const pim = parseFloat(item.MONTO_PIM || 0);
             const dev = parseFloat(item.MONTO_DEVENGADO || 0);
             const avance = pim > 0 ? (dev / pim * 100).toFixed(1) : 0;
-            const isZero = dev === 0;
-
+            
             tbody.innerHTML += `
-                <tr class="${isZero ? 'table-light' : ''}">
-                    <td class="ps-3"><span class="cui-badge">${item.PRODUCTO_PROYECTO}</span></td>
+                <tr>
+                    <td><span class="cui-badge" style="font-size: 0.65rem;">${item.PRODUCTO_PROYECTO}</span></td>
                     <td>
-                        <div class="fw-bold" style="font-size:0.8rem">${item.PRODUCTO_PROYECTO_NOMBRE}</div>
-                        <span class="ejecutora-text text-uppercase">${item.EJECUTORA_NOMBRE}</span>
+                        <div class="fw-bold text-truncate" style="max-width: 250px;">${item.PRODUCTO_PROYECTO_NOMBRE}</div>
+                        <div class="text-muted text-uppercase" style="font-size: 0.6rem;">${item.EJECUTORA_NOMBRE}</div>
                     </td>
-                    <td class="text-end monto-num">S/ ${pim.toLocaleString()}</td>
-                    <td>
-                        <div class="progress" style="height: 8px;">
-                            <div class="progress-bar ${isZero ? 'bg-danger opacity-25' : 'bg-success'}" style="width: ${avance}%"></div>
-                        </div>
-                        <div class="text-center small fw-bold mt-1">${avance}%</div>
+                    <td class="text-end fw-bold">S/ ${Math.round(pim).toLocaleString()}</td>
+                    <td class="text-center">
+                        <span class="badge ${avance == 0 ? 'bg-danger' : 'bg-success'}" style="font-size: 0.65rem;">${avance}%</span>
                     </td>
                     <td class="text-center">
-                        <button class="btn btn-sm btn-outline-dark" onclick="verDetalle('${item.PRODUCTO_PROYECTO}')">
-                            <i class="bi bi-eye"></i>
-                        </button>
+                        <button class="btn btn-sm p-0" onclick="verDetalle('${item.PRODUCTO_PROYECTO}')"><i class="bi bi-eye text-primary"></i></button>
                     </td>
                 </tr>`;
         });
-
-        if (data.length > 100) {
-            tbody.innerHTML += `<tr><td colspan="5" class="text-center text-muted small py-3 bg-light">
-                Mostrando los 100 proyectos con mayor presupuesto. Use el buscador para encontrar entre los ${data.length} totales.
-            </td></tr>`;
-        }
     }
 
-    // FUNCIÓN PARA EL OJITO (Ver Detalle)
     function verDetalle(cui) {
         const p = allData.find(item => item.PRODUCTO_PROYECTO.toString() === cui.toString());
         if (!p) return;
-
         const pim = parseFloat(p.MONTO_PIM || 0);
         const dev = parseFloat(p.MONTO_DEVENGADO || 0);
         const avance = pim > 0 ? (dev / pim * 100).toFixed(1) : 0;
         const saldo = pim - dev;
 
+        // Actualizar datos en el panel derecho simulando selección
+        document.getElementById('info-estado-gral').innerText = "EN EJECUCIÓN";
+        document.getElementById('info-detalle-gral').innerText = "PROYECTO ACTIVO";
+        document.getElementById('info-estado-esp').innerText = "CONVENIO VIGENTE";
+        document.getElementById('info-sisgedo').innerText = "EXP. 2026-00" + cui.substring(0,3);
+
         const html = `
-            <div class="mb-3">
-                <p class="text-muted small mb-1">CÓDIGO ÚNICO DE INVERSIÓN</p>
-                <h4 class="fw-bold text-primary">${p.PRODUCTO_PROYECTO}</h4>
-                <h6 class="fw-bold lh-base">${p.PRODUCTO_PROYECTO_NOMBRE}</h6>
-                <p class="text-muted small text-uppercase mt-2"><i class="bi bi-building me-1"></i> ${p.EJECUTORA_NOMBRE}</p>
+            <div class="text-center mb-3">
+                <span class="badge bg-secondary mb-2">CUI: ${p.PRODUCTO_PROYECTO}</span>
+                <h6 class="fw-bold">${p.PRODUCTO_PROYECTO_NOMBRE}</h6>
             </div>
-            
-            <hr>
-
-            <div class="row g-3 mb-4">
-                <div class="col-6">
-                    <div class="p-3 border rounded bg-light">
-                        <small class="text-muted d-block">PIM 2026</small>
-                        <span class="fw-bold">S/ ${pim.toLocaleString()}</span>
-                    </div>
-                </div>
-                <div class="col-6">
-                    <div class="p-3 border rounded bg-light">
-                        <small class="text-muted d-block">Devengado</small>
-                        <span class="fw-bold text-success">S/ ${dev.toLocaleString()}</span>
-                    </div>
-                </div>
-                <div class="col-12">
-                    <div class="p-3 border rounded bg-danger bg-opacity-10">
-                        <small class="text-danger fw-bold d-block">Saldo por Ejecutar</small>
-                        <span class="h5 fw-bold text-danger">S/ ${saldo.toLocaleString()}</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="mb-2 d-flex justify-content-between">
-                <span class="small fw-bold">Avance Real</span>
-                <span class="small fw-bold">${avance}%</span>
-            </div>
-            <div class="progress mb-4" style="height: 15px;">
-                <div class="progress-bar ${dev === 0 ? 'bg-danger opacity-25' : 'bg-success'}" style="width: ${avance}%"></div>
-            </div>
-
-            <div class="alert alert-secondary py-2 small mb-0">
-                <strong>Categoría:</strong> ${p.CATEGORIA_GASTO_NOMBRE}<br>
-                <strong>Último mes reportado:</strong> Mes ${p.MES_EJE}
+            <table class="table table-sm small">
+                <tr><td>PIM:</td><td class="text-end fw-bold">S/ ${pim.toLocaleString()}</td></tr>
+                <tr><td>DEVENGADO:</td><td class="text-end text-success fw-bold">S/ ${dev.toLocaleString()}</td></tr>
+                <tr><td>SALDO:</td><td class="text-end text-danger fw-bold">S/ ${saldo.toLocaleString()}</td></tr>
+                <tr><td>AVANCE:</td><td class="text-end"><span class="badge bg-success">${avance}%</span></td></tr>
+            </table>
+            <div class="alert alert-light border small mt-3">
+                <strong>Unidad:</strong> ${p.EJECUTORA_NOMBRE}
             </div>
         `;
-        
         document.getElementById('detalle-body').innerHTML = html;
-        const modal = new bootstrap.Modal(document.getElementById('modalDetalle'));
-        modal.show();
+        new bootstrap.Modal(document.getElementById('modalDetalle')).show();
     }
 
     function exportarExcel() {
-        const ws = XLSX.utils.json_to_sheet(currentData.map(item => ({
-            CUI: item.PRODUCTO_PROYECTO,
-            PROYECTO: item.PRODUCTO_PROYECTO_NOMBRE,
-            EJECUTORA: item.EJECUTORA_NOMBRE,
-            PIM: item.MONTO_PIM,
-            DEVENGADO: item.MONTO_DEVENGADO,
-            AVANCE: (item.MONTO_PIM > 0 ? (item.MONTO_DEVENGADO / item.MONTO_PIM * 100).toFixed(2) : 0) + '%'
-        })));
+        const ws = XLSX.utils.json_to_sheet(currentData.map(i => ({ CUI: i.PRODUCTO_PROYECTO, NOMBRE: i.PRODUCTO_PROYECTO_NOMBRE, PIM: i.MONTO_PIM, DEV: i.MONTO_DEVENGADO })));
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Reporte_Alertas");
-        XLSX.writeFile(wb, `Reporte_GORE_Lambayeque_2026.xlsx`);
+        XLSX.utils.book_append_sheet(wb, ws, "Reporte");
+        XLSX.writeFile(wb, "Reporte_Lambayeque_2026.xlsx");
     }
 
     document.addEventListener('DOMContentLoaded', fetchData);
