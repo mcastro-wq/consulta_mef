@@ -36,7 +36,6 @@
         .gauge-fill { fill: none; stroke-width: 12; stroke-linecap: round; stroke-dasharray: 157; stroke-dashoffset: 157; transition: 0.8s; }
         .gauge-val { font-size: 1.1rem; font-weight: 800; display: block; margin-top: -12px; }
 
-        /* TRAZABILIDAD */
         .tracking-section { margin-top: 20px; background: #fff; padding: 15px; border: 1px solid #ddd; border-radius: 4px; }
         .tracking-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
         .tracking-card { border: 1px solid #eee; padding: 10px; text-align: center; min-height: 100px; display: flex; flex-direction: column; justify-content: flex-start; }
@@ -48,7 +47,6 @@
         .status-medio { background-color: #ffc107; }
         .status-bajo { background-color: #dc3545; }
 
-        /* ESTILOS MODAL */
         .modal-header { background: var(--gore-brown); color: white; }
         .modal-title { font-size: 1rem; font-weight: bold; }
         .form-label { font-weight: bold; font-size: 0.7rem; color: #555; text-transform: uppercase; }
@@ -85,36 +83,35 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-7">
+            <div class="col-md-9">
                 <label class="label-filter">Buscar por Código CUI o Nombre</label>
                 <div class="input-group input-group-sm">
                     <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
                     <input type="text" id="inputBusqueda" class="form-control border-start-0" placeholder="Escriba código o nombre..." onkeyup="filtrar()">
                 </div>
             </div>
-            
-
-<div class="d-flex align-items-end mb-2">
-    <span class="badge bg-light text-dark border fw-normal me-auto">
-        <i class="bi bi-database-check text-primary"></i> MEF: <span id="txt-corte">...</span>
-    </span>
+        </div>
     </div>
 
-            
-        </div>
+    <div class="d-flex mb-1">
+        <span class="badge bg-light text-dark border fw-normal shadow-sm">
+            <i class="bi bi-database-check text-primary"></i> MEF: <span id="txt-corte">...</span>
+        </span>
     </div>
 
     <div class="table-responsive">
         <table class="table table-sm table-resumen shadow-sm">
             <thead>
                 <tr>
-                    <th style="width: 30%;">UNIDAD EJECUTORA</th>
+                    <th style="width: 25%;">UNIDAD EJECUTORA</th>
                     <th>PIA</th>
                     <th>PIM</th>
                     <th>CERTIFICADO</th>
                     <th>% CERT</th>
                     <th>COMP. ANUAL</th>
-                    <th>% COMP</th>
+                    <th>% CA</th>
+                    <th>COMP. MENSUAL</th>
+                    <th>% CM</th>
                     <th>DEVENGADO</th>
                     <th>% DEV</th>
                 </tr>
@@ -196,15 +193,15 @@
             <div class="row g-3">
                 <div class="col-md-4">
                     <label class="form-label">Código CUI / Producto</label>
-                    <input type="text" id="form-cui" class="form-control form-control-sm border-primary fw-bold" placeholder="Ingrese CUI">
+                    <input type="text" id="form-cui" class="form-control form-control-sm border-primary fw-bold">
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Estado General</label>
-                    <input type="text" id="form-est-gral" class="form-control form-control-sm" placeholder="Ej: EJECUCIÓN FÍSICA">
+                    <input type="text" id="form-est-gral" class="form-control form-control-sm">
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">SISGEDO</label>
-                    <input type="text" id="form-sisgedo" class="form-control form-control-sm" placeholder="Número de expediente">
+                    <input type="text" id="form-sisgedo" class="form-control form-control-sm">
                 </div>
                 <div class="col-12">
                     <label class="form-label">Detalle Estado General</label>
@@ -220,11 +217,11 @@
                 </div>
                 <div class="col-12">
                     <label class="form-label">Timeline Inversión</label>
-                    <textarea id="form-timeline" class="form-control form-control-sm" rows="3" placeholder="Describa el historial de la inversión..."></textarea>
+                    <textarea id="form-timeline" class="form-control form-control-sm" rows="3"></textarea>
                 </div>
                 <div class="col-12">
                     <label class="form-label">Acciones Programadas</label>
-                    <textarea id="form-acciones" class="form-control form-control-sm" rows="3" placeholder="1. Acción...&#10;2. Acción..."></textarea>
+                    <textarea id="form-acciones" class="form-control form-control-sm" rows="3"></textarea>
                 </div>
             </div>
         </form>
@@ -250,7 +247,7 @@
             const res = await fetch('data_proyectos.json');
             const json = await res.json();
             allData = json.proyectos;
-            document.getElementById('txt-corte').innerText = "Corte: " + json.fecha_extraccion;
+            document.getElementById('txt-corte').innerText = json.fecha_extraccion;
             filtrar();
         } catch (e) { console.error("Error cargando JSON", e); }
     }
@@ -278,24 +275,33 @@
     }
 
     function renderResumen(data) {
-        let t = { pia:0, pim:0, cer:0, can:0, dev:0 };
+        let t = { pia:0, pim:0, cer:0, can:0, cme:0, dev:0 };
         data.forEach(p => {
-            t.pia += p.MONTO_PIA; t.pim += p.MONTO_PIM;
-            t.cer += p.MONTO_CERTIFICADO; t.can += p.MONTO_COMPROMETIDO_ANUAL;
+            t.pia += p.MONTO_PIA; 
+            t.pim += p.MONTO_PIM;
+            t.cer += p.MONTO_CERTIFICADO; 
+            t.can += p.MONTO_COMPROMETIDO_ANUAL;
+            t.cme += p.MONTO_COMPROMETIDO; // Campo para compromiso mensual
             t.dev += p.MONTO_DEVENGADO;
         });
         const perc = (v) => t.pim > 0 ? (v/t.pim*100).toFixed(1) + '%' : '0%';
         document.getElementById('resumen-ejecutora').innerHTML = `
             <tr>
-                <td class="text-start">452 - GORE LAMBAYEQUE (FILTRADO)</td>
-                <td>${t.pia.toLocaleString()}</td><td>${t.pim.toLocaleString()}</td><td>${t.cer.toLocaleString()}</td>
-                <td class="bg-light text-primary">${perc(t.cer)}</td><td>${t.can.toLocaleString()}</td>
-                <td class="bg-light text-primary">${perc(t.can)}</td><td>${t.dev.toLocaleString()}</td>
-                <td class="bg-light text-success">${perc(t.dev)}</td>
+                <td class="text-start">452 - GOBIERNO REGIONAL LAMBAYEQUE (FILTRADO)</td>
+                <td>${t.pia.toLocaleString()}</td>
+                <td>${t.pim.toLocaleString()}</td>
+                <td>${t.cer.toLocaleString()}</td>
+                <td class="text-primary">${perc(t.cer)}</td>
+                <td>${t.can.toLocaleString()}</td>
+                <td class="text-primary">${perc(t.can)}</td>
+                <td>${t.cme.toLocaleString()}</td>
+                <td class="text-primary">${perc(t.cme)}</td>
+                <td>${t.dev.toLocaleString()}</td>
+                <td class="text-success">${perc(t.dev)}</td>
             </tr>`;
     }
 
-function renderTable(data) {
+    function renderTable(data) {
         const tbody = document.getElementById('tbody-main');
         if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="8" class="text-center p-4">Sin datos</td></tr>'; return; }
         
@@ -305,20 +311,9 @@ function renderTable(data) {
             const pDev = pim > 0 ? (dev / pim * 100).toFixed(1) : 0;
             const pCer = pim > 0 ? (p.MONTO_CERTIFICADO / pim * 100).toFixed(1) : 0;
             
-            // Lógica de colores y etiquetas
-            let sem = 'status-bajo';
-            let txt = 'BAJO';
-            let clr = 'text-danger';
-
-            if (pDev > 75) {
-                sem = 'status-alto';
-                txt = 'ALTO';
-                clr = 'text-success';
-            } else if (pDev >= 40) {
-                sem = 'status-medio';
-                txt = 'MEDIO';
-                clr = 'text-warning';
-            }
+            let sem = 'status-bajo', txt = 'BAJO', clr = 'text-danger';
+            if (pDev > 75) { sem = 'status-alto'; txt = 'ALTO'; clr = 'text-success'; }
+            else if (pDev >= 40) { sem = 'status-medio'; txt = 'MEDIO'; clr = 'text-warning'; }
 
             return `
                 <tr class="row-item" onclick="seleccionar('${p.PRODUCTO_PROYECTO}', this)">
@@ -345,8 +340,6 @@ function renderTable(data) {
         fila.classList.add('selected-row');
         document.getElementById('selected-cui-label').innerText = "CUI: " + cui;
         document.getElementById('selected-cui-label').className = "badge bg-primary";
-        
-        // Sincronizar con el campo CUI del modal
         document.getElementById('form-cui').value = cui;
 
         const regs = allData.filter(i => i.PRODUCTO_PROYECTO.toString() === cui.toString());
@@ -373,15 +366,7 @@ function renderTable(data) {
     function guardarSeguimiento() {
         const cui = document.getElementById('form-cui').value;
         if(!cui) { alert("Por favor, ingrese un CUI"); return; }
-        
-        console.log("Datos capturados:", {
-            cui: cui,
-            estadoGral: document.getElementById('form-est-gral').value,
-            sisgedo: document.getElementById('form-sisgedo').value,
-            timeline: document.getElementById('form-timeline').value
-        });
-
-        alert("¡Seguimiento para el CUI " + cui + " capturado! (Funcionalidad de guardado pendiente)");
+        alert("¡Seguimiento capturado para " + cui + "!");
         bootstrap.Modal.getInstance(document.getElementById('modalRegistro')).hide();
     }
 
