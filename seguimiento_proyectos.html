@@ -252,11 +252,11 @@
 
     // 1. Diccionario con los IDs exactos que proporcionaste
 const MEF_RESOURCES = {
-    "2025": "749cb9b6-604f-485b-bb06-4b906b44034f",
-    "2024": "cb6d4f8b-94b3-4f7e-ae6d-3d6ee75e03e8",
-    "2023": "759d6b36-2582-4486-ae61-dc0311462bb7",
-    "2022": "f075d8af-1352-4f16-a3da-61f45fa4d502",
-    "2021": "5b3d4d5c-abeb-49f6-9e37-c7d8d1162cb5"
+    "2025": "35bdc5b5-017c-42c1-ba20-8820bf1248b7",
+    "2024": "0b938fa8-f18c-4685-88ae-a9d7e392cafa",
+    "2023": "9e9a6d67-2687-4056-9b59-e170b945182f",
+    "2022": "1904862a-a8c8-4b0f-ae2e-49e577996588",
+    "2021": "f87e302c-bc93-4dd3-bfb0-60df1d6bf41c"
 };
 
     
@@ -271,44 +271,55 @@ async function fetchData(anio = "2026") {
 
     try {
         let rawRecords = [];
+        
         if (anio === "2026") {
+            // Tu carga local para el año actual
             const res = await fetch('data_proyectos.json');
             const json = await res.json();
             rawRecords = json.proyectos;
-            document.getElementById('txt-corte').innerText = "LOCAL: " + json.fecha_extraccion;
+            document.getElementById('txt-corte').innerText = "LOCAL: " + (json.fecha_extraccion || '2026');
         } else {
+            // Consulta SQL a la API del MEF usando el diccionario de datos proporcionado
             const resourceId = MEF_RESOURCES[anio];
-            // Filtramos por la Ejecutora 452 (Gore Lambayeque) que es constante en el tiempo
-            const sql = `SELECT * FROM "${resourceId}" WHERE "EJECUTORA" = '452'`;
+            // Filtramos por SEC_EJEC '452' (GORE Lambayeque)
+            const sql = `SELECT * FROM "${resourceId}" WHERE "SEC_EJEC" = '452'`;
             const url = `https://api.datosabiertos.mef.gob.pe/DatosAbiertos/v1/datastore_search_sql?sql=${encodeURIComponent(sql)}`;
 
             const res = await fetch(url);
             const json = await res.json();
+            
             if (json.success) {
                 rawRecords = json.result.records;
-                document.getElementById('txt-corte').innerText = "API MEF - HISTÓRICO " + anio;
+                document.getElementById('txt-corte').innerText = "API MEF - " + anio;
             }
         }
 
-        // --- PROCESO DE VERIFICACIÓN Y NORMALIZACIÓN ---
-        allData = rawRecords.map(r => ({
-            // Mapeamos los campos para que coincidan con lo que tu tabla ya usa
-            PRODUCTO_PROYECTO: r.PRODUCTO_PROYECTO || r.PRODUCTO_PROYECTO_CODIGO || "",
-            PRODUCTO_PROYECTO_NOMBRE: r.PRODUCTO_PROYECTO_NOMBRE || r.NOMBRE_INVERSION || "",
-            TIPO: (r.TIPO || "").toUpperCase(),
-            MONTO_PIA: parseFloat(r.MONTO_PIA || 0),
-            MONTO_PIM: parseFloat(r.MONTO_PIM || 0),
-            MONTO_CERTIFICADO: parseFloat(r.MONTO_CERTIFICADO || 0),
-            MONTO_COMPROMETIDO_ANUAL: parseFloat(r.MONTO_COMPROMETIDO_ANUAL || 0),
-            MONTO_COMPROMETIDO: parseFloat(r.MONTO_COMPROMETIDO || 0),
-            MONTO_DEVENGADO: parseFloat(r.MONTO_DEVENGADO || 0),
-            MONTO_GIRADO: parseFloat(r.MONTO_GIRADO || 0)
-        }));
+        // --- NORMALIZACIÓN BASADA EN TU DICCIONARIO ---
+        allData = rawRecords.map(r => {
+            // Determinamos si es PROYECTO o ACTIVIDAD basado en el campo TIPO_ACT_PROY_NOMBRE
+            // En el MEF: 2 usualmente es Proyecto, 3 es Actividad (pero usamos el nombre para seguridad)
+            const tipoNombre = (r.TIPO_ACT_PROY_NOMBRE || "").toUpperCase();
+            const esProyecto = tipoNombre.includes("PROYECTO") || tipoNombre.includes("INVERSION");
 
-        filtrar();
+            return {
+                CUI: r.PRODUCTO_PROYECTO,
+                NOMBRE: r.PRODUCTO_PROYECTO_NOMBRE,
+                TIPO: esProyecto ? "PROYECTO" : "ACTIVIDAD",
+                PIA: parseFloat(r.MONTO_PIA || 0),
+                PIM: parseFloat(r.MONTO_PIM || 0),
+                CERTIFICADO: parseFloat(r.MONTO_CERTIFICADO || 0),
+                COMPROMISO_ANUAL: parseFloat(r.MONTO_COMPROMETIDO_ANUAL || 0),
+                DEVENGADO: parseFloat(r.MONTO_DEVENGADO || 0),
+                GIRADO: parseFloat(r.MONTO_GIRADO || 0)
+            };
+        });
+
+        // Una vez normalizado, ejecutamos el filtro y dibujo de tabla
+        filtrar(); 
+
     } catch (e) {
-        console.error("Error en verificación:", e);
-        document.getElementById('txt-corte').innerText = "ERROR DE SINCRONIZACIÓN";
+        console.error("Error cargando datos del MEF:", e);
+        document.getElementById('txt-corte').innerText = "ERROR DE CONEXIÓN";
     } finally {
         if(overlay) overlay.style.display = 'none';
     }
