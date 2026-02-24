@@ -3,168 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Historial de Gestión - GORE</title>
-    
+    <title>Historial GORE Lambayeque</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
     <style>
-        :root { --gore-brown: #7a3321; }
-        body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        
-        .header-simple { background: var(--gore-brown); color: white; padding: 15px 0; border-bottom: 4px solid #d35400; }
-        .content-card { background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 20px; margin-top: 20px; }
-        
-        /* Estilo de Tabla Sencilla */
-        .table { font-size: 0.88rem; }
-        .table thead th { 
-            background-color: #f2f2f2; 
-            cursor: pointer; 
-            text-transform: uppercase; 
-            font-size: 0.75rem; 
-            color: #555;
-            vertical-align: middle;
-        }
-        .table thead th:hover { background-color: #e9ecef; }
-        .badge-cui { background-color: var(--gore-brown); color: white; font-weight: 500; }
-        .fecha-col { color: #666; font-weight: bold; min-width: 140px; }
+        :root { --gore: #7a3321; }
+        body { background: #f4f7f6; font-size: 0.9rem; }
+        .table-container { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        thead { background: #f8f9fa; }
+        th { color: var(--gore); cursor: pointer; text-transform: uppercase; font-size: 0.75rem; }
+        .btn-excel { background: #1d6f42; color: white; border: none; }
+        .btn-excel:hover { background: #155a35; color: white; }
     </style>
 </head>
 <body>
 
-<div class="header-simple">
-    <div class="container d-flex justify-content-between align-items-center">
-        <h4 class="m-0"><i class="bi bi-table me-2"></i> HISTORIAL DE GESTIÓN</h4>
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold" style="color: var(--gore)"><i class="bi bi-clock-history"></i> HISTORIAL DE TRAZABILIDAD</h3>
         <div class="d-flex gap-2">
-            <button class="btn btn-success btn-sm px-3" onclick="exportarExcel()">
-                <i class="bi bi-file-earmark-excel"></i> Excel
-            </button>
-            <a href="index.html" class="btn btn-warning btn-sm fw-bold">Volver</a>
+            <button onclick="exportarExcel()" class="btn btn-excel btn-sm px-3"><i class="bi bi-file-earmark-excel"></i> Exportar</button>
+            <a href="index.html" class="btn btn-secondary btn-sm">Volver</a>
         </div>
     </div>
-</div>
 
-<div class="container-fluid px-4">
-    <div class="content-card">
+    <div class="table-container">
         <div class="row mb-3">
             <div class="col-md-4">
-                <div class="input-group">
-                    <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
-                    <input type="text" id="inputBusqueda" class="form-control" placeholder="Buscar por CUI o Nombre..." onkeyup="ejecutarFiltro()">
-                </div>
-            </div>
-            <div class="col text-end">
-                <small class="text-muted" id="totalRegistros">Cargando datos...</small>
+                <input type="text" id="buscador" class="form-control form-control-sm" placeholder="Buscar por CUI o Palabra Clave..." onkeyup="filtrar()">
             </div>
         </div>
 
         <div class="table-responsive">
-            <table class="table table-hover table-bordered" id="tablaDatos">
+            <table class="table table-sm table-hover table-bordered" id="tablaHistorial">
                 <thead>
                     <tr>
-                        <th onclick="ordenarTabla(0)">Fecha Registro <i class="bi bi-arrow-down-up ms-1"></i></th>
-                        <th onclick="ordenarTabla(1)">CUI <i class="bi bi-arrow-down-up ms-1"></i></th>
-                        <th onclick="ordenarTabla(2)">Estado Gral.</th>
-                        <th>Detalle de Gestión</th>
+                        <th onclick="ordenar(0)">Fecha Registro</th>
+                        <th onclick="ordenar(1)">CUI</th>
+                        <th onclick="ordenar(2)">Estado Gral</th>
+                        <th>Detalle Gestión</th>
                         <th>Estado Específico</th>
-                        <th>Acciones / Timeline</th>
+                        <th>Timeline Inversión</th>
+                        <th>Acciones</th>
                         <th>SISGEDO</th>
                     </tr>
                 </thead>
-                <tbody id="cuerpoTabla">
-                    </tbody>
+                <tbody id="res-body">
+                    <tr><td colspan="8" class="text-center">Cargando datos...</td></tr>
+                </tbody>
             </table>
         </div>
     </div>
 </div>
 
 <script>
-    let datosOriginales = [];
-    const urlApi = 'https://script.google.com/macros/s/AKfycbzJ8wJlhZ9w-aAtl_1bsZPyy9OhnFp_cB4Sa_Ovt-hijyN8MS-dloEU8cChQIxTD2bG/exec';
+    let rawData = [];
+    const url = 'https://script.google.com/macros/s/AKfycbwwVZjEMpICtkt-EFsLJ2mg9V7NPfHd5cpWfj2LbLCn3M3MKKvHVu3c4RWOFWwHgR3Z/exec';
 
-    async function obtenerDatos() {
-        const cuerpo = document.getElementById('cuerpoTabla');
+    async function cargar() {
         try {
-            const respuesta = await fetch(`${urlApi}?modo=todo`);
-            const json = await respuesta.json();
-            
-            if (json.status === "success") {
-                datosOriginales = json.data;
-                // Ordenar por fecha automáticamente (más reciente primero)
-                datosOriginales.sort((a, b) => new Date(b.fecha_registro) - new Date(a.fecha_registro));
-                renderizarTabla(datosOriginales);
+            const r = await fetch(url + "?modo=todo");
+            const res = await r.json();
+            if(res.status === "success") {
+                rawData = res.data;
+                renderizar(rawData);
             }
-        } catch (error) {
-            cuerpo.innerHTML = `<tr><td colspan="7" class="text-center text-danger">Error: No se pudo conectar con la base de datos.</td></tr>`;
+        } catch(e) { 
+            document.getElementById('res-body').innerHTML = '<tr><td colspan="8" class="text-center text-danger">Error de conexión</td></tr>';
         }
     }
 
-    function renderizarTabla(lista) {
-        const cuerpo = document.getElementById('cuerpoTabla');
-        document.getElementById('totalRegistros').innerText = `Total: ${lista.length} registros`;
-        
-        cuerpo.innerHTML = lista.map(item => `
+    function renderizar(datos) {
+        const body = document.getElementById('res-body');
+        body.innerHTML = datos.map(item => `
             <tr>
-                <td class="fecha-col">${formatearFecha(item.fecha_registro)}</td>
-                <td><span class="badge badge-cui">${item.codigo_cui || ''}</span></td>
-                <td class="fw-bold text-uppercase" style="color:#d35400">${item.estado_general || ''}</td>
-                <td style="max-width:300px"><small>${item.detalle_estado_general || '-'}</small></td>
+                <td class="fw-bold text-muted">${item.fecha_registro || 'N/R'}</td>
+                <td class="fw-bold">${item.codigo_cui || ''}</td>
+                <td class="text-uppercase fw-bold text-danger">${item.estado_general || ''}</td>
+                <td><small>${item.detalle_estado_general || ''}</small></td>
                 <td>
                     <div class="fw-bold text-primary">${item.estado_especifico || ''}</div>
-                    <div class="text-muted" style="font-size:0.7rem">${item.detalle_estado_especifico || ''}</div>
+                    <small class="text-muted">${item.detalle_estado_especifico || ''}</small>
                 </td>
-                <td>
-                    <div class="text-success small fw-bold">ACCIONES: ${item.acciones_programadas || '-'}</div>
-                    <div class="text-secondary small">TIMELINE: ${item.timeline_inversion || '-'}</div>
-                </td>
-                <td class="fw-bold text-center">${item.sisgedo || '-'}</td>
+                <td class="text-info fw-bold"><small>${item.timeline_inversion || '-'}</small></td>
+                <td><small>${item.acciones_programadas || ''}</small></td>
+                <td class="text-center fw-bold">${item.sisgedo || '-'}</td>
             </tr>
         `).join('');
     }
 
-    function formatearFecha(isoStr) {
-        if (!isoStr) return '---';
-        try {
-            const d = new Date(isoStr);
-            if (isNaN(d.getTime())) return isoStr; 
-            return d.toLocaleDateString('es-PE') + ' ' + d.toLocaleTimeString('es-PE', {hour: '2-digit', minute:'2-digit'});
-        } catch(e) { return isoStr; }
+    function filtrar() {
+        const q = document.getElementById('buscador').value.toLowerCase();
+        const f = rawData.filter(i => Object.values(i).some(v => String(v).toLowerCase().includes(q)));
+        renderizar(f);
     }
 
-    function ejecutarFiltro() {
-        const busqueda = document.getElementById('inputBusqueda').value.toLowerCase();
-        const filtrados = datosOriginales.filter(item => 
-            String(item.codigo_cui).includes(busqueda) || 
-            String(item.detalle_estado_general).toLowerCase().includes(busqueda) ||
-            String(item.estado_general).toLowerCase().includes(busqueda)
-        );
-        renderizarTabla(filtrados);
-    }
-
-    // Exportación a Excel
     function exportarExcel() {
-        const hoja = XLSX.utils.json_to_sheet(datosOriginales);
-        const libro = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(libro, hoja, "Historial");
-        XLSX.writeFile(libro, "Historial_GORE_Lambayeque.xlsx");
+        const ws = XLSX.utils.json_to_sheet(rawData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Historial");
+        XLSX.writeFile(wb, "Reporte_GORE.xlsx");
     }
 
-    // Ordenamiento Sencillo
+    // Orden simple
     let asc = true;
-    function ordenarTabla(colIndex) {
-        const claves = ['fecha_registro', 'codigo_cui', 'estado_general'];
-        const clave = claves[colIndex];
+    function ordenar(col) {
+        const keys = ['fecha_registro', 'codigo_cui', 'estado_general'];
         asc = !asc;
-        datosOriginales.sort((a, b) => {
-            if (a[clave] < b[clave]) return asc ? -1 : 1;
-            if (a[clave] > b[clave]) return asc ? 1 : -1;
-            return 0;
-        });
-        renderizarTabla(datosOriginales);
+        rawData.sort((a,b) => (a[keys[col]] > b[keys[col]] ? (asc?1:-1) : (asc?-1:1)));
+        renderizar(rawData);
     }
 
-    window.onload = obtenerDatos;
+    window.onload = cargar;
 </script>
 </body>
 </html>
