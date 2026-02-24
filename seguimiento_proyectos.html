@@ -410,25 +410,23 @@
     }
 
 
-function guardarSeguimiento() {
-    const urlApi = 'https://script.google.com/macros/s/AKfycbxwYHnLMHEDyCrCd-YoJ2dCJNhxexdm4WeqFPzGKyS_jHEOHgjkaaWpWLpNPjlTLb-r/exec';
+function guardarSeguimiento(event) { // <--- Agregamos 'event' aquí
+    const urlApi = 'https://script.google.com/macros/s/AKfycby00hg_TS_IOQ0oWPAt8-1cTbad_tree-TKAozfzNpM_y6_RLxN-WNxym6ikEOADwCv/exec';
     
-    // Función auxiliar vinculada a los IDs REALES de tu HTML
     const getVal = (id) => {
         const el = document.getElementById(id);
         return el ? el.value : "";
     };
 
-    // Mapeo corregido según tu <form id="formSeguimiento">
     const datos = {
-        cui: getVal('form-cui'),          // Antes decías 'codigo_cui'
-        estado_g: getVal('form-est-gral'), // Antes decías 'estado_general'
+        cui: getVal('form-cui'),
+        estado_g: getVal('form-est-gral'),
         sisgedo: getVal('form-sisgedo'),
-        detalle_g: getVal('form-det-gral'), // Antes decías 'detalle_estado_general'
-        estado_e: getVal('form-est-esp'),   // Antes decías 'estado_especifico'
-        detalle_e: getVal('form-det-esp'),   // Antes decías 'detalle_estado_especifico'
-        timeline: getVal('form-timeline'),  // Antes decías 'timeline_inversion'
-        acciones: getVal('form-acciones')   // Antes decías 'acciones_programadas'
+        detalle_g: getVal('form-det-gral'),
+        estado_e: getVal('form-est-esp'),
+        detalle_e: getVal('form-det-esp'),
+        timeline: getVal('form-timeline'),
+        acciones: getVal('form-acciones')
     };
 
     if (!datos.cui) {
@@ -436,7 +434,6 @@ function guardarSeguimiento() {
         return;
     }
 
-    // Feedback visual en el botón
     const btn = event.target.closest('button');
     const originalText = btn.innerHTML;
     btn.disabled = true;
@@ -444,24 +441,33 @@ function guardarSeguimiento() {
 
     fetch(urlApi, {
         method: 'POST',
-        mode: 'no-cors', 
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'text/plain' }, 
         body: JSON.stringify(datos)
     })
-    .then(() => {
-        alert("✅ ¡Registro exitoso en Aiven para el CUI: " + datos.cui + "!");
-        
-        // Cerrar modal usando el ID correcto 'modalRegistro'
-        const modalElement = document.getElementById('modalRegistro');
-        const modal = bootstrap.Modal.getInstance(modalElement);
-        if (modal) modal.hide();
-        
-        // Limpiar campos del formulario
-        document.getElementById('formSeguimiento').reset();
+    .then(response => response.json()) 
+    .then(res => {
+        if(res.result === "success") {
+            alert("✅ ¡Registro exitoso para el CUI: " + datos.cui + "!");
+            
+            // ACTUALIZACIÓN VISUAL INMEDIATA
+            document.getElementById('track-est-gral').innerText = datos.estado_g || "-";
+            document.getElementById('track-det-gral').innerText = datos.detalle_g || "-";
+            document.getElementById('track-est-esp').innerText = datos.estado_e || "-";
+            document.getElementById('track-det-esp').innerText = datos.detalle_e || "-";
+            document.getElementById('track-sisgedo').innerText = datos.sisgedo || "-";
+            document.getElementById('track-timeline').innerText = datos.timeline || "-";
+            document.getElementById('track-acciones').innerText = datos.acciones || "-";
+
+            const modal = bootstrap.Modal.getInstance(document.getElementById('modalRegistro'));
+            if (modal) modal.hide();
+            document.getElementById('formSeguimiento').reset();
+        } else {
+            alert("❌ Error en servidor: " + res.error);
+        }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert("❌ Error de conexión al servidor.");
+        alert("❌ Error de conexión. Revisa la consola.");
     })
     .finally(() => {
         btn.disabled = false;
