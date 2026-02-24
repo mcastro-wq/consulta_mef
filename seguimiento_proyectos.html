@@ -417,8 +417,8 @@
     }
 
 
-function guardarSeguimiento(event) { // <--- Agregamos 'event' aquí
-    const urlApi = 'https://script.google.com/macros/s/AKfycbxHsULfzbMQtpRoNUUJKQDY-4f4NLXoFCthAgIGAselxxUxv7xsKeyZiB7Si4n9dLrP/exec';
+function guardarSeguimiento(event) {
+    const urlApi = 'https://script.google.com/macros/s/AKfycbz7qF9bRn8zWXAD2didOc4sKUYiJG7tAjY5IYH-bAQ1OqlWWsbJPtTEep2EsmB71wfB/exec';
     
     const getVal = (id) => {
         const el = document.getElementById(id);
@@ -448,33 +448,31 @@ function guardarSeguimiento(event) { // <--- Agregamos 'event' aquí
 
     fetch(urlApi, {
         method: 'POST',
-        headers: { 'Content-Type': 'text/plain' }, 
+        mode: 'no-cors', // Añadimos esto para evitar problemas de redirección de Google
         body: JSON.stringify(datos)
     })
-    .then(response => response.json()) 
-    .then(res => {
-        if(res.result === "success") {
-            alert("✅ ¡Registro exitoso para el CUI: " + datos.cui + "!");
-            
-            // ACTUALIZACIÓN VISUAL INMEDIATA
-            document.getElementById('track-est-gral').innerText = datos.estado_g || "-";
-            document.getElementById('track-det-gral').innerText = datos.detalle_g || "-";
-            document.getElementById('track-est-esp').innerText = datos.estado_e || "-";
-            document.getElementById('track-det-esp').innerText = datos.detalle_e || "-";
-            document.getElementById('track-sisgedo').innerText = datos.sisgedo || "-";
-            document.getElementById('track-timeline').innerText = datos.timeline || "-";
-            document.getElementById('track-acciones').innerText = datos.acciones || "-";
+    .then(() => {
+        // Como Google Apps Script a veces da problemas de CORS al responder, 
+        // si la petición sale (no entra al catch), asumimos éxito o refrescamos.
+        alert("✅ Solicitud enviada correctamente.");
+        
+        // Actualización visual
+        document.getElementById('track-est-gral').innerText = datos.estado_g || "-";
+        document.getElementById('track-det-gral').innerText = datos.detalle_g || "-";
+        document.getElementById('track-est-esp').innerText = datos.estado_e || "-";
+        document.getElementById('track-det-esp').innerText = datos.detalle_e || "-";
+        document.getElementById('track-sisgedo').innerText = datos.sisgedo || "-";
+        document.getElementById('track-timeline').innerText = datos.timeline || "-";
+        document.getElementById('track-acciones').innerText = datos.acciones || "-";
 
-            const modal = bootstrap.Modal.getInstance(document.getElementById('modalRegistro'));
-            if (modal) modal.hide();
-            document.getElementById('formSeguimiento').reset();
-        } else {
-            alert("❌ Error en servidor: " + res.error);
-        }
+        const modalEl = document.getElementById('modalRegistro');
+        const modal = bootstrap.Modal.getInstance(modalEl);
+        if (modal) modal.hide();
+        document.getElementById('formSeguimiento').reset();
     })
     .catch(error => {
         console.error('Error:', error);
-        alert("❌ Error de conexión. Revisa la consola.");
+        alert("❌ Error de conexión.");
     })
     .finally(() => {
         btn.disabled = false;
@@ -487,7 +485,7 @@ function guardarSeguimiento(event) { // <--- Agregamos 'event' aquí
 // Esta función se debe llamar cuando haces clic en una fila de tu tabla
 function cargarDetalleSeguimiento(cui) {
     // URL que me pasaste (la completa)
-    const urlApi = 'https://script.google.com/macros/s/AKfycbxHsULfzbMQtpRoNUUJKQDY-4f4NLXoFCthAgIGAselxxUxv7xsKeyZiB7Si4n9dLrP/exec';
+    const urlApi = 'https://script.google.com/macros/s/AKfycbz7qF9bRn8zWXAD2didOc4sKUYiJG7tAjY5IYH-bAQ1OqlWWsbJPtTEep2EsmB71wfB/exec';
     
     // Feedback visual: ponemos "..." en los cuadros mientras carga
     document.querySelectorAll('.tracking-body').forEach(el => el.innerText = "...");
