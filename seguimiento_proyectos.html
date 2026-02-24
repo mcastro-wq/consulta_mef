@@ -289,22 +289,46 @@
             </tr>`;
     }
 
-    function renderTable(data) {
+function renderTable(data) {
         const tbody = document.getElementById('tbody-main');
         if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="8" class="text-center p-4">Sin datos</td></tr>'; return; }
+        
         tbody.innerHTML = data.map(p => {
             const pim = p.MONTO_PIM || 0;
-            const pDev = pim > 0 ? (p.MONTO_DEVENGADO/pim*100).toFixed(1) : 0;
-            const pCer = pim > 0 ? (p.MONTO_CERTIFICADO/pim*100).toFixed(1) : 0;
-            let sem = pDev > 75 ? 'status-alto' : (pDev >= 40 ? 'status-medio' : 'status-bajo');
+            const dev = p.MONTO_DEVENGADO || 0;
+            const pDev = pim > 0 ? (dev / pim * 100).toFixed(1) : 0;
+            const pCer = pim > 0 ? (p.MONTO_CERTIFICADO / pim * 100).toFixed(1) : 0;
+            
+            // Lógica de colores y etiquetas
+            let sem = 'status-bajo';
+            let txt = 'BAJO';
+            let clr = 'text-danger';
+
+            if (pDev > 75) {
+                sem = 'status-alto';
+                txt = 'ALTO';
+                clr = 'text-success';
+            } else if (pDev >= 40) {
+                sem = 'status-medio';
+                txt = 'MEDIO';
+                clr = 'text-warning';
+            }
+
             return `
                 <tr class="row-item" onclick="seleccionar('${p.PRODUCTO_PROYECTO}', this)">
                     <td class="text-center fw-bold text-muted">${p.PRODUCTO_PROYECTO}</td>
                     <td class="text-start fw-bold" style="width:35%">${p.PRODUCTO_PROYECTO_NOMBRE}</td>
-                    <td class="text-end">${pim.toLocaleString()}</td><td class="text-end">${p.MONTO_CERTIFICADO.toLocaleString()}</td>
-                    <td class="text-center text-primary">${pCer}%</td><td class="text-end text-success fw-bold">${p.MONTO_DEVENGADO.toLocaleString()}</td>
+                    <td class="text-end">${pim.toLocaleString()}</td>
+                    <td class="text-end">${p.MONTO_CERTIFICADO.toLocaleString()}</td>
+                    <td class="text-center text-primary">${pCer}%</td>
+                    <td class="text-end text-success fw-bold">${dev.toLocaleString()}</td>
                     <td class="text-center fw-bold text-success">${pDev}%</td>
-                    <td class="text-center"><span class="semaforo ${sem}"></span></td>
+                    <td class="text-center">
+                        <div class="d-flex align-items-center justify-content-center gap-2">
+                            <span class="semaforo ${sem}"></span>
+                            <span class="fw-extrabold ${clr}" style="font-size: 0.65rem;">${txt}</span>
+                        </div>
+                    </td>
                 </tr>`;
         }).join('');
     }
