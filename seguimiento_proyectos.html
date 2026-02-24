@@ -495,7 +495,7 @@ function cargarDetalleSeguimiento(cui) {
     const urlApi = 'https://script.google.com/macros/s/AKfycbwDEGA0bOYDv3opzS0qteRFUS_ik9SzT5XlKCpjU6_PWzfPtBjBLfI52Zog8Cojtgz1/exec';
     
     // Feedback visual: ponemos "..." en los cuadros mientras carga
-    document.querySelectorAll('.tracking-body').forEach(el => el.innerText = "...");
+    document.querySelectorAll('.tracking-body').forEach(el => el.innerText = "Cargando...");
 
     fetch(`${urlApi}?cui=${cui}`)
         .then(response => response.json())
