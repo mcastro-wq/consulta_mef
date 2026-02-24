@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histórico de Seguimiento - GORE Lambayeque</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        :root { --gore-brown: #703020; --gore-orange: #d35400; }
+        body { background-color: #f4f7f6; font-family: 'Segoe UI', sans-serif; }
+        .header-report { background: var(--gore-brown); color: white; padding: 20px 0; margin-bottom: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .card-history { border: none; border-left: 5px solid var(--gore-orange); margin-bottom: 20px; transition: 0.3s; }
+        .card-history:hover { transform: translateX(10px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .timestamp { font-size: 0.8rem; color: #888; font-weight: bold; }
+        .cui-badge { background-color: var(--gore-brown); color: white; font-size: 0.9rem; }
+        .search-section { background: white; padding: 20px; border-radius: 8px; margin-top: -50px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body>
+
+<div class="header-report">
+    <div class="container text-center">
+        <h2 class="fw-bold"><i class="bi bi-journal-text"></i> REPORTE HISTÓRICO DE GESTIÓN</h2>
+        <p class="mb-0">Consulta de todas las actualizaciones registradas en el sistema</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="search-section mb-4">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-8">
+                <label class="form-label fw-bold text-muted">Filtrar por CUI o Palabra Clave</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                    <input type="text" id="inputFiltro" class="form-control" placeholder="Ingrese CUI o detalle a buscar..." onkeyup="renderizarHistorial()">
+                </div>
+            </div>
+            <div class="col-md-4 text-end">
+                <button class="btn btn-outline-secondary fw-bold" onclick="cargarTodoElHistorial()">
+                    <i class="bi bi-arrow-clockwise"></i> Actualizar
+                </button>
+                <a href="index.html" class="btn btn-warning fw-bold">Volver</a>
+            </div>
+        </div>
+    </div>
+
+    <div id="contenedor-historial" class="mt-4">
+        <div class="text-center p-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2">Consultando base de datos Aiven...</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    let historialCompleto = [];
+    const urlApi = 'https://script.google.com/macros/s/AKfycbwy54w0S_ZZ9Axn355XU18zoOv-MTkuShvXco5Q9_uDN0Y3Nc8NelzBDJvwKTYO6RJS/exec';
+
+    async function cargarTodoElHistorial() {
+        try {
+            // En el script de Google, si no enviamos CUI, debe devolver TODO
+            const response = await fetch(`${urlApi}?modo=todo`);
+            const res = await response.json();
+            
+            if (res.status === "success") {
+                historialCompleto = res.data;
+                renderizarHistorial();
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            document.getElementById('contenedor-historial').innerHTML = `<div class="alert alert-danger">Error al conectar con la base de datos.</div>`;
+        }
+    }
+
+    function renderizarHistorial() {
+        const query = document.getElementById('inputFiltro').value.toLowerCase();
+        const contenedor = document.getElementById('contenedor-historial');
+        
+        const filtrados = historialCompleto.filter(item => 
+            item.codigo_cui.includes(query) || 
+            item.detalle_estado_general.toLowerCase().includes(query) ||
+            item.estado_general.toLowerCase().includes(query)
+        );
+
+        if(filtrados.length === 0) {
+            contenedor.innerHTML = `<div class="text-center text-muted p-5">No se encontraron registros.</div>`;
+            return;
+        }
+
+        contenedor.innerHTML = filtrados.map(item => `
+            <div class="card card-history shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <span class="badge cui-badge">CUI: ${item.codigo_cui}</span>
+                            <span class="ms-2 fw-bold text-uppercase" style="color: var(--gore-orange)">${item.estado_general}</span>
+                        </div>
+                        <div class="timestamp">
+                            <i class="bi bi-calendar3"></i> ${item.fecha_registro || 'Reciente'}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 border-end">
+                            <p class="mb-1 text-muted small">DETALLE GENERAL:</p>
+                            <p class="fw-medium">${item.detalle_estado_general || '-'}</p>
+                            <p class="mb-1 text-muted small">ESTADO ESPECÍFICO:</p>
+                            <p class="fw-bold text-primary">${item.estado_especifico || '-'} <small class="text-dark fw-normal">(${item.detalle_estado_especifico})</small></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-1 text-muted small">ACCIONES PROGRAMADAS:</p>
+                            <p class="text-success fw-bold">${item.acciones_programadas || '-'}</p>
+                            <p class="mb-1 text-muted small">TIMELINE:</p>
+                            <p class="small text-secondary">${item.timeline_inversion || '-'}</p>
+                        </div>
+                    </div>
+                    <div class="mt-2 pt-2 border-top">
+                        <small class="text-muted"><i class="bi bi-paperclip"></i> SISGEDO: <strong>${item.sisgedo || 'N/A'}</strong></small>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // Cargar al iniciar
+    window.onload = cargarTodoElHistorial;
+</script>
+</body>
+</html>
