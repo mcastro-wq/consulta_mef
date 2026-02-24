@@ -140,36 +140,47 @@
         ejecutarFiltros();
     }
 
-    function renderTable(data) {
-        const tbody = document.getElementById('lista-proyectos');
-        tbody.innerHTML = '';
-        data.forEach(item => {
-            const pim = parseFloat(item.MONTO_PIM || 0);
-            const dev = parseFloat(item.MONTO_DEVENGADO || 0);
-            const avance = pim > 0 ? (dev / pim * 100).toFixed(1) : 0;
-            const isZero = dev === 0;
+function renderTable(data) {
+    const tbody = document.getElementById('lista-proyectos');
+    tbody.innerHTML = '';
+    
+    // LIMITAMOS A LOS PRIMEROS 100 RESULTADOS PARA EVITAR EL BLOQUEO
+    // El usuario encontrará el resto usando el buscador
+    const dataLimitada = data.slice(0, 100); 
 
-            tbody.innerHTML += `
-                <tr class="${isZero ? 'table-light' : ''}">
-                    <td class="ps-3"><span class="cui-badge">${item.PRODUCTO_PROYECTO}</span></td>
-                    <td>
-                        <div class="fw-bold" style="font-size:0.8rem">${item.PRODUCTO_PROYECTO_NOMBRE}</div>
-                        <span class="ejecutora-text text-uppercase">${item.EJECUTORA_NOMBRE}</span>
-                        ${isZero ? '<span class="status-zero">SIN AVANCE</span>' : ''}
-                    </td>
-                    <td class="text-end monto-num">S/ ${pim.toLocaleString()}</td>
-                    <td>
-                        <div class="progress" style="height: 8px;">
-                            <div class="progress-bar ${isZero ? 'bg-danger opacity-25' : 'bg-success'}" style="width: ${avance}%"></div>
-                        </div>
-                        <div class="text-center small fw-bold mt-1">${avance}%</div>
-                    </td>
-                    <td class="text-center">
-                        <button class="btn btn-sm btn-outline-dark" onclick="verDetalle('${item.PRODUCTO_PROYECTO}')"><i class="bi bi-eye"></i></button>
-                    </td>
-                </tr>`;
-        });
+    dataLimitada.forEach(item => {
+        const pim = parseFloat(item.MONTO_PIM || 0);
+        const dev = parseFloat(item.MONTO_DEVENGADO || 0);
+        const avance = pim > 0 ? (dev / pim * 100).toFixed(1) : 0;
+        const isZero = dev === 0;
+
+        tbody.innerHTML += `
+            <tr class="${isZero ? 'table-light' : ''}">
+                <td class="ps-3"><span class="cui-badge">${item.PRODUCTO_PROYECTO}</span></td>
+                <td>
+                    <div class="fw-bold" style="font-size:0.8rem">${item.PRODUCTO_PROYECTO_NOMBRE}</div>
+                    <span class="ejecutora-text text-uppercase">${item.EJECUTORA_NOMBRE}</span>
+                </td>
+                <td class="text-end monto-num">S/ ${pim.toLocaleString()}</td>
+                <td>
+                    <div class="progress" style="height: 8px;">
+                        <div class="progress-bar ${isZero ? 'bg-danger opacity-25' : 'bg-success'}" style="width: ${avance}%"></div>
+                    </div>
+                    <div class="text-center small fw-bold mt-1">${avance}%</div>
+                </td>
+                <td class="text-center">
+                    <button class="btn btn-sm btn-outline-dark" onclick="verDetalle('${item.PRODUCTO_PROYECTO}')"><i class="bi bi-eye"></i></button>
+                </td>
+            </tr>`;
+    });
+
+    // Si hay más de 100, avisamos al usuario
+    if (data.length > 100) {
+        tbody.innerHTML += `<tr><td colspan="5" class="text-center text-muted small py-3">
+            Mostrando los 100 proyectos más importantes. Use el buscador para encontrar un CUI específico entre los ${data.length} totales.
+        </td></tr>`;
     }
+}
 
     function exportarExcel() {
         const ws = XLSX.utils.json_to_sheet(currentData.map(item => ({
