@@ -229,7 +229,7 @@
     let timeoutBusqueda;
     let cuiSeleccionadoActual = "";
 
-    async function fetchData() {
+async function fetchData() {
         const anio = document.getElementById('selectAnio').value;
         const loader = document.getElementById('loader-overlay');
         const txtCorte = document.getElementById('txt-corte');
@@ -243,21 +243,42 @@
         try {
             if (anio === '2025') {
                 loaderText.innerText = "Cargando Base 2025 (Uniendo Partes)...";
-                // DESCARGA AMBAS PARTES EN PARALELO
+                
+                // 1. Descargar ambos archivos como TEXTO para limpiarlos antes de unir
                 const [res1, res2] = await Promise.all([
-                    fetch('data_2025_part1.json'),
-                    fetch('data_2025_part2.json')
+                    fetch('data_2025_diario_part1.json').then(r => r.text()),
+                    fetch('data_2025_diario_part2.json').then(r => r.text())
                 ]);
 
-                if (!res1.ok || !res2.ok) throw new Error("No se pudieron cargar las partes del 2025");
+                // 2. Limpieza de seguridad: Quitamos corchetes de inicio/fin y espacios
+                let cleanPart1 = res1.trim().replace(/^\[/, "").replace(/\]$/, "").trim();
+                let cleanPart2 = res2.trim().replace(/^\[/, "").replace(/\]$/, "").trim();
 
-                const d1 = await res1.json();
-                const d2 = await res2.json();
+                // 3. Asegurar la coma de unión si falta
+                if (!cleanPart1.endsWith(',') && !cleanPart2.startsWith('{')) {
+                    // Si no hay coma al final del 1 ni inicio de objeto en el 2, algo anda mal, 
+                    // pero intentamos forzar la unión con una coma
+                    cleanPart1 += ",";
+                } else if (cleanPart1.endsWith(',') && cleanPart2.startsWith('{')) {
+                    // Ya tiene coma, no hacemos nada
+                } else if (!cleanPart1.endsWith(',')) {
+                    cleanPart1 += ",";
+                }
 
-                // UNIÓN DE DATOS HISTÓRICOS
-                allData = d1.concat(d2);
-                txtCorte.innerText = "Datos Históricos 2025 Sincronizados";
+                // 4. Unir y convertir a JSON real
+                const fullJsonText = "[" + cleanPart1 + cleanPart2 + "]";
+                
+                try {
+                    allData = JSON.parse(fullJsonText);
+                } catch (parseError) {
+                    console.error("Error al parsear el JSON unido:", parseError);
+                    throw new Error("La unión de archivos falló. Revisa que los archivos terminen/empiecen en objetos completos.");
+                }
+
+                txtCorte.innerText = "Datos 2025 Sincronizados";
+
             } else {
+                // Lógica para 2026 (Archivo único)
                 loaderText.innerText = "Cargando Base de Datos 2026...";
                 const res = await fetch('data_proyectos.json');
                 if (!res.ok) throw new Error("No se encontró el archivo 2026");
@@ -266,11 +287,9 @@
                 txtCorte.innerText = json.fecha_extraccion || "Actualizado 2026";
             }
 
-            // Población de selectores de ejecutora
+            // Población de selectores (el resto del código sigue igual...)
             const select = document.getElementById('selectEjecutora');
             select.innerHTML = '<option value="TODAS">-- TODAS LAS UNIDADES --</option>';
-            
-            // Obtenemos nombres únicos de ejecutoras
             const ejecutoras = [...new Set(allData.map(p => p.EJECUTORA_NOMBRE))].filter(Boolean).sort();
             ejecutoras.forEach(ej => {
                 const opt = document.createElement('option');
@@ -280,9 +299,9 @@
 
             filtrar();
         } catch (e) {
-            console.error("Error cargando JSON", e);
-            txtCorte.innerText = "Error en JSON: " + e.message;
-            alert("Error al cargar datos. Verifica que los archivos existan en GitHub.");
+            console.error("Error detallado:", e);
+            txtCorte.innerText = "Error: " + e.message;
+            alert("Error al cargar datos. Verifica los nombres de los archivos en GitHub.");
         } finally {
             loader.classList.add('d-none');
         }
