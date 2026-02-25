@@ -355,18 +355,22 @@ const datos = {
     });
 }
 
-    function cargarDetalleSeguimiento(cui) {
-    const urlApi = 'https://script.google.com/macros/s/AKfycbwDEGA0bOYDv3opzS0qteRFUS_ik9SzT5XlKCpjU6_PWzfPtBjBLfI52Zog8Cojtgz1/exec';
+   function cargarDetalleSeguimiento(cui) {
+    const urlApi = 'https://script.google.com/macros/s/AKfycbzE3RjPk02QohR3kTnbkBa_Nfeatu5CICYQm9LzDLndk429Vsp7D3PAWOvsReul0sb2/exec'; // Asegúrate que sea la misma
     
     document.querySelectorAll('.tracking-body').forEach(el => el.innerText = "Cargando...");
 
-    // Agregamos redirect: 'follow' para que no falle el salto de URL de Google
+    // Agregamos el parámetro modo=unico para que el Script sepa qué buscar
     fetch(`${urlApi}?cui=${cui}`, {
         method: 'GET',
-        redirect: 'follow' 
+        redirect: 'follow' // <--- CRÍTICO para Google Apps Script
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) throw new Error('Error en red');
+        return response.json();
+    })
     .then(res => {
+        // En tu App Script, si no es "modo=todo", devuelves res.data directamente
         if (res.status === "success" && res.data) {
             const d = res.data;
             document.getElementById('track-est-gral').innerText = d.estado_general || "-";
@@ -381,7 +385,7 @@ const datos = {
         }
     })
     .catch(error => {
-        console.error('Error al cargar seguimiento:', error);
+        console.error('Error:', error);
         limpiarCuadros();
     });
 }
