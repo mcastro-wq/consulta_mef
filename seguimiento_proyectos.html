@@ -295,6 +295,101 @@ async function fetchData() {
         }
     }
 
+    function guardarSeguimiento(event) {
+    const urlApi = 'https://script.google.com/macros/s/AKfycbwDEGA0bOYDv3opzS0qteRFUS_ik9SzT5XlKCpjU6_PWzfPtBjBLfI52Zog8Cojtgz1/exec';
+    
+    const getVal = (id) => {
+        const el = document.getElementById(id);
+        return el ? el.value : "";
+    };
+
+    // UNIFICAMOS NOMBRES: Estos deben ser los mismos que lee tu Google Apps Script
+    const datos = {
+        cui: getVal('form-cui'),
+        estado_general: getVal('form-est-gral'),
+        sisgedo: getVal('form-sisgedo'),
+        detalle_estado_general: getVal('form-det-gral'),
+        estado_especifico: getVal('form-est-esp'),
+        detalle_estado_especifico: getVal('form-det-esp'),
+        timeline_inversion: getVal('form-timeline'),
+        acciones_programadas: getVal('form-acciones')
+    };
+
+    if (!datos.cui) {
+        alert("⚠️ No se ha seleccionado un CUI válido.");
+        return;
+    }
+
+    const btn = event.target.closest('button');
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Guardando...';
+
+    fetch(urlApi, {
+        method: 'POST',
+        mode: 'no-cors', 
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(datos)
+    })
+    .then(() => {
+        alert("✅ ¡Registro enviado a la base de datos!");
+
+        // Actualización inmediata de los cuadros en pantalla
+        document.getElementById('track-est-gral').innerText = datos.estado_general || "-";
+        document.getElementById('track-det-gral').innerText = datos.detalle_estado_general || "-";
+        document.getElementById('track-est-esp').innerText = datos.estado_especifico || "-";
+        document.getElementById('track-det-esp').innerText = datos.detalle_estado_especifico || "-";
+        document.getElementById('track-sisgedo').innerText = datos.sisgedo || "-";
+        document.getElementById('track-timeline').innerText = datos.timeline_inversion || "-";
+        document.getElementById('track-acciones').innerText = datos.acciones_programadas || "-";
+
+        // Cerrar modal y limpiar
+        const modalEl = document.getElementById('modalRegistro');
+        const modal = bootstrap.Modal.getInstance(modalEl);
+        if (modal) modal.hide();
+        document.getElementById('formSeguimiento').reset();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert("❌ Error de comunicación.");
+    })
+    .finally(() => {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    });
+}
+
+    function cargarDetalleSeguimiento(cui) {
+    const urlApi = 'https://script.google.com/macros/s/AKfycbwDEGA0bOYDv3opzS0qteRFUS_ik9SzT5XlKCpjU6_PWzfPtBjBLfI52Zog8Cojtgz1/exec';
+    
+    document.querySelectorAll('.tracking-body').forEach(el => el.innerText = "Cargando...");
+
+    // Agregamos redirect: 'follow' para que no falle el salto de URL de Google
+    fetch(`${urlApi}?cui=${cui}`, {
+        method: 'GET',
+        redirect: 'follow' 
+    })
+    .then(response => response.json())
+    .then(res => {
+        if (res.status === "success" && res.data) {
+            const d = res.data;
+            document.getElementById('track-est-gral').innerText = d.estado_general || "-";
+            document.getElementById('track-det-gral').innerText = d.detalle_estado_general || "-";
+            document.getElementById('track-est-esp').innerText = d.estado_especifico || "-";
+            document.getElementById('track-det-esp').innerText = d.detalle_estado_especifico || "-";
+            document.getElementById('track-sisgedo').innerText = d.sisgedo || "-";
+            document.getElementById('track-timeline').innerText = d.timeline_inversion || "-";
+            document.getElementById('track-acciones').innerText = d.acciones_programadas || "-";
+        } else {
+            limpiarCuadros();
+        }
+    })
+    .catch(error => {
+        console.error('Error al cargar seguimiento:', error);
+        limpiarCuadros();
+    });
+}
+
     function filtrar() {
         clearTimeout(timeoutBusqueda);
         timeoutBusqueda = setTimeout(() => {
