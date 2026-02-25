@@ -304,16 +304,16 @@ async function fetchData() {
     };
 
     // UNIFICAMOS NOMBRES: Estos deben ser los mismos que lee tu Google Apps Script
-    const datos = {
-        cui: getVal('form-cui'),
-        estado_general: getVal('form-est-gral'),
-        sisgedo: getVal('form-sisgedo'),
-        detalle_estado_general: getVal('form-det-gral'),
-        estado_especifico: getVal('form-est-esp'),
-        detalle_estado_especifico: getVal('form-det-esp'),
-        timeline_inversion: getVal('form-timeline'),
-        acciones_programadas: getVal('form-acciones')
-    };
+const datos = {
+    cui: getVal('form-cui'),
+    estado_general: getVal('form-est-gral'),        // Cambiado de estado_g
+    sisgedo: getVal('form-sisgedo'),
+    detalle_estado_general: getVal('form-det-gral'), // Cambiado de detalle_g
+    estado_especifico: getVal('form-est-esp'),       // Cambiado de estado_e
+    detalle_estado_especifico: getVal('form-det-esp'), // Cambiado de detalle_e
+    timeline_inversion: getVal('form-timeline'),    // Cambiado de timeline
+    acciones_programadas: getVal('form-acciones')    // Cambiado de acciones
+};
 
     if (!datos.cui) {
         alert("⚠️ No se ha seleccionado un CUI válido.");
