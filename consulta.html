@@ -65,9 +65,10 @@
                 rawData = res.data;
                 renderizar(rawData);
             }
-        } catch (e) {
-            document.getElementById('tablaBody').innerHTML = '<tr><td colspan="8" class="text-center text-danger">Error de conexión</td></tr>';
-        }
+} catch (e) {
+    console.error("Error detallado:", e); // Esto te dirá qué pasó exactamente en la consola F12
+    document.getElementById('tablaBody').innerHTML = `<tr><td colspan="8" class="text-center text-danger">Error: ${e.message}</td></tr>`;
+}
     }
 
     function renderizar(datos) {
