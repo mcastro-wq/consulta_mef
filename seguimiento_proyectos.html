@@ -248,39 +248,54 @@ async function fetchData() {
     const spinner = document.getElementById('loading-spinner');
     const txtCorte = document.getElementById('txt-corte');
     
-    // 1. Mostrar spinner y estado inicial
-    if(spinner) spinner.classList.remove('d-none');
-    txtCorte.innerText = "Cargando datos...";
-
-    let url = 'data_proyectos.json'; // 2026 local
+    document.getElementById('display-anio').innerText = `Monitor de Ejecución Presupuestal ${anio}`;
     
-    if (anio === '2025') {
-        // EL ENLACE QUE SÍ FUNCIONA (CON RAW=1)
-        url = 'https://www.dropbox.com/scl/fi/nsyjqewk4obhxgdu47nxj/data_2025_diario.json?rlkey=1ctmsaht03bma9a2bmef5fm1y&raw=1';
-    }
+    if(spinner) spinner.classList.remove('d-none');
+    txtCorte.innerText = "Conectando con la base de datos...";
 
     try {
-        const res = await fetch(url);
-        if (!res.ok) throw new Error('Error en servidor');
-        const json = await res.json();
+        if (anio === '2025') {
+            txtCorte.innerText = "Descargando datos 2025 (Parte 1 y 2)...";
+            
+            // Descarga ambas partes al mismo tiempo
+            const [res1, res2] = await Promise.all([
+                fetch('data_2025_part1.json'),
+                fetch('data_2025_part2.json')
+            ]);
 
-        // 2. Procesar el JSON según el año
-        if (Array.isArray(json)) {
-            allData = json; // 2025 es lista directa
-            txtCorte.innerText = "Sincronizado: 2025";
+            if (!res1.ok || !res2.ok) throw new Error('Error al descargar las partes');
+
+            const d1 = await res1.json();
+            const d2 = await res2.json();
+
+            // Unimos los arrays
+            allData = d1.concat(d2);
+            txtCorte.innerText = "Sincronizado: Datos 2025 completos";
         } else {
-            allData = json.proyectos || []; // 2026 tiene .proyectos
+            // Carga normal para 2026
+            const res = await fetch('data_proyectos.json');
+            const json = await res.json();
+            allData = json.proyectos || [];
             txtCorte.innerText = json.fecha_extraccion || "Sincronizado: 2026";
         }
 
-        // 3. Ejecutar filtros y actualizar UI
+        // Poblamos el selector de Unidades Ejecutoras
+        const select = document.getElementById('selectEjecutora');
+        select.innerHTML = '<option value="TODAS">-- TODAS LAS UNIDADES --</option>';
+        const ejecutoras = [...new Set(allData.map(p => p.EJECUTORA_NOMBRE))].filter(Boolean).sort();
+        ejecutoras.forEach(ej => {
+            const opt = document.createElement('option');
+            opt.value = ej;
+            opt.innerText = ej;
+            select.appendChild(opt);
+        });
+
         filtrar();
 
-    } catch (e) { 
-        console.error(e); 
-        txtCorte.innerText = "Error al leer Dropbox";
+    } catch (e) {
+        console.error("Error de carga:", e);
+        txtCorte.innerText = "Error: No se pudo cargar la data";
     } finally {
-        // 4. OCULTAR EL SPINNER SIEMPRE AL FINAL
         if(spinner) spinner.classList.add('d-none');
     }
 }
