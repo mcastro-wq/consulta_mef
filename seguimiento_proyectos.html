@@ -243,42 +243,83 @@
     let timeoutBusqueda;
     let cuiSeleccionadoActual = "";
 
-    async function fetchData() {
-        const anio = document.getElementById('selectorAnio').value;
-        document.getElementById('display-anio').innerText = `Monitor de Ejecución Presupuestal ${anio}`;
-        
-        // Determinar URL según el año
-        let url = 'data_proyectos.json'; // Default 2026
-        if (anio === '2025') {
-            url = 'https://www.dropbox.com/scl/fi/nsyjqewk4obhxgdu47nxj/data_2025_diario.json?rlkey=1ctmsaht03bma9a2bmef5fm1y&st=egh05uqd&dl=1';
-        }
+async function fetchData() {
+    const anio = document.getElementById('selectorAnio').value;
+    document.getElementById('display-anio').innerText = `Monitor de Ejecución Presupuestal ${anio}`;
+    
+    let url = 'data_proyectos.json'; // 2026
+    if (anio === '2025') {
+        url = 'https://www.dropbox.com/scl/fi/nsyjqewk4obhxgdu47nxj/data_2025_diario.json?rlkey=1ctmsaht03bma9a2bmef5fm1y&st=egh05uqd&dl=1';
+    }
 
-        try {
-            const res = await fetch(url);
-            const json = await res.json();
+    try {
+        const res = await fetch(url);
+        const json = await res.json();
+
+        // VALIDACIÓN DE ESTRUCTURA
+        if (anio === '2025') {
+            // Si es 2025, el json es el array directo
+            allData = json; 
+            document.getElementById('txt-corte').innerText = "Carga Directa Dropbox";
+        } else {
+            // Si es 2026, usa la estructura original
             allData = json.proyectos;
             document.getElementById('txt-corte').innerText = json.fecha_extraccion;
-
-            const select = document.getElementById('selectEjecutora');
-            // Limpiar opciones anteriores pero mantener la primera
-            select.innerHTML = '<option value="TODAS">-- TODAS LAS UNIDADES --</option>';
-            
-            const ejecutoras = [...new Set(allData.map(p => p.EJECUTORA_NOMBRE))].sort();
-            ejecutoras.forEach(ej => {
-                if(ej) {
-                    const opt = document.createElement('option');
-                    opt.value = ej;
-                    opt.innerText = ej;
-                    select.appendChild(opt);
-                }
-            });
-
-            filtrar();
-        } catch (e) { 
-            console.error("Error cargando datos", e); 
-            document.getElementById('txt-corte').innerText = "Error en carga";
         }
+
+        const select = document.getElementById('selectEjecutora');
+        select.innerHTML = '<option value="TODAS">-- TODAS LAS UNIDADES --</option>';
+        
+        const ejecutoras = [...new Set(allData.map(p => p.EJECUTORA_NOMBRE))].sort();
+        ejecutoras.forEach(ej => {
+            if(ej) {
+                const opt = document.createElement('option');
+                opt.value = ej;
+                opt.innerText = ej;
+                select.appendChild(opt);
+            }
+        });
+
+        filtrar();
+    } catch (e) { 
+        console.error("Error cargando datos", e); 
+        document.getElementById('txt-corte').innerText = "Error en carga";
     }
+}
+
+function filtrar() {
+    clearTimeout(timeoutBusqueda);
+    timeoutBusqueda = setTimeout(() => {
+        const query = document.getElementById('inputBusqueda').value.toLowerCase();
+        const verProyecto = document.getElementById('checkProyecto').checked;
+        const verActividad = document.getElementById('checkActividad').checked;
+        const ejecSeleccionada = document.getElementById('selectEjecutora').value;
+
+        const filtered = allData.filter(p => {
+            // NORMALIZACIÓN DE CAMPOS PARA 2025 Y 2026
+            const tipo = (p.TIPO || p.TIPO_ACT_PROY_NOMBRE || "").toUpperCase();
+            const esProyecto = tipo.includes("PROYECTO");
+            const esActividad = tipo.includes("PRODUCTO") || tipo.includes("ACTIVIDAD");
+            
+            const cumpleEjecutora = (ejecSeleccionada === "TODAS" || p.EJECUTORA_NOMBRE === ejecSeleccionada);
+
+            // Convertimos a número para asegurar que la suma funcione
+            p.MONTO_PIM = parseFloat(p.MONTO_PIM) || 0;
+            p.MONTO_DEVENGADO = parseFloat(p.MONTO_DEVENGADO) || 0;
+            p.MONTO_CERTIFICADO = parseFloat(p.MONTO_CERTIFICADO) || 0;
+
+            return cumpleEjecutora &&
+                   ((verProyecto && esProyecto) || (verActividad && esActividad)) &&
+                   (p.PRODUCTO_PROYECTO_NOMBRE.toLowerCase().includes(query) || p.PRODUCTO_PROYECTO.toString().includes(query));
+        });
+
+        renderResumen(filtered, ejecSeleccionada);
+        actualizarGaugesGlobales(filtered);
+        document.getElementById('txt-contador').innerText = filtered.length;
+        renderTable(filtered.slice(0, 100));
+        document.getElementById('msg-limit').classList.toggle('d-none', filtered.length <= 100);
+    }, 250);
+}
 
     // --- EL RESTO DE TUS FUNCIONES SE MANTIENEN IGUAL (NO SE TOCAN) ---
     function filtrar() {
