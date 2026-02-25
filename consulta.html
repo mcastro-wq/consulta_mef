@@ -71,24 +71,29 @@
 }
     }
 
-    function renderizar(datos) {
-        const body = document.getElementById('tablaBody');
-        body.innerHTML = datos.map(item => `
-            <tr>
-                <td class="fw-bold text-secondary text-nowrap">${item.fecha_registro}</td>
-                <td class="text-center"><span class="badge-cui">${item.codigo_cui || ''}</span></td>
-                <td class="fw-bold text-danger text-uppercase">${item.estado_general || ''}</td>
-                <td><small>${item.detalle_estado_general || ''}</small></td>
-                <td>
-                    <div class="fw-bold text-primary">${item.estado_especifico || ''}</div>
-                    <div class="text-muted small">${item.detalle_estado_especifico || ''}</div>
-                </td>
-                <td class="fw-bold text-info">${item.timeline_inversion || '-'}</td>
-                <td><small>${item.acciones_programadas || ''}</small></td>
-                <td class="fw-bold text-center">${item.sisgedo || '-'}</td>
-            </tr>
-        `).join('');
+ function renderizar(datos) {
+    const body = document.getElementById('tablaBody');
+    if (!datos || datos.length === 0) {
+        body.innerHTML = '<tr><td colspan="8" class="text-center">No hay registros encontrados</td></tr>';
+        return;
     }
+    
+    body.innerHTML = datos.map(item => `
+        <tr>
+            <td class="fw-bold text-secondary text-nowrap">${item.fecha_registro || '-'}</td>
+            <td class="text-center"><span class="badge-cui">${item.codigo_cui || ''}</span></td>
+            <td class="fw-bold text-danger text-uppercase">${item.estado_general || ''}</td>
+            <td><small>${item.detalle_estado_general || ''}</small></td>
+            <td>
+                <div class="fw-bold text-primary">${item.estado_especifico || ''}</div>
+                <div class="text-muted small">${item.detalle_estado_especifico || ''}</div>
+            </td>
+            <td class="fw-bold text-info">${item.timeline_inversion || '-'}</td>
+            <td><small>${item.acciones_programadas || ''}</small></td>
+            <td class="fw-bold text-center">${item.sisgedo || '-'}</td>
+        </tr>
+    `).join('');
+}
 
     function filtrar() {
         const q = document.getElementById('buscador').value.toLowerCase();
