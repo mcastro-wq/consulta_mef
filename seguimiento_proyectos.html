@@ -296,7 +296,7 @@ async function fetchData() {
     }
 
     function guardarSeguimiento(event) {
-    const urlApi = 'https://script.google.com/macros/s/AKfycbwDEGA0bOYDv3opzS0qteRFUS_ik9SzT5XlKCpjU6_PWzfPtBjBLfI52Zog8Cojtgz1/exec';
+    const urlApi = 'https://script.google.com/macros/s/AKfycbzE3RjPk02QohR3kTnbkBa_Nfeatu5CICYQm9LzDLndk429Vsp7D3PAWOvsReul0sb2/exec';
     
     const getVal = (id) => {
         const el = document.getElementById(id);
@@ -325,25 +325,21 @@ async function fetchData() {
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Guardando...';
 
-    fetch(urlApi, {
+  fetch(urlApi, {
         method: 'POST',
-        mode: 'no-cors', 
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(datos)
+        // ELIMINAMOS mode: 'no-cors' para que funcione el intercambio de datos real
+        body: JSON.stringify(datos) 
     })
-    .then(() => {
+    .then(response => {
+        // Aunque Google Apps Script a veces da error de CORS en el POST, 
+        // el dato suele llegar. Si quieres confirmar éxito total:
         alert("✅ ¡Registro enviado a la base de datos!");
-
+        
         // Actualización inmediata de los cuadros en pantalla
         document.getElementById('track-est-gral').innerText = datos.estado_general || "-";
         document.getElementById('track-det-gral').innerText = datos.detalle_estado_general || "-";
-        document.getElementById('track-est-esp').innerText = datos.estado_especifico || "-";
-        document.getElementById('track-det-esp').innerText = datos.detalle_estado_especifico || "-";
-        document.getElementById('track-sisgedo').innerText = datos.sisgedo || "-";
-        document.getElementById('track-timeline').innerText = datos.timeline_inversion || "-";
-        document.getElementById('track-acciones').innerText = datos.acciones_programadas || "-";
-
-        // Cerrar modal y limpiar
+        // ... (resto de tus actualizaciones de UI)
+        
         const modalEl = document.getElementById('modalRegistro');
         const modal = bootstrap.Modal.getInstance(modalEl);
         if (modal) modal.hide();
@@ -351,7 +347,7 @@ async function fetchData() {
     })
     .catch(error => {
         console.error('Error:', error);
-        alert("❌ Error de comunicación.");
+        alert("❌ Error de comunicación. Revisa la consola.");
     })
     .finally(() => {
         btn.disabled = false;
@@ -529,7 +525,7 @@ async function fetchData() {
     }
 
  function cargarDetalleSeguimiento(cui) {
-    const urlApi = 'https://script.google.com/macros/s/AKfycbwDEGA0bOYDv3opzS0qteRFUS_ik9SzT5XlKCpjU6_PWzfPtBjBLfI52Zog8Cojtgz1/exec';
+    const urlApi = 'https://script.google.com/macros/s/AKfycbzE3RjPk02QohR3kTnbkBa_Nfeatu5CICYQm9LzDLndk429Vsp7D3PAWOvsReul0sb2/exec';
     
     // Limpiar y poner estado de carga
     document.querySelectorAll('.tracking-body').forEach(el => el.innerText = "...");
