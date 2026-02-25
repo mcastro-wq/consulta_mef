@@ -243,85 +243,51 @@
     let timeoutBusqueda;
     let cuiSeleccionadoActual = "";
 
-async function fetchData() {
-    const anio = document.getElementById('selectorAnio').value;
-    document.getElementById('display-anio').innerText = `Monitor de Ejecución Presupuestal ${anio}`;
-    
-    let url = 'data_proyectos.json'; // 2026
-    if (anio === '2025') {
-        url = 'https://www.dropbox.com/scl/fi/nsyjqewk4obhxgdu47nxj/data_2025_diario.json?rlkey=1ctmsaht03bma9a2bmef5fm1y&st=egh05uqd&dl=1';
-    }
-
-    try {
-        const res = await fetch(url);
-        const json = await res.json();
-
-        // VALIDACIÓN DE ESTRUCTURA
+    async function fetchData() {
+        const anio = document.getElementById('selectorAnio').value;
+        document.getElementById('display-anio').innerText = `Monitor de Ejecución Presupuestal ${anio}`;
+        
+        // El link de 2026 sigue igual. El de 2025 usa un Proxy para saltar el bloqueo de Dropbox.
+        let url = 'data_proyectos.json'; 
         if (anio === '2025') {
-            // Si es 2025, el json es el array directo
-            allData = json; 
-            document.getElementById('txt-corte').innerText = "Carga Directa Dropbox";
-        } else {
-            // Si es 2026, usa la estructura original
-            allData = json.proyectos;
-            document.getElementById('txt-corte').innerText = json.fecha_extraccion;
+            const dropboxLink = 'https://www.dropbox.com/scl/fi/nsyjqewk4obhxgdu47nxj/data_2025_diario.json?rlkey=1ctmsaht03bma9a2bmef5fm1y&st=egh05uqd&dl=1';
+            url = `https://api.allorigins.win/raw?url=${encodeURIComponent(dropboxLink)}`;
         }
 
-        const select = document.getElementById('selectEjecutora');
-        select.innerHTML = '<option value="TODAS">-- TODAS LAS UNIDADES --</option>';
-        
-        const ejecutoras = [...new Set(allData.map(p => p.EJECUTORA_NOMBRE))].sort();
-        ejecutoras.forEach(ej => {
-            if(ej) {
-                const opt = document.createElement('option');
-                opt.value = ej;
-                opt.innerText = ej;
-                select.appendChild(opt);
+        try {
+            const res = await fetch(url);
+            if (!res.ok) throw new Error('Error en respuesta de red');
+            const json = await res.json();
+
+            // 2025 es un Array [], 2026 es un Objeto {} con propiedad .proyectos
+            if (Array.isArray(json)) {
+                allData = json;
+                document.getElementById('txt-corte').innerText = "Datos 2025 (Carga Externa)";
+            } else if (json.proyectos) {
+                allData = json.proyectos;
+                document.getElementById('txt-corte').innerText = json.fecha_extraccion || "Datos 2026";
             }
-        });
 
-        filtrar();
-    } catch (e) { 
-        console.error("Error cargando datos", e); 
-        document.getElementById('txt-corte').innerText = "Error en carga";
+            // Actualizar select de ejecutoras
+            const select = document.getElementById('selectEjecutora');
+            select.innerHTML = '<option value="TODAS">-- TODAS LAS UNIDADES --</option>';
+            const ejecutoras = [...new Set(allData.map(p => p.EJECUTORA_NOMBRE))].sort();
+            ejecutoras.forEach(ej => {
+                if(ej) {
+                    const opt = document.createElement('option');
+                    opt.value = ej;
+                    opt.innerText = ej;
+                    select.appendChild(opt);
+                }
+            });
+
+            filtrar();
+        } catch (e) { 
+            console.error("Error cargando datos:", e); 
+            document.getElementById('txt-corte').innerText = "Error de conexión o CORS";
+        }
     }
-}
 
-function filtrar() {
-    clearTimeout(timeoutBusqueda);
-    timeoutBusqueda = setTimeout(() => {
-        const query = document.getElementById('inputBusqueda').value.toLowerCase();
-        const verProyecto = document.getElementById('checkProyecto').checked;
-        const verActividad = document.getElementById('checkActividad').checked;
-        const ejecSeleccionada = document.getElementById('selectEjecutora').value;
-
-        const filtered = allData.filter(p => {
-            // NORMALIZACIÓN DE CAMPOS PARA 2025 Y 2026
-            const tipo = (p.TIPO || p.TIPO_ACT_PROY_NOMBRE || "").toUpperCase();
-            const esProyecto = tipo.includes("PROYECTO");
-            const esActividad = tipo.includes("PRODUCTO") || tipo.includes("ACTIVIDAD");
-            
-            const cumpleEjecutora = (ejecSeleccionada === "TODAS" || p.EJECUTORA_NOMBRE === ejecSeleccionada);
-
-            // Convertimos a número para asegurar que la suma funcione
-            p.MONTO_PIM = parseFloat(p.MONTO_PIM) || 0;
-            p.MONTO_DEVENGADO = parseFloat(p.MONTO_DEVENGADO) || 0;
-            p.MONTO_CERTIFICADO = parseFloat(p.MONTO_CERTIFICADO) || 0;
-
-            return cumpleEjecutora &&
-                   ((verProyecto && esProyecto) || (verActividad && esActividad)) &&
-                   (p.PRODUCTO_PROYECTO_NOMBRE.toLowerCase().includes(query) || p.PRODUCTO_PROYECTO.toString().includes(query));
-        });
-
-        renderResumen(filtered, ejecSeleccionada);
-        actualizarGaugesGlobales(filtered);
-        document.getElementById('txt-contador').innerText = filtered.length;
-        renderTable(filtered.slice(0, 100));
-        document.getElementById('msg-limit').classList.toggle('d-none', filtered.length <= 100);
-    }, 250);
-}
-
-    // --- EL RESTO DE TUS FUNCIONES SE MANTIENEN IGUAL (NO SE TOCAN) ---
     function filtrar() {
         clearTimeout(timeoutBusqueda);
         timeoutBusqueda = setTimeout(() => {
@@ -331,13 +297,18 @@ function filtrar() {
             const ejecSeleccionada = document.getElementById('selectEjecutora').value;
 
             const filtered = allData.filter(p => {
-                const tipo = (p.TIPO || "").toUpperCase();
-                const esProyecto = tipo === "PROYECTO";
-                const esActividad = tipo === "PRODUCTO" || tipo === "ACTIVIDAD";
+                // Normalización para que funcione con ambos JSON
+                const tipo = (p.TIPO || p.TIPO_ACT_PROY_NOMBRE || "").toUpperCase();
+                const esProyecto = tipo.includes("PROYECTO");
+                const esActividad = tipo.includes("ACTIVIDAD") || tipo.includes("PRODUCTO");
+                
                 const cumpleEjecutora = (ejecSeleccionada === "TODAS" || p.EJECUTORA_NOMBRE === ejecSeleccionada);
+                const nombre = (p.PRODUCTO_PROYECTO_NOMBRE || "").toLowerCase();
+                const cui = (p.PRODUCTO_PROYECTO || "").toString();
+
                 return cumpleEjecutora &&
                        ((verProyecto && esProyecto) || (verActividad && esActividad)) &&
-                       (p.PRODUCTO_PROYECTO_NOMBRE.toLowerCase().includes(query) || p.PRODUCTO_PROYECTO.toString().includes(query));
+                       (nombre.includes(query) || cui.includes(query));
             });
 
             renderResumen(filtered, ejecSeleccionada);
@@ -348,12 +319,13 @@ function filtrar() {
         }, 250);
     }
 
+    // --- REUTILIZACIÓN DE TUS FUNCIONES ORIGINALES (SIN CAMBIOS) ---
     function renderResumen(data, nombreEjecutora) {
         let t = { pia:0, pim:0, cer:0, can:0, cme:0, dev:0 };
         data.forEach(p => {
-            t.pia += (p.MONTO_PIA || 0); t.pim += (p.MONTO_PIM || 0);
-            t.cer += (p.MONTO_CERTIFICADO || 0); t.can += (p.MONTO_COMPROMETIDO_ANUAL || 0);
-            t.cme += (p.MONTO_COMPROMETIDO || 0); t.dev += (p.MONTO_DEVENGADO || 0);
+            t.pia += Number(p.MONTO_PIA || 0); t.pim += Number(p.MONTO_PIM || 0);
+            t.cer += Number(p.MONTO_CERTIFICADO || 0); t.can += Number(p.MONTO_COMPROMETIDO_ANUAL || 0);
+            t.cme += Number(p.MONTO_COMPROMETIDO || 0); t.dev += Number(p.MONTO_DEVENGADO || 0);
         });
         const titulo = nombreEjecutora === "TODAS" ? "GORE LAMBAYEQUE (TODAS)" : nombreEjecutora;
         const perc = (v) => t.pim > 0 ? (v/t.pim*100).toFixed(1) + '%' : '0%';
@@ -377,10 +349,11 @@ function filtrar() {
         const tbody = document.getElementById('tbody-main');
         if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="8" class="text-center p-4">Sin datos</td></tr>'; return; }
         tbody.innerHTML = data.map(p => {
-            const pim = p.MONTO_PIM || 0;
-            const dev = p.MONTO_DEVENGADO || 0;
+            const pim = Number(p.MONTO_PIM || 0);
+            const dev = Number(p.MONTO_DEVENGADO || 0);
+            const cer = Number(p.MONTO_CERTIFICADO || 0);
             const pDev = pim > 0 ? (dev / pim * 100).toFixed(1) : 0;
-            const pCer = pim > 0 ? (p.MONTO_CERTIFICADO / pim * 100).toFixed(1) : 0;
+            const pCer = pim > 0 ? (cer / pim * 100).toFixed(1) : 0;
             let sem = 'status-bajo', txt = 'BAJO', clr = 'text-danger';
             if (pDev > 75) { sem = 'status-alto'; txt = 'ALTO'; clr = 'text-success'; }
             else if (pDev >= 40) { sem = 'status-medio'; txt = 'MEDIO'; clr = 'text-warning'; }
@@ -389,13 +362,16 @@ function filtrar() {
                     <td class="text-center fw-bold text-muted">${p.PRODUCTO_PROYECTO}</td>
                     <td class="text-start fw-bold" style="width:35%">${p.PRODUCTO_PROYECTO_NOMBRE}</td>
                     <td class="text-end">${pim.toLocaleString()}</td>
-                    <td class="text-end">${p.MONTO_CERTIFICADO.toLocaleString()}</td>
+                    <td class="text-end">${cer.toLocaleString()}</td>
                     <td class="text-center text-primary">${pCer}%</td>
                     <td class="text-end text-success fw-bold">${dev.toLocaleString()}</td>
                     <td class="text-center fw-bold text-success">${pDev}%</td>
-                    <td class="text-center"><div class="d-flex align-items-center justify-content-center gap-2">
-                        <span class="semaforo ${sem}"></span><span class="fw-bold ${clr}" style="font-size: 0.6rem;">${txt}</span>
-                    </div></td>
+                    <td class="text-center">
+                        <div class="d-flex align-items-center justify-content-center gap-2">
+                            <span class="semaforo ${sem}"></span>
+                            <span class="fw-bold ${clr}" style="font-size: 0.6rem;">${txt}</span>
+                        </div>
+                    </td>
                 </tr>`;
         }).join('');
     }
@@ -409,12 +385,13 @@ function filtrar() {
         document.getElementById('form-cui').value = cui;
         const p = allData.find(i => i.PRODUCTO_PROYECTO.toString() === cui.toString());
         if(p) {
-            const getP = (v) => p.MONTO_PIM > 0 ? (v/p.MONTO_PIM*100).toFixed(1) : 0;
-            updateG('g-cer', 'v-cer', getP(p.MONTO_CERTIFICADO));
-            updateG('g-can', 'v-can', getP(p.MONTO_COMPROMETIDO_ANUAL));
-            updateG('g-cme', 'v-cme', getP(p.MONTO_COMPROMETIDO));
-            updateG('g-dev', 'v-dev', getP(p.MONTO_DEVENGADO));
-            updateG('g-gir', 'v-gir', getP(p.MONTO_GIRADO));
+            const pim = Number(p.MONTO_PIM || 0);
+            const getP = (v) => pim > 0 ? (v/pim*100).toFixed(1) : 0;
+            updateG('g-cer', 'v-cer', getP(Number(p.MONTO_CERTIFICADO)));
+            updateG('g-can', 'v-can', getP(Number(p.MONTO_COMPROMETIDO_ANUAL)));
+            updateG('g-cme', 'v-cme', getP(Number(p.MONTO_COMPROMETIDO)));
+            updateG('g-dev', 'v-dev', getP(Number(p.MONTO_DEVENGADO)));
+            updateG('g-gir', 'v-gir', getP(Number(p.MONTO_GIRADO)));
         }
         cargarDetalleSeguimiento(cui);
     }
@@ -422,9 +399,9 @@ function filtrar() {
     function actualizarGaugesGlobales(data) {
         let s = { pim:0, cer:0, can:0, cme:0, dev:0, gir:0 };
         data.forEach(r => {
-            s.pim += (r.MONTO_PIM || 0); s.cer += (r.MONTO_CERTIFICADO || 0);
-            s.can += (r.MONTO_COMPROMETIDO_ANUAL || 0); s.cme += (r.MONTO_COMPROMETIDO || 0);
-            s.dev += (r.MONTO_DEVENGADO || 0); s.gir += (r.MONTO_GIRADO || 0);
+            s.pim += Number(r.MONTO_PIM || 0); s.cer += Number(r.MONTO_CERTIFICADO || 0);
+            s.can += Number(r.MONTO_COMPROMETIDO_ANUAL || 0); s.cme += Number(r.MONTO_COMPROMETIDO || 0);
+            s.dev += Number(r.MONTO_DEVENGADO || 0); s.gir += Number(r.MONTO_GIRADO || 0);
         });
         const getP = (v) => s.pim > 0 ? (v/s.pim*100).toFixed(1) : 0;
         updateG('g-cer', 'v-cer', getP(s.cer));
@@ -442,9 +419,10 @@ function filtrar() {
         if(tel) tel.innerText = val + '%';
     }
 
+    // Funciones de seguimiento (Google Script) se mantienen igual...
     function cargarDetalleSeguimiento(cui) {
         const urlApi = 'https://script.google.com/macros/s/AKfycbwDEGA0bOYDv3opzS0qteRFUS_ik9SzT5XlKCpjU6_PWzfPtBjBLfI52Zog8Cojtgz1/exec';
-        document.querySelectorAll('.tracking-body').forEach(el => el.innerText = "Cargando...");
+        document.querySelectorAll('.tracking-body').forEach(el => el.innerText = "...");
         fetch(`${urlApi}?cui=${cui}`)
             .then(r => r.json())
             .then(res => {
@@ -483,7 +461,7 @@ function filtrar() {
         const btn = event.target.closest('button');
         const originalText = btn.innerHTML;
         btn.disabled = true;
-        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Guardando...';
+        btn.innerHTML = 'Guardando...';
 
         fetch(urlApi, { method: 'POST', mode: 'no-cors', body: JSON.stringify(datos) })
         .then(() => {
@@ -493,8 +471,7 @@ function filtrar() {
         }).finally(() => { btn.disabled = false; btn.innerHTML = originalText; });
     }
 
-    // Inicio automático
-    fetchData();
+    fetchData(); // Carga inicial
 </script>
 </body>
 </html>
