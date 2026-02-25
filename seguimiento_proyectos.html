@@ -10,7 +10,6 @@
         :root { --gore-brown: #703020; --gore-orange: #d35400; }
         body { background-color: #f8f9fa; font-family: 'Segoe UI', sans-serif; font-size: 0.75rem; color: #333; }
         
-        /* Estilos del Loader */
         #loader-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(255,255,255,0.9); z-index: 9999;
@@ -244,41 +243,30 @@ async function fetchData() {
             if (anio === '2025') {
                 loaderText.innerText = "Cargando Base 2025 (Uniendo Partes)...";
                 
-                // 1. Descargar ambos archivos como TEXTO para limpiarlos antes de unir
                 const [res1, res2] = await Promise.all([
                     fetch('data_2025_diario_part1.json').then(r => r.text()),
                     fetch('data_2025_diario_part2.json').then(r => r.text())
                 ]);
 
-                // 2. Limpieza de seguridad: Quitamos corchetes de inicio/fin y espacios
+                // Limpieza de seguridad mejorada
                 let cleanPart1 = res1.trim().replace(/^\[/, "").replace(/\]$/, "").trim();
                 let cleanPart2 = res2.trim().replace(/^\[/, "").replace(/\]$/, "").trim();
 
-                // 3. Asegurar la coma de unión si falta
-                if (!cleanPart1.endsWith(',') && !cleanPart2.startsWith('{')) {
-                    // Si no hay coma al final del 1 ni inicio de objeto en el 2, algo anda mal, 
-                    // pero intentamos forzar la unión con una coma
-                    cleanPart1 += ",";
-                } else if (cleanPart1.endsWith(',') && cleanPart2.startsWith('{')) {
-                    // Ya tiene coma, no hacemos nada
-                } else if (!cleanPart1.endsWith(',')) {
-                    cleanPart1 += ",";
-                }
-
-                // 4. Unir y convertir a JSON real
-                const fullJsonText = "[" + cleanPart1 + cleanPart2 + "]";
+                // Quitar coma final de parte 1 si existe para controlarla nosotros
+                if (cleanPart1.endsWith(',')) cleanPart1 = cleanPart1.slice(0, -1);
+                
+                // Unir con una sola coma de seguridad
+                const fullJsonText = "[" + cleanPart1 + "," + cleanPart2 + "]";
                 
                 try {
                     allData = JSON.parse(fullJsonText);
                 } catch (parseError) {
                     console.error("Error al parsear el JSON unido:", parseError);
-                    throw new Error("La unión de archivos falló. Revisa que los archivos terminen/empiecen en objetos completos.");
+                    throw new Error("La unión de archivos falló. Revisa el formato de las partes.");
                 }
-
                 txtCorte.innerText = "Datos 2025 Sincronizados";
 
             } else {
-                // Lógica para 2026 (Archivo único)
                 loaderText.innerText = "Cargando Base de Datos 2026...";
                 const res = await fetch('data_proyectos.json');
                 if (!res.ok) throw new Error("No se encontró el archivo 2026");
@@ -287,7 +275,7 @@ async function fetchData() {
                 txtCorte.innerText = json.fecha_extraccion || "Actualizado 2026";
             }
 
-            // Población de selectores (el resto del código sigue igual...)
+            // Población de selectores
             const select = document.getElementById('selectEjecutora');
             select.innerHTML = '<option value="TODAS">-- TODAS LAS UNIDADES --</option>';
             const ejecutoras = [...new Set(allData.map(p => p.EJECUTORA_NOMBRE))].filter(Boolean).sort();
@@ -301,7 +289,7 @@ async function fetchData() {
         } catch (e) {
             console.error("Error detallado:", e);
             txtCorte.innerText = "Error: " + e.message;
-            alert("Error al cargar datos. Verifica los nombres de los archivos en GitHub.");
+            alert("Error al cargar datos. Revisa la consola (F12).");
         } finally {
             loader.classList.add('d-none');
         }
@@ -316,8 +304,8 @@ async function fetchData() {
             const ejecSeleccionada = document.getElementById('selectEjecutora').value;
 
             const filtered = allData.filter(p => {
-                // Normalización de tipos (2025 vs 2026 usan nombres distintos a veces)
-                const tipoRaw = (p.TIPO || p.TIPO_ACT_PROY_NOMBRE || "").toUpperCase();
+                // Compatibilidad de nombres de columna 2025 vs 2026
+                const tipoRaw = (p.TIPO_ACT_PROY_NOMBRE || p.TIPO || "").toUpperCase();
                 const esProyecto = tipoRaw.includes("PROYECTO");
                 const esActividad = tipoRaw.includes("PRODUCTO") || tipoRaw.includes("ACTIVIDAD") || tipoRaw.includes("ACCION");
                 
@@ -333,7 +321,7 @@ async function fetchData() {
             renderResumen(filtered, ejecSeleccionada);
             actualizarGaugesGlobales(filtered);
             document.getElementById('txt-contador').innerText = filtered.length;
-            renderTable(filtered.slice(0, 100)); // Limite visual para rendimiento
+            renderTable(filtered.slice(0, 100)); 
             document.getElementById('msg-limit').classList.toggle('d-none', filtered.length <= 100);
         }, 250);
     }
@@ -341,13 +329,17 @@ async function fetchData() {
     function renderResumen(data, nombreEjecutora) {
         let t = { pia:0, pim:0, cer:0, can:0, cme:0, dev:0 };
         data.forEach(p => {
-            t.pia += parseFloat(p.MONTO_PIA || 0); t.pim += parseFloat(p.MONTO_PIM || 0);
-            t.cer += parseFloat(p.MONTO_CERTIFICADO || 0); t.can += parseFloat(p.MONTO_COMPROMETIDO_ANUAL || 0);
-            t.cme += parseFloat(p.MONTO_COMPROMETIDO || 0); t.dev += parseFloat(p.MONTO_DEVENGADO || 0);
+            // parseFloat robusto para evitar NaN
+            t.pia += parseFloat(p.MONTO_PIA) || 0; 
+            t.pim += parseFloat(p.MONTO_PIM) || 0;
+            t.cer += parseFloat(p.MONTO_CERTIFICADO) || 0; 
+            t.can += parseFloat(p.MONTO_COMPROMETIDO_ANUAL) || 0;
+            t.cme += parseFloat(p.MONTO_COMPROMETIDO) || 0; 
+            t.dev += parseFloat(p.MONTO_DEVENGADO) || 0;
         });
         
         const titulo = nombreEjecutora === "TODAS" ? "GORE LAMBAYEQUE (TODAS)" : nombreEjecutora;
-        const perc = (v) => t.pim > 0 ? (v/t.pim*100).toFixed(1) + '%' : '0%';
+        const perc = (v) => t.pim > 0 ? (v/t.pim*100).toFixed(1) + '%' : '0.0%';
         
         document.getElementById('resumen-ejecutora').innerHTML = `
             <tr>
@@ -365,15 +357,15 @@ async function fetchData() {
         if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="8" class="text-center p-4">Sin datos coincidentes</td></tr>'; return; }
         
         tbody.innerHTML = data.map(p => {
-            const pim = parseFloat(p.MONTO_PIM || 0);
-            const dev = parseFloat(p.MONTO_DEVENGADO || 0);
-            const cert = parseFloat(p.MONTO_CERTIFICADO || 0);
-            const pDev = pim > 0 ? (dev / pim * 100).toFixed(1) : 0;
-            const pCer = pim > 0 ? (cert / pim * 100).toFixed(1) : 0;
+            const pim = parseFloat(p.MONTO_PIM) || 0;
+            const dev = parseFloat(p.MONTO_DEVENGADO) || 0;
+            const cert = parseFloat(p.MONTO_CERTIFICADO) || 0;
+            const pDev = pim > 0 ? (dev / pim * 100).toFixed(1) : "0.0";
+            const pCer = pim > 0 ? (cert / pim * 100).toFixed(1) : "0.0";
             
             let sem = 'status-bajo', txt = 'BAJO', clr = 'text-danger';
-            if (pDev > 75) { sem = 'status-alto'; txt = 'ALTO'; clr = 'text-success'; }
-            else if (pDev >= 40) { sem = 'status-medio'; txt = 'MEDIO'; clr = 'text-warning'; }
+            if (parseFloat(pDev) > 75) { sem = 'status-alto'; txt = 'ALTO'; clr = 'text-success'; }
+            else if (parseFloat(pDev) >= 40) { sem = 'status-medio'; txt = 'MEDIO'; clr = 'text-warning'; }
 
             return `
                 <tr class="row-item" onclick="seleccionar('${p.PRODUCTO_PROYECTO}', this)">
@@ -404,8 +396,8 @@ async function fetchData() {
 
         const p = allData.find(i => i.PRODUCTO_PROYECTO.toString() === cui.toString());
         if(p) {
-            const pim = parseFloat(p.MONTO_PIM || 0);
-            const getP = (v) => pim > 0 ? (parseFloat(v)/pim*100).toFixed(1) : 0;
+            const pim = parseFloat(p.MONTO_PIM) || 0;
+            const getP = (v) => pim > 0 ? (parseFloat(v || 0)/pim*100).toFixed(1) : 0;
             updateG('g-cer', 'v-cer', getP(p.MONTO_CERTIFICADO));
             updateG('g-can', 'v-can', getP(p.MONTO_COMPROMETIDO_ANUAL));
             updateG('g-cme', 'v-cme', getP(p.MONTO_COMPROMETIDO));
@@ -418,9 +410,12 @@ async function fetchData() {
     function actualizarGaugesGlobales(data) {
         let s = { pim:0, cer:0, can:0, cme:0, dev:0, gir:0 };
         data.forEach(r => {
-            s.pim += parseFloat(r.MONTO_PIM || 0); s.cer += parseFloat(r.MONTO_CERTIFICADO || 0);
-            s.can += parseFloat(r.MONTO_COMPROMETIDO_ANUAL || 0); s.cme += parseFloat(r.MONTO_COMPROMETIDO || 0);
-            s.dev += parseFloat(r.MONTO_DEVENGADO || 0); s.gir += parseFloat(r.MONTO_GIRADO || 0);
+            s.pim += parseFloat(r.MONTO_PIM) || 0; 
+            s.cer += parseFloat(r.MONTO_CERTIFICADO) || 0;
+            s.can += parseFloat(r.MONTO_COMPROMETIDO_ANUAL) || 0; 
+            s.cme += parseFloat(r.MONTO_COMPROMETIDO) || 0;
+            s.dev += parseFloat(r.MONTO_DEVENGADO) || 0; 
+            s.gir += parseFloat(r.MONTO_GIRADO) || 0;
         });
         const getP = (v) => s.pim > 0 ? (v/s.pim*100).toFixed(1) : 0;
         updateG('g-cer', 'v-cer', getP(s.cer));
@@ -462,7 +457,6 @@ async function fetchData() {
         ids.forEach(id => { if(document.getElementById(id)) document.getElementById(id).innerText = "-"; });
     }
 
-    // Inicio automático al cargar página
     window.onload = fetchData;
 </script>
 </body>
