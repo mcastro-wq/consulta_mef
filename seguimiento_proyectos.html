@@ -63,7 +63,7 @@
 <div id="loader-overlay" class="d-none">
     <div class="spinner-border text-danger" style="width: 3rem; height: 3rem;" role="status"></div>
     <h5 class="mt-3 fw-bold" style="color: var(--gore-brown)" id="loader-text">Procesando base de datos...</h5>
-    <p class="text-muted">Esto puede tardar unos segundos debido al tamaño del archivo.</p>
+    <p class="text-muted" id="loader-subtext">Esto puede tardar unos segundos debido al tamaño del archivo.</p>
 </div>
 
 <header class="header-gore d-flex justify-content-between align-items-center">
@@ -234,6 +234,7 @@
         const loader = document.getElementById('loader-overlay');
         const txtCorte = document.getElementById('txt-corte');
         const mainTitle = document.getElementById('main-title');
+        const loaderText = document.getElementById('loader-text');
 
         mainTitle.innerText = `Monitor de Ejecución Presupuestal ${anio}`;
         loader.classList.remove('d-none');
@@ -241,27 +242,35 @@
 
         try {
             if (anio === '2025') {
-                document.getElementById('loader-text').innerText = "Cargando Base de Datos 2025 (46MB)...";
-                // Cargar partes en paralelo
+                loaderText.innerText = "Cargando Base 2025 (Uniendo Partes)...";
+                // DESCARGA AMBAS PARTES EN PARALELO
                 const [res1, res2] = await Promise.all([
                     fetch('data_2025_part1.json'),
                     fetch('data_2025_part2.json')
                 ]);
+
+                if (!res1.ok || !res2.ok) throw new Error("No se pudieron cargar las partes del 2025");
+
                 const d1 = await res1.json();
                 const d2 = await res2.json();
+
+                // UNIÓN DE DATOS HISTÓRICOS
                 allData = d1.concat(d2);
-                txtCorte.innerText = "Datos 2025 Cargados";
+                txtCorte.innerText = "Datos Históricos 2025 Sincronizados";
             } else {
-                document.getElementById('loader-text').innerText = "Cargando Base de Datos 2026...";
+                loaderText.innerText = "Cargando Base de Datos 2026...";
                 const res = await fetch('data_proyectos.json');
+                if (!res.ok) throw new Error("No se encontró el archivo 2026");
                 const json = await res.json();
-                allData = json.proyectos;
-                txtCorte.innerText = json.fecha_extraccion;
+                allData = json.proyectos || json;
+                txtCorte.innerText = json.fecha_extraccion || "Actualizado 2026";
             }
 
-            // Población de selectores
+            // Población de selectores de ejecutora
             const select = document.getElementById('selectEjecutora');
             select.innerHTML = '<option value="TODAS">-- TODAS LAS UNIDADES --</option>';
+            
+            // Obtenemos nombres únicos de ejecutoras
             const ejecutoras = [...new Set(allData.map(p => p.EJECUTORA_NOMBRE))].filter(Boolean).sort();
             ejecutoras.forEach(ej => {
                 const opt = document.createElement('option');
@@ -272,7 +281,8 @@
             filtrar();
         } catch (e) {
             console.error("Error cargando JSON", e);
-            txtCorte.innerText = "Error en JSON";
+            txtCorte.innerText = "Error en JSON: " + e.message;
+            alert("Error al cargar datos. Verifica que los archivos existan en GitHub.");
         } finally {
             loader.classList.add('d-none');
         }
@@ -287,10 +297,10 @@
             const ejecSeleccionada = document.getElementById('selectEjecutora').value;
 
             const filtered = allData.filter(p => {
-                // Compatibilidad de nombres de columnas entre 2025 y 2026
+                // Normalización de tipos (2025 vs 2026 usan nombres distintos a veces)
                 const tipoRaw = (p.TIPO || p.TIPO_ACT_PROY_NOMBRE || "").toUpperCase();
                 const esProyecto = tipoRaw.includes("PROYECTO");
-                const esActividad = tipoRaw.includes("PRODUCTO") || tipoRaw.includes("ACTIVIDAD");
+                const esActividad = tipoRaw.includes("PRODUCTO") || tipoRaw.includes("ACTIVIDAD") || tipoRaw.includes("ACCION");
                 
                 const cumpleEjecutora = (ejecSeleccionada === "TODAS" || p.EJECUTORA_NOMBRE === ejecSeleccionada);
                 const cui = (p.PRODUCTO_PROYECTO || "").toString();
@@ -304,7 +314,7 @@
             renderResumen(filtered, ejecSeleccionada);
             actualizarGaugesGlobales(filtered);
             document.getElementById('txt-contador').innerText = filtered.length;
-            renderTable(filtered.slice(0, 100));
+            renderTable(filtered.slice(0, 100)); // Limite visual para rendimiento
             document.getElementById('msg-limit').classList.toggle('d-none', filtered.length <= 100);
         }, 250);
     }
@@ -333,7 +343,7 @@
 
     function renderTable(data) {
         const tbody = document.getElementById('tbody-main');
-        if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="8" class="text-center p-4">Sin datos</td></tr>'; return; }
+        if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="8" class="text-center p-4">Sin datos coincidentes</td></tr>'; return; }
         
         tbody.innerHTML = data.map(p => {
             const pim = parseFloat(p.MONTO_PIM || 0);
@@ -433,8 +443,8 @@
         ids.forEach(id => { if(document.getElementById(id)) document.getElementById(id).innerText = "-"; });
     }
 
-    // Inicio automático
-    fetchData();
+    // Inicio automático al cargar página
+    window.onload = fetchData;
 </script>
 </body>
 </html>
