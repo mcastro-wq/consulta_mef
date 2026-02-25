@@ -251,37 +251,35 @@
         
         document.getElementById('display-anio').innerText = `Monitor de Ejecución Presupuestal ${anio}`;
         
-        // Mostrar spinner
         if(spinner) spinner.classList.remove('d-none');
-        txtCorte.innerText = "Cargando datos...";
+        txtCorte.innerText = "Cargando...";
 
-        let url = 'data_proyectos.json'; // 2026
+        // Usamos el parámetro raw=1 que es más estable para peticiones directas en Dropbox
+        let url = 'data_proyectos.json'; 
         if (anio === '2025') {
-            // Link de Dropbox con Proxy para evitar bloqueo CORS
-            const dropboxLink = 'https://www.dropbox.com/scl/fi/nsyjqewk4obhxgdu47nxj/data_2025_diario.json?rlkey=1ctmsaht03bma9a2bmef5fm1y&st=egh05uqd&dl=1';
-            url = `https://api.allorigins.win/raw?url=${encodeURIComponent(dropboxLink)}`;
+            url = 'https://www.dropbox.com/scl/fi/nsyjqewk4obhxgdu47nxj/data_2025_diario.json?rlkey=1ctmsaht03bma9a2bmef5fm1y&raw=1';
         }
 
         try {
+            // Añadimos un pequeño delay para que el spinner sea visible
+            await new Promise(resolve => setTimeout(resolve, 500));
+
             const res = await fetch(url);
-            if (!res.ok) throw new Error('Error en la descarga');
+            if (!res.ok) throw new Error('Servidor no responde');
             const json = await res.json();
 
-            // Lógica para detectar estructura de 2025 vs 2026
+            // Detectar estructura (Array para 2025, Objeto para 2026)
             if (Array.isArray(json)) {
-                // Caso 2025: Es una lista directa []
                 allData = json;
-                txtCorte.innerText = "Datos 2025 (Dropbox)";
+                txtCorte.innerText = "Sincronizado: 2025";
             } else if (json && json.proyectos) {
-                // Caso 2026: Tiene propiedad .proyectos
                 allData = json.proyectos;
-                txtCorte.innerText = json.fecha_extraccion || "Datos 2026";
+                txtCorte.innerText = json.fecha_extraccion || "Sincronizado: 2026";
             } else {
-                allData = [];
-                txtCorte.innerText = "Formato no reconocido";
+                throw new Error('Formato incompatible');
             }
 
-            // Actualizar select de ejecutora
+            // Actualizar Unidades Ejecutoras
             const select = document.getElementById('selectEjecutora');
             select.innerHTML = '<option value="TODAS">-- TODAS LAS UNIDADES --</option>';
             const ejecutoras = [...new Set(allData.map(p => p.EJECUTORA_NOMBRE))].filter(Boolean).sort();
@@ -294,10 +292,11 @@
 
             filtrar();
         } catch (e) { 
-            console.error("Error cargando datos:", e); 
-            txtCorte.innerText = "Error: Verifica conexión";
+            console.error("Error de carga:", e); 
+            txtCorte.innerText = "Error: Sin respuesta de Dropbox";
+            // Si falla, limpiamos la tabla
+            document.getElementById('tbody-main').innerHTML = '<tr><td colspan="8" class="text-center text-danger p-4">Error de conexión con la base de datos de Dropbox.</td></tr>';
         } finally {
-            // Ocultar spinner
             if(spinner) spinner.classList.add('d-none');
         }
     }
@@ -311,7 +310,7 @@
             const ejecSeleccionada = document.getElementById('selectEjecutora').value;
 
             const filtered = allData.filter(p => {
-                // Normalización de campos para 2025 y 2026
+                // Soporte para ambos formatos de columna "TIPO"
                 const tipo = (p.TIPO || p.TIPO_ACT_PROY_NOMBRE || "").toUpperCase();
                 const esProyecto = tipo.includes("PROYECTO");
                 const esActividad = tipo.includes("ACTIVIDAD") || tipo.includes("PRODUCTO");
@@ -328,21 +327,21 @@
             renderResumen(filtered, ejecSeleccionada);
             actualizarGaugesGlobales(filtered);
             document.getElementById('txt-contador').innerText = filtered.length;
-            renderTable(filtered.slice(0, 100)); // Mostrar solo primeros 100 por rendimiento
+            renderTable(filtered.slice(0, 100));
             document.getElementById('msg-limit').classList.toggle('d-none', filtered.length <= 100);
-        }, 250);
+        }, 200);
     }
 
     function renderResumen(data, nombreEjecutora) {
         let t = { pia:0, pim:0, cer:0, can:0, cme:0, dev:0 };
         data.forEach(p => {
-            // Usamos Number() porque el JSON de Dropbox trae los números como texto "158"
-            t.pia += Number(p.MONTO_PIA || 0); 
-            t.pim += Number(p.MONTO_PIM || 0);
-            t.cer += Number(p.MONTO_CERTIFICADO || 0); 
-            t.can += Number(p.MONTO_COMPROMETIDO_ANUAL || 0);
-            t.cme += Number(p.MONTO_COMPROMETIDO || 0); 
-            t.dev += Number(p.MONTO_DEVENGADO || 0);
+            // Aseguramos conversión a número porque Dropbox envía strings
+            t.pia += parseFloat(p.MONTO_PIA || 0); 
+            t.pim += parseFloat(p.MONTO_PIM || 0);
+            t.cer += parseFloat(p.MONTO_CERTIFICADO || 0); 
+            t.can += parseFloat(p.MONTO_COMPROMETIDO_ANUAL || 0);
+            t.cme += parseFloat(p.MONTO_COMPROMETIDO || 0); 
+            t.dev += parseFloat(p.MONTO_DEVENGADO || 0);
         });
         
         const titulo = nombreEjecutora === "TODAS" ? "GORE LAMBAYEQUE (TODAS)" : nombreEjecutora;
@@ -367,14 +366,14 @@
     function renderTable(data) {
         const tbody = document.getElementById('tbody-main');
         if(data.length === 0) { 
-            tbody.innerHTML = '<tr><td colspan="8" class="text-center p-4">Sin datos para esta selección</td></tr>'; 
+            tbody.innerHTML = '<tr><td colspan="8" class="text-center p-4">No se encontraron registros</td></tr>'; 
             return; 
         }
         
         tbody.innerHTML = data.map(p => {
-            const pim = Number(p.MONTO_PIM || 0);
-            const dev = Number(p.MONTO_DEVENGADO || 0);
-            const cer = Number(p.MONTO_CERTIFICADO || 0);
+            const pim = parseFloat(p.MONTO_PIM || 0);
+            const dev = parseFloat(p.MONTO_DEVENGADO || 0);
+            const cer = parseFloat(p.MONTO_CERTIFICADO || 0);
             const pDev = pim > 0 ? (dev / pim * 100).toFixed(1) : 0;
             const pCer = pim > 0 ? (cer / pim * 100).toFixed(1) : 0;
             
@@ -405,33 +404,30 @@
         cuiSeleccionadoActual = cui;
         document.querySelectorAll('.row-item').forEach(r => r.classList.remove('selected-row'));
         fila.classList.add('selected-row');
-        
         document.getElementById('selected-cui-label').innerText = "CUI: " + cui;
-        document.getElementById('selected-cui-label').className = "badge bg-primary";
         document.getElementById('form-cui').value = cui;
         
         const p = allData.find(i => i.PRODUCTO_PROYECTO.toString() === cui.toString());
         if(p) {
-            const pim = Number(p.MONTO_PIM || 0);
+            const pim = parseFloat(p.MONTO_PIM || 0);
             const getP = (v) => pim > 0 ? (v/pim*100).toFixed(1) : 0;
-            updateG('g-cer', 'v-cer', getP(Number(p.MONTO_CERTIFICADO)));
-            updateG('g-can', 'v-can', getP(Number(p.MONTO_COMPROMETIDO_ANUAL)));
-            updateG('g-cme', 'v-cme', getP(Number(p.MONTO_COMPROMETIDO)));
-            updateG('g-dev', 'v-dev', getP(Number(p.MONTO_DEVENGADO)));
-            updateG('g-gir', 'v-gir', getP(Number(p.MONTO_GIRADO)));
+            updateG('g-cer', 'v-cer', getP(parseFloat(p.MONTO_CERTIFICADO)));
+            updateG('g-can', 'v-can', getP(parseFloat(p.MONTO_COMPROMETIDO_ANUAL)));
+            updateG('g-cme', 'v-cme', getP(parseFloat(p.MONTO_COMPROMETIDO)));
+            updateG('g-dev', 'v-dev', getP(parseFloat(p.MONTO_DEVENGADO)));
+            updateG('g-gir', 'v-gir', getP(parseFloat(p.MONTO_GIRADO)));
         }
-        cargarDetalleSeguimiento(cui);
     }
 
     function actualizarGaugesGlobales(data) {
         let s = { pim:0, cer:0, can:0, cme:0, dev:0, gir:0 };
         data.forEach(r => {
-            s.pim += Number(r.MONTO_PIM || 0); 
-            s.cer += Number(r.MONTO_CERTIFICADO || 0);
-            s.can += Number(r.MONTO_COMPROMETIDO_ANUAL || 0); 
-            s.cme += Number(r.MONTO_COMPROMETIDO || 0);
-            s.dev += Number(r.MONTO_DEVENGADO || 0); 
-            s.gir += Number(r.MONTO_GIRADO || 0);
+            s.pim += parseFloat(r.MONTO_PIM || 0); 
+            s.cer += parseFloat(r.MONTO_CERTIFICADO || 0);
+            s.can += parseFloat(r.MONTO_COMPROMETIDO_ANUAL || 0); 
+            s.cme += parseFloat(r.MONTO_COMPROMETIDO || 0);
+            s.dev += parseFloat(r.MONTO_DEVENGADO || 0); 
+            s.gir += parseFloat(r.MONTO_GIRADO || 0);
         });
         const getP = (v) => s.pim > 0 ? (v/s.pim*100).toFixed(1) : 0;
         updateG('g-cer', 'v-cer', getP(s.cer));
@@ -449,32 +445,7 @@
         if(tel) tel.innerText = val + '%';
     }
 
-    // Funciones de Google Apps Script permanecen igual
-    function cargarDetalleSeguimiento(cui) {
-        const urlApi = 'https://script.google.com/macros/s/AKfycbwDEGA0bOYDv3opzS0qteRFUS_ik9SzT5XlKCpjU6_PWzfPtBjBLfI52Zog8Cojtgz1/exec';
-        document.querySelectorAll('.tracking-body').forEach(el => el.innerText = "...");
-        fetch(`${urlApi}?cui=${cui}`)
-            .then(r => r.json())
-            .then(res => {
-                if (res.status === "success" && res.data) {
-                    const d = res.data;
-                    document.getElementById('track-est-gral').innerText = d.estado_general || "-";
-                    document.getElementById('track-det-gral').innerText = d.detalle_estado_general || "-";
-                    document.getElementById('track-est-esp').innerText = d.estado_especifico || "-";
-                    document.getElementById('track-det-esp').innerText = d.detalle_estado_especifico || "-";
-                    document.getElementById('track-sisgedo').innerText = d.sisgedo || "-";
-                    document.getElementById('track-timeline').innerText = d.timeline_inversion || "-";
-                    document.getElementById('track-acciones').innerText = d.acciones_programadas || "-";
-                } else { limpiarCuadros(); }
-            }).catch(() => limpiarCuadros());
-    }
-
-    function limpiarCuadros() {
-        const ids = ['track-est-gral', 'track-det-gral', 'track-est-esp', 'track-det-esp', 'track-sisgedo', 'track-timeline', 'track-acciones'];
-        ids.forEach(id => { const el = document.getElementById(id); if(el) el.innerText = "-"; });
-    }
-
-    fetchData(); // Inicio automático
+    fetchData();
 </script>
 </body>
 </html>
