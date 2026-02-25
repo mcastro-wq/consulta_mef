@@ -250,33 +250,35 @@
         
         document.getElementById('display-anio').innerText = `Monitor de Ejecución Presupuestal ${anio}`;
         
-        // Reset de interfaz y mostrar carga
         if(spinner) spinner.classList.remove('d-none');
-        txtCorte.innerText = "Cargando datos...";
-        document.getElementById('tbody-main').innerHTML = '<tr><td colspan="8" class="text-center p-4">Procesando información...</td></tr>';
+        txtCorte.innerText = "Conectando con Dropbox...";
 
         let url = 'data_proyectos.json'; // 2026 local
+        
         if (anio === '2025') {
-            // Usamos un proxy para evitar el bloqueo de Dropbox
-            const dropboxLink = 'https://www.dropbox.com/scl/fi/nsyjqewk4obhxgdu47nxj/data_2025_diario.json?rlkey=1ctmsaht03bma9a2bmef5fm1y&st=egh05uqd&dl=1';
-            url = `https://api.allorigins.win/raw?url=${encodeURIComponent(dropboxLink)}`;
+            // URL de Dropbox configurada para descarga directa (dl=1)
+            const dbUrl = 'https://www.dropbox.com/scl/fi/nsyjqewk4obhxgdu47nxj/data_2025_diario.json?rlkey=1ctmsaht03bma9a2bmef5fm1y&dl=1';
+            // Usamos un proxy para saltar el bloqueo CORS del navegador
+            url = `https://api.allorigins.win/raw?url=${encodeURIComponent(dbUrl)}`;
         }
 
         try {
             const res = await fetch(url);
-            if (!res.ok) throw new Error('No se pudo conectar con el servidor');
+            if (!res.ok) throw new Error('Respuesta de red no ok');
             const json = await res.json();
 
-            // Diferenciación de estructura 2025 vs 2026
+            // Validar si el JSON es un array (2025) o tiene propiedad .proyectos (2026)
             if (Array.isArray(json)) {
                 allData = json;
-                txtCorte.innerText = "Sincronizado: 2025";
+                txtCorte.innerText = "Datos 2025 cargados";
             } else if (json && json.proyectos) {
                 allData = json.proyectos;
-                txtCorte.innerText = json.fecha_extraccion || "Sincronizado: 2026";
+                txtCorte.innerText = json.fecha_extraccion || "Datos 2026 cargados";
+            } else {
+                throw new Error('Estructura de JSON no reconocida');
             }
 
-            // Población del selector de Unidades Ejecutoras
+            // Actualizar el selector de Unidades Ejecutoras
             const select = document.getElementById('selectEjecutora');
             select.innerHTML = '<option value="TODAS">-- TODAS LAS UNIDADES --</option>';
             const ejecutoras = [...new Set(allData.map(p => p.EJECUTORA_NOMBRE))].filter(Boolean).sort();
@@ -290,9 +292,15 @@
             filtrar();
 
         } catch (e) { 
-            console.error("Error crítico:", e); 
-            txtCorte.innerText = "Error de conexión";
-            document.getElementById('tbody-main').innerHTML = `<tr><td colspan="8" class="text-center text-danger p-4">Error al cargar datos de Dropbox. Intente recargar la página.</td></tr>`;
+            console.error("Error en fetchData:", e);
+            txtCorte.innerText = "Error: Sin conexión";
+            document.getElementById('tbody-main').innerHTML = `
+                <tr>
+                    <td colspan="8" class="text-center p-5">
+                        <div class="text-danger fw-bold">No se pudieron cargar los datos de 2025.</div>
+                        <div class="text-muted small">Dropbox rechazó la conexión. Intenta refrescar (F5).</div>
+                    </td>
+                </tr>`;
         } finally {
             if(spinner) spinner.classList.add('d-none');
         }
@@ -307,9 +315,11 @@
             const ejecSeleccionada = document.getElementById('selectEjecutora').value;
 
             const filtered = allData.filter(p => {
+                // Normalizar nombres de columnas para ambos años
                 const tipo = (p.TIPO || p.TIPO_ACT_PROY_NOMBRE || "").toUpperCase();
                 const esProyecto = tipo.includes("PROYECTO");
                 const esActividad = tipo.includes("ACTIVIDAD") || tipo.includes("PRODUCTO");
+                
                 const cumpleEjecutora = (ejecSeleccionada === "TODAS" || p.EJECUTORA_NOMBRE === ejecSeleccionada);
                 const nombre = (p.PRODUCTO_PROYECTO_NOMBRE || "").toLowerCase();
                 const cui = (p.PRODUCTO_PROYECTO || "").toString();
@@ -319,27 +329,26 @@
                        (nombre.includes(query) || cui.includes(query));
             });
 
-            actualizarVista(filtered, ejecSeleccionada);
-        }, 250);
+            actualizarInterfaz(filtered, ejecSeleccionada);
+        }, 200);
     }
 
-    function actualizarVista(data, nombreEjecutora) {
-        let s = { pia:0, pim:0, cer:0, can:0, cme:0, dev:0, gir:0 };
+    function actualizarInterfaz(data, nombreEjecutora) {
+        let s = { pia:0, pim:0, cer:0, can:0, cme:0, dev:0 };
         
         data.forEach(p => {
-            // Forzar conversión a número para evitar errores de suma con strings de Dropbox
+            // Forzar conversión a número porque Dropbox suele enviar strings "0.00"
             s.pia += parseFloat(p.MONTO_PIA || 0);
             s.pim += parseFloat(p.MONTO_PIM || 0);
             s.cer += parseFloat(p.MONTO_CERTIFICADO || 0);
             s.can += parseFloat(p.MONTO_COMPROMETIDO_ANUAL || 0);
             s.cme += parseFloat(p.MONTO_COMPROMETIDO || 0);
             s.dev += parseFloat(p.MONTO_DEVENGADO || 0);
-            s.gir += parseFloat(p.MONTO_GIRADO || 0);
         });
 
-        // Render Tabla Resumen Superior
+        // Totales superiores
         const titulo = nombreEjecutora === "TODAS" ? "GORE LAMBAYEQUE (TODAS)" : nombreEjecutora;
-        const getP = (v) => s.pim > 0 ? (v/s.pim*100).toFixed(1) : "0.0";
+        const perc = (v) => s.pim > 0 ? (v/s.pim*100).toFixed(1) : "0.0";
         
         document.getElementById('resumen-ejecutora').innerHTML = `
             <tr>
@@ -347,31 +356,25 @@
                 <td>${s.pia.toLocaleString()}</td>
                 <td>${s.pim.toLocaleString()}</td>
                 <td>${s.cer.toLocaleString()}</td>
-                <td class="text-primary fw-bold">${getP(s.cer)}%</td>
+                <td class="text-primary fw-bold">${perc(s.cer)}%</td>
                 <td>${s.can.toLocaleString()}</td>
-                <td class="text-primary fw-bold">${getP(s.can)}%</td>
+                <td class="text-primary fw-bold">${perc(s.can)}%</td>
                 <td>${s.cme.toLocaleString()}</td>
-                <td class="text-primary fw-bold">${getP(s.cme)}%</td>
+                <td class="text-primary fw-bold">${perc(s.cme)}%</td>
                 <td>${s.dev.toLocaleString()}</td>
-                <td class="text-success fw-bold">${getP(s.dev)}%</td>
+                <td class="text-success fw-bold">${perc(s.dev)}%</td>
             </tr>`;
 
-        // Actualizar Contadores y Gauges
+        // Gauges y contadores
         document.getElementById('txt-contador').innerText = data.length;
-        updateG('g-cer', 'v-cer', getP(s.cer));
-        updateG('g-can', 'v-can', getP(s.can));
-        updateG('g-cme', 'v-cme', getP(s.cme));
-        updateG('g-dev', 'v-dev', getP(s.dev));
-        updateG('g-gir', 'v-gir', getP(s.gir));
-
-        renderTableMain(data.slice(0, 100));
-        document.getElementById('msg-limit').classList.toggle('d-none', data.length <= 100);
+        actualizarGauges(s);
+        renderTableMain(data.slice(0, 100)); // Limitar a 100 para fluidez
     }
 
     function renderTableMain(data) {
         const tbody = document.getElementById('tbody-main');
         if(data.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="8" class="text-center p-4">No se encontraron registros</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="8" class="text-center p-4">Sin registros encontrados</td></tr>';
             return;
         }
         tbody.innerHTML = data.map(p => {
@@ -379,14 +382,13 @@
             const dev = parseFloat(p.MONTO_DEVENGADO || 0);
             const cer = parseFloat(p.MONTO_CERTIFICADO || 0);
             const pDev = pim > 0 ? (dev / pim * 100).toFixed(1) : 0;
-            const pCer = pim > 0 ? (cer / pim * 100).toFixed(1) : 0;
             return `
                 <tr class="row-item" onclick="seleccionar('${p.PRODUCTO_PROYECTO}', this)">
                     <td class="text-center fw-bold text-muted">${p.PRODUCTO_PROYECTO}</td>
-                    <td class="text-start fw-bold" style="width:35%">${p.PRODUCTO_PROYECTO_NOMBRE}</td>
+                    <td class="text-start" style="font-size:0.85rem">${p.PRODUCTO_PROYECTO_NOMBRE}</td>
                     <td class="text-end">${pim.toLocaleString()}</td>
                     <td class="text-end">${cer.toLocaleString()}</td>
-                    <td class="text-center text-primary">${pCer}%</td>
+                    <td class="text-center text-primary">${pim > 0 ? (cer/pim*100).toFixed(1) : 0}%</td>
                     <td class="text-end text-success fw-bold">${dev.toLocaleString()}</td>
                     <td class="text-center fw-bold text-success">${pDev}%</td>
                     <td class="text-center"><span class="semaforo ${pDev > 75 ? 'status-alto' : pDev >= 40 ? 'status-medio' : 'status-bajo'}"></span></td>
@@ -394,7 +396,15 @@
         }).join('');
     }
 
-    function updateG(id, tid, val) {
+    function actualizarGauges(s) {
+        const getP = (v) => s.pim > 0 ? (v/s.pim*100).toFixed(1) : 0;
+        updateCircle('g-cer', 'v-cer', getP(s.cer));
+        updateCircle('g-can', 'v-can', getP(s.can));
+        updateCircle('g-cme', 'v-cme', getP(s.cme));
+        updateCircle('g-dev', 'v-dev', getP(s.dev));
+    }
+
+    function updateCircle(id, tid, val) {
         const off = 157 - (157 * (Math.min(val, 100) / 100));
         const el = document.getElementById(id);
         if(el) el.style.strokeDashoffset = off;
@@ -402,7 +412,8 @@
         if(tel) tel.innerText = val + '%';
     }
 
-    fetchData(); // Carga inicial
+    // Al cargar la página
+    fetchData();
 </script>
 </body>
 </html>
