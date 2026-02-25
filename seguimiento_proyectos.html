@@ -433,24 +433,40 @@ async function fetchData() {
         if(txt) txt.innerText = val + '%';
     }
 
-    function cargarDetalleSeguimiento(cui) {
-        const urlApi = 'https://script.google.com/macros/s/AKfycbwDEGA0bOYDv3opzS0qteRFUS_ik9SzT5XlKCpjU6_PWzfPtBjBLfI52Zog8Cojtgz1/exec';
-        document.querySelectorAll('.tracking-body').forEach(el => el.innerText = "...");
-        fetch(`${urlApi}?cui=${cui}`)
-            .then(response => response.json())
-            .then(res => {
-                if (res.status === "success" && res.data) {
-                    const d = res.data;
-                    document.getElementById('track-est-gral').innerText = d.estado_general || "-";
-                    document.getElementById('track-det-gral').innerText = d.detalle_estado_general || "-";
-                    document.getElementById('track-est-esp').innerText = d.estado_especifico || "-";
-                    document.getElementById('track-det-esp').innerText = d.detalle_estado_especifico || "-";
-                    document.getElementById('track-sisgedo').innerText = d.sisgedo || "-";
-                    document.getElementById('track-timeline').innerText = d.timeline_inversion || "-";
-                    document.getElementById('track-acciones').innerText = d.acciones_programadas || "-";
-                } else { limpiarCuadros(); }
-            }).catch(() => limpiarCuadros());
-    }
+ function cargarDetalleSeguimiento(cui) {
+    const urlApi = 'https://script.google.com/macros/s/AKfycbwDEGA0bOYDv3opzS0qteRFUS_ik9SzT5XlKCpjU6_PWzfPtBjBLfI52Zog8Cojtgz1/exec';
+    
+    // Limpiar y poner estado de carga
+    document.querySelectorAll('.tracking-body').forEach(el => el.innerText = "...");
+    
+    // Aseguramos que el CUI no tenga espacios
+    const cuiLimpio = cui.toString().trim();
+
+    fetch(`${urlApi}?cui=${cuiLimpio}`, {
+        method: 'GET',
+        mode: 'cors', // Forzamos modo cors
+        redirect: 'follow' // Importante para Google Scripts
+    })
+    .then(response => response.json())
+    .then(res => {
+        if (res.status === "success" && res.data) {
+            const d = res.data;
+            document.getElementById('track-est-gral').innerText = d.estado_general || "-";
+            document.getElementById('track-det-gral').innerText = d.detalle_estado_general || "-";
+            document.getElementById('track-est-esp').innerText = d.estado_especifico || "-";
+            document.getElementById('track-det-esp').innerText = d.detalle_estado_especifico || "-";
+            document.getElementById('track-sisgedo').innerText = d.sisgedo || "-";
+            document.getElementById('track-timeline').innerText = d.timeline_inversion || "-";
+            document.getElementById('track-acciones').innerText = d.acciones_programadas || "-";
+        } else { 
+            limpiarCuadros("Sin datos"); 
+        }
+    })
+    .catch(err => {
+        console.error("Error en fetch:", err);
+        limpiarCuadros("Error de conexión");
+    });
+}
 
     function limpiarCuadros() {
         const ids = ['track-est-gral', 'track-det-gral', 'track-est-esp', 'track-det-esp', 'track-sisgedo', 'track-timeline', 'track-acciones'];
