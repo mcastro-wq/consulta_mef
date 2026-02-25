@@ -243,68 +243,47 @@
     let allData = [];
     let timeoutBusqueda;
 
-    async function fetchData() {
-        const anio = document.getElementById('selectorAnio').value;
-        const spinner = document.getElementById('loading-spinner');
-        const txtCorte = document.getElementById('txt-corte');
-        
-        document.getElementById('display-anio').innerText = `Monitor de Ejecución Presupuestal ${anio}`;
-        
-        if(spinner) spinner.classList.remove('d-none');
-        txtCorte.innerText = "Conectando con Dropbox...";
+async function fetchData() {
+    const anio = document.getElementById('selectorAnio').value;
+    const spinner = document.getElementById('loading-spinner');
+    const txtCorte = document.getElementById('txt-corte');
+    
+    // 1. Mostrar spinner y estado inicial
+    if(spinner) spinner.classList.remove('d-none');
+    txtCorte.innerText = "Cargando datos...";
 
-        let url = 'data_proyectos.json'; // 2026 local
-        
-        if (anio === '2025') {
-            // URL de Dropbox configurada para descarga directa (dl=1)
-            const dbUrl = 'https://www.dropbox.com/scl/fi/nsyjqewk4obhxgdu47nxj/data_2025_diario.json?rlkey=1ctmsaht03bma9a2bmef5fm1y&dl=1';
-            // Usamos un proxy para saltar el bloqueo CORS del navegador
-            url = `https://api.allorigins.win/raw?url=${encodeURIComponent(dbUrl)}`;
-        }
-
-        try {
-            const res = await fetch(url);
-            if (!res.ok) throw new Error('Respuesta de red no ok');
-            const json = await res.json();
-
-            // Validar si el JSON es un array (2025) o tiene propiedad .proyectos (2026)
-            if (Array.isArray(json)) {
-                allData = json;
-                txtCorte.innerText = "Datos 2025 cargados";
-            } else if (json && json.proyectos) {
-                allData = json.proyectos;
-                txtCorte.innerText = json.fecha_extraccion || "Datos 2026 cargados";
-            } else {
-                throw new Error('Estructura de JSON no reconocida');
-            }
-
-            // Actualizar el selector de Unidades Ejecutoras
-            const select = document.getElementById('selectEjecutora');
-            select.innerHTML = '<option value="TODAS">-- TODAS LAS UNIDADES --</option>';
-            const ejecutoras = [...new Set(allData.map(p => p.EJECUTORA_NOMBRE))].filter(Boolean).sort();
-            ejecutoras.forEach(ej => {
-                const opt = document.createElement('option');
-                opt.value = ej;
-                opt.innerText = ej;
-                select.appendChild(opt);
-            });
-
-            filtrar();
-
-        } catch (e) { 
-            console.error("Error en fetchData:", e);
-            txtCorte.innerText = "Error: Sin conexión";
-            document.getElementById('tbody-main').innerHTML = `
-                <tr>
-                    <td colspan="8" class="text-center p-5">
-                        <div class="text-danger fw-bold">No se pudieron cargar los datos de 2025.</div>
-                        <div class="text-muted small">Dropbox rechazó la conexión. Intenta refrescar (F5).</div>
-                    </td>
-                </tr>`;
-        } finally {
-            if(spinner) spinner.classList.add('d-none');
-        }
+    let url = 'data_proyectos.json'; // 2026 local
+    
+    if (anio === '2025') {
+        // EL ENLACE QUE SÍ FUNCIONA (CON RAW=1)
+        url = 'https://www.dropbox.com/scl/fi/nsyjqewk4obhxgdu47nxj/data_2025_diario.json?rlkey=1ctmsaht03bma9a2bmef5fm1y&raw=1';
     }
+
+    try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('Error en servidor');
+        const json = await res.json();
+
+        // 2. Procesar el JSON según el año
+        if (Array.isArray(json)) {
+            allData = json; // 2025 es lista directa
+            txtCorte.innerText = "Sincronizado: 2025";
+        } else {
+            allData = json.proyectos || []; // 2026 tiene .proyectos
+            txtCorte.innerText = json.fecha_extraccion || "Sincronizado: 2026";
+        }
+
+        // 3. Ejecutar filtros y actualizar UI
+        filtrar();
+
+    } catch (e) { 
+        console.error(e); 
+        txtCorte.innerText = "Error al leer Dropbox";
+    } finally {
+        // 4. OCULTAR EL SPINNER SIEMPRE AL FINAL
+        if(spinner) spinner.classList.add('d-none');
+    }
+}
 
     function filtrar() {
         clearTimeout(timeoutBusqueda);
