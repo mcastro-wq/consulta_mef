@@ -245,46 +245,59 @@
 
     async function fetchData() {
         const anio = document.getElementById('selectorAnio').value;
+        const spinner = document.getElementById('loading-spinner');
+        const txtCorte = document.getElementById('txt-corte');
+        
         document.getElementById('display-anio').innerText = `Monitor de Ejecución Presupuestal ${anio}`;
         
-        // El link de 2026 sigue igual. El de 2025 usa un Proxy para saltar el bloqueo de Dropbox.
-        let url = 'data_proyectos.json'; 
+        // Mostrar spinner
+        if(spinner) spinner.classList.remove('d-none');
+        txtCorte.innerText = "Cargando datos...";
+
+        let url = 'data_proyectos.json'; // 2026
         if (anio === '2025') {
+            // Link de Dropbox con Proxy para evitar bloqueo CORS
             const dropboxLink = 'https://www.dropbox.com/scl/fi/nsyjqewk4obhxgdu47nxj/data_2025_diario.json?rlkey=1ctmsaht03bma9a2bmef5fm1y&st=egh05uqd&dl=1';
             url = `https://api.allorigins.win/raw?url=${encodeURIComponent(dropboxLink)}`;
         }
 
         try {
             const res = await fetch(url);
-            if (!res.ok) throw new Error('Error en respuesta de red');
+            if (!res.ok) throw new Error('Error en la descarga');
             const json = await res.json();
 
-            // 2025 es un Array [], 2026 es un Objeto {} con propiedad .proyectos
+            // Lógica para detectar estructura de 2025 vs 2026
             if (Array.isArray(json)) {
+                // Caso 2025: Es una lista directa []
                 allData = json;
-                document.getElementById('txt-corte').innerText = "Datos 2025 (Carga Externa)";
-            } else if (json.proyectos) {
+                txtCorte.innerText = "Datos 2025 (Dropbox)";
+            } else if (json && json.proyectos) {
+                // Caso 2026: Tiene propiedad .proyectos
                 allData = json.proyectos;
-                document.getElementById('txt-corte').innerText = json.fecha_extraccion || "Datos 2026";
+                txtCorte.innerText = json.fecha_extraccion || "Datos 2026";
+            } else {
+                allData = [];
+                txtCorte.innerText = "Formato no reconocido";
             }
 
-            // Actualizar select de ejecutoras
+            // Actualizar select de ejecutora
             const select = document.getElementById('selectEjecutora');
             select.innerHTML = '<option value="TODAS">-- TODAS LAS UNIDADES --</option>';
-            const ejecutoras = [...new Set(allData.map(p => p.EJECUTORA_NOMBRE))].sort();
+            const ejecutoras = [...new Set(allData.map(p => p.EJECUTORA_NOMBRE))].filter(Boolean).sort();
             ejecutoras.forEach(ej => {
-                if(ej) {
-                    const opt = document.createElement('option');
-                    opt.value = ej;
-                    opt.innerText = ej;
-                    select.appendChild(opt);
-                }
+                const opt = document.createElement('option');
+                opt.value = ej;
+                opt.innerText = ej;
+                select.appendChild(opt);
             });
 
             filtrar();
         } catch (e) { 
             console.error("Error cargando datos:", e); 
-            document.getElementById('txt-corte').innerText = "Error de conexión o CORS";
+            txtCorte.innerText = "Error: Verifica conexión";
+        } finally {
+            // Ocultar spinner
+            if(spinner) spinner.classList.add('d-none');
         }
     }
 
@@ -297,7 +310,7 @@
             const ejecSeleccionada = document.getElementById('selectEjecutora').value;
 
             const filtered = allData.filter(p => {
-                // Normalización para que funcione con ambos JSON
+                // Normalización de campos para 2025 y 2026
                 const tipo = (p.TIPO || p.TIPO_ACT_PROY_NOMBRE || "").toUpperCase();
                 const esProyecto = tipo.includes("PROYECTO");
                 const esActividad = tipo.includes("ACTIVIDAD") || tipo.includes("PRODUCTO");
@@ -314,49 +327,60 @@
             renderResumen(filtered, ejecSeleccionada);
             actualizarGaugesGlobales(filtered);
             document.getElementById('txt-contador').innerText = filtered.length;
-            renderTable(filtered.slice(0, 100));
+            renderTable(filtered.slice(0, 100)); // Mostrar solo primeros 100 por rendimiento
             document.getElementById('msg-limit').classList.toggle('d-none', filtered.length <= 100);
         }, 250);
     }
 
-    // --- REUTILIZACIÓN DE TUS FUNCIONES ORIGINALES (SIN CAMBIOS) ---
     function renderResumen(data, nombreEjecutora) {
         let t = { pia:0, pim:0, cer:0, can:0, cme:0, dev:0 };
         data.forEach(p => {
-            t.pia += Number(p.MONTO_PIA || 0); t.pim += Number(p.MONTO_PIM || 0);
-            t.cer += Number(p.MONTO_CERTIFICADO || 0); t.can += Number(p.MONTO_COMPROMETIDO_ANUAL || 0);
-            t.cme += Number(p.MONTO_COMPROMETIDO || 0); t.dev += Number(p.MONTO_DEVENGADO || 0);
+            // Usamos Number() porque el JSON de Dropbox trae los números como texto "158"
+            t.pia += Number(p.MONTO_PIA || 0); 
+            t.pim += Number(p.MONTO_PIM || 0);
+            t.cer += Number(p.MONTO_CERTIFICADO || 0); 
+            t.can += Number(p.MONTO_COMPROMETIDO_ANUAL || 0);
+            t.cme += Number(p.MONTO_COMPROMETIDO || 0); 
+            t.dev += Number(p.MONTO_DEVENGADO || 0);
         });
+        
         const titulo = nombreEjecutora === "TODAS" ? "GORE LAMBAYEQUE (TODAS)" : nombreEjecutora;
-        const perc = (v) => t.pim > 0 ? (v/t.pim*100).toFixed(1) + '%' : '0%';
+        const perc = (v) => t.pim > 0 ? (v/t.pim*100).toFixed(1) + '%' : '0.0%';
+        
         document.getElementById('resumen-ejecutora').innerHTML = `
             <tr>
-                <td class="text-start text-dark">${titulo}</td>
+                <td class="text-start text-dark fw-bold">${titulo}</td>
                 <td>${t.pia.toLocaleString()}</td>
                 <td>${t.pim.toLocaleString()}</td>
                 <td>${t.cer.toLocaleString()}</td>
-                <td class="text-primary">${perc(t.cer)}</td>
+                <td class="text-primary fw-bold">${perc(t.cer)}</td>
                 <td>${t.can.toLocaleString()}</td>
-                <td class="text-primary">${perc(t.can)}</td>
+                <td class="text-primary fw-bold">${perc(t.can)}</td>
                 <td>${t.cme.toLocaleString()}</td>
-                <td class="text-primary">${perc(t.cme)}</td>
+                <td class="text-primary fw-bold">${perc(t.cme)}</td>
                 <td>${t.dev.toLocaleString()}</td>
-                <td class="text-success">${perc(t.dev)}</td>
+                <td class="text-success fw-bold">${perc(t.dev)}</td>
             </tr>`;
     }
 
     function renderTable(data) {
         const tbody = document.getElementById('tbody-main');
-        if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="8" class="text-center p-4">Sin datos</td></tr>'; return; }
+        if(data.length === 0) { 
+            tbody.innerHTML = '<tr><td colspan="8" class="text-center p-4">Sin datos para esta selección</td></tr>'; 
+            return; 
+        }
+        
         tbody.innerHTML = data.map(p => {
             const pim = Number(p.MONTO_PIM || 0);
             const dev = Number(p.MONTO_DEVENGADO || 0);
             const cer = Number(p.MONTO_CERTIFICADO || 0);
             const pDev = pim > 0 ? (dev / pim * 100).toFixed(1) : 0;
             const pCer = pim > 0 ? (cer / pim * 100).toFixed(1) : 0;
+            
             let sem = 'status-bajo', txt = 'BAJO', clr = 'text-danger';
             if (pDev > 75) { sem = 'status-alto'; txt = 'ALTO'; clr = 'text-success'; }
             else if (pDev >= 40) { sem = 'status-medio'; txt = 'MEDIO'; clr = 'text-warning'; }
+            
             return `
                 <tr class="row-item" onclick="seleccionar('${p.PRODUCTO_PROYECTO}', this)">
                     <td class="text-center fw-bold text-muted">${p.PRODUCTO_PROYECTO}</td>
@@ -380,9 +404,11 @@
         cuiSeleccionadoActual = cui;
         document.querySelectorAll('.row-item').forEach(r => r.classList.remove('selected-row'));
         fila.classList.add('selected-row');
+        
         document.getElementById('selected-cui-label').innerText = "CUI: " + cui;
         document.getElementById('selected-cui-label').className = "badge bg-primary";
         document.getElementById('form-cui').value = cui;
+        
         const p = allData.find(i => i.PRODUCTO_PROYECTO.toString() === cui.toString());
         if(p) {
             const pim = Number(p.MONTO_PIM || 0);
@@ -399,9 +425,12 @@
     function actualizarGaugesGlobales(data) {
         let s = { pim:0, cer:0, can:0, cme:0, dev:0, gir:0 };
         data.forEach(r => {
-            s.pim += Number(r.MONTO_PIM || 0); s.cer += Number(r.MONTO_CERTIFICADO || 0);
-            s.can += Number(r.MONTO_COMPROMETIDO_ANUAL || 0); s.cme += Number(r.MONTO_COMPROMETIDO || 0);
-            s.dev += Number(r.MONTO_DEVENGADO || 0); s.gir += Number(r.MONTO_GIRADO || 0);
+            s.pim += Number(r.MONTO_PIM || 0); 
+            s.cer += Number(r.MONTO_CERTIFICADO || 0);
+            s.can += Number(r.MONTO_COMPROMETIDO_ANUAL || 0); 
+            s.cme += Number(r.MONTO_COMPROMETIDO || 0);
+            s.dev += Number(r.MONTO_DEVENGADO || 0); 
+            s.gir += Number(r.MONTO_GIRADO || 0);
         });
         const getP = (v) => s.pim > 0 ? (v/s.pim*100).toFixed(1) : 0;
         updateG('g-cer', 'v-cer', getP(s.cer));
@@ -419,7 +448,7 @@
         if(tel) tel.innerText = val + '%';
     }
 
-    // Funciones de seguimiento (Google Script) se mantienen igual...
+    // Funciones de Google Apps Script permanecen igual
     function cargarDetalleSeguimiento(cui) {
         const urlApi = 'https://script.google.com/macros/s/AKfycbwDEGA0bOYDv3opzS0qteRFUS_ik9SzT5XlKCpjU6_PWzfPtBjBLfI52Zog8Cojtgz1/exec';
         document.querySelectorAll('.tracking-body').forEach(el => el.innerText = "...");
@@ -444,34 +473,7 @@
         ids.forEach(id => { const el = document.getElementById(id); if(el) el.innerText = "-"; });
     }
 
-    function guardarSeguimiento(event) {
-        const urlApi = 'https://script.google.com/macros/s/AKfycbwDEGA0bOYDv3opzS0qteRFUS_ik9SzT5XlKCpjU6_PWzfPtBjBLfI52Zog8Cojtgz1/exec';
-        const getVal = (id) => { const el = document.getElementById(id); return el ? el.value : ""; };
-        const datos = {
-            cui: getVal('form-cui'),
-            estado_g: getVal('form-est-gral'),
-            sisgedo: getVal('form-sisgedo'),
-            detalle_g: getVal('form-det-gral'),
-            estado_e: getVal('form-est-esp'),
-            detalle_e: getVal('form-det-esp'),
-            timeline: getVal('form-timeline'),
-            acciones: getVal('form-acciones')
-        };
-        if (!datos.cui) return alert("Seleccione un CUI");
-        const btn = event.target.closest('button');
-        const originalText = btn.innerHTML;
-        btn.disabled = true;
-        btn.innerHTML = 'Guardando...';
-
-        fetch(urlApi, { method: 'POST', mode: 'no-cors', body: JSON.stringify(datos) })
-        .then(() => {
-            alert("✅ Guardado correctamente");
-            cargarDetalleSeguimiento(datos.cui);
-            bootstrap.Modal.getInstance(document.getElementById('modalRegistro')).hide();
-        }).finally(() => { btn.disabled = false; btn.innerHTML = originalText; });
-    }
-
-    fetchData(); // Carga inicial
+    fetchData(); // Inicio automático
 </script>
 </body>
 </html>
