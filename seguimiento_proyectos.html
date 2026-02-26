@@ -245,36 +245,53 @@ async function fetchData() {
     txtCorte.innerText = "Sincronizando...";
 
     try {
-        if (anio === '2025') {
-            loaderText.innerText = "Procesando y Limpiando Base 2025...";
-            
-            const [res1, res2] = await Promise.all([
-                fetch(URL_PART1).then(r => r.text()),
-                fetch(URL_PART2).then(r => r.text())
-            ]);
+if (anio === '2025') {
 
-            let clean1 = res1.trim().replace(/^\[/, "").replace(/\]$/, "").trim();
-            let clean2 = res2.trim().replace(/^\[/, "").replace(/\]$/, "").trim();
-            if (clean1.endsWith(',')) clean1 = clean1.slice(0, -1);
-            
-            const rawData = JSON.parse("[" + clean1 + "," + clean2 + "]");
+    loaderText.innerText = "Procesando Base 2025...";
 
-            // --- AQUÍ ESTÁ EL TRUCO PARA ELIMINAR DUPLICADOS ---
-            const mapaUnicos = new Map();
-            
-            rawData.forEach(item => {
-                const cui = item.PRODUCTO_PROYECTO;
-                // Si el CUI ya existe, comparamos y nos quedamos con el que tenga más PIM (o el más reciente)
-                if (!mapaUnicos.has(cui)) {
-                    mapaUnicos.set(cui, item);
-                }
-            });
+    const [res1, res2] = await Promise.all([
+        fetch(URL_PART1).then(r => r.json()),
+        fetch(URL_PART2).then(r => r.json())
+    ]);
 
-            // Convertimos el mapa de nuevo a un array
-            allData = Array.from(mapaUnicos.values());
-            txtCorte.innerText = "Datos 2025 Depurados";
+    // Unimos ambos archivos
+    const rawData = [...res1, ...res2];
 
-        } else {
+    // AGRUPAMOS POR CUI SUMANDO MONTOS
+    const agrupado = {};
+
+    rawData.forEach(item => {
+
+        const key = item.PRODUCTO_PROYECTO;
+
+        if (!agrupado[key]) {
+            agrupado[key] = {
+                ...item,
+                MONTO_PIA: 0,
+                MONTO_PIM: 0,
+                MONTO_CERTIFICADO: 0,
+                MONTO_COMPROMETIDO_ANUAL: 0,
+                MONTO_COMPROMETIDO: 0,
+                MONTO_DEVENGADO: 0,
+                MONTO_GIRADO: 0
+            };
+        }
+
+        agrupado[key].MONTO_PIA += parseFloat(item.MONTO_PIA) || 0;
+        agrupado[key].MONTO_PIM += parseFloat(item.MONTO_PIM) || 0;
+        agrupado[key].MONTO_CERTIFICADO += parseFloat(item.MONTO_CERTIFICADO) || 0;
+        agrupado[key].MONTO_COMPROMETIDO_ANUAL += parseFloat(item.MONTO_COMPROMETIDO_ANUAL) || 0;
+        agrupado[key].MONTO_COMPROMETIDO += parseFloat(item.MONTO_COMPROMETIDO) || 0;
+        agrupado[key].MONTO_DEVENGADO += parseFloat(item.MONTO_DEVENGADO) || 0;
+        agrupado[key].MONTO_GIRADO += parseFloat(item.MONTO_GIRADO) || 0;
+
+    });
+
+    // Convertimos a array final
+    allData = Object.values(agrupado);
+
+    txtCorte.innerText = "Datos 2025 Consolidados Correctamente";
+} else {
             // Lógica 2026 normal...
             const res = await fetch(URL_2026);
             const json = await res.json();
