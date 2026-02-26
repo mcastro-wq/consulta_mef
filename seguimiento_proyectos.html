@@ -225,51 +225,77 @@
 <script>
     let allData = [];
     let timeoutBusqueda;
-    let cuiSeleccionadoActual = null;
+    let cuiSeleccionadoActual = "";
 
-    // 1. CONFIGURACIÓN DE URLs (REEMPLAZA ESTO)
-    const URL_GITHUB_PART1 = 'https://raw.githubusercontent.com/mcastro-wq/consulta_mef/refs/heads/main/data_2025_diario_part1.json';
-    const URL_GITHUB_PART2 = 'https://raw.githubusercontent.com/mcastro-wq/consulta_mef/refs/heads/main/data_2025_diario_part2.json';
-    const URL_APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbzE3RjPk02QohR3kTnbkBa_Nfeatu5CICYQm9LzDLndk429Vsp7D3PAWOvsReul0sb2/exec';
+    // CONFIGURACIÓN DE RUTAS
+    const URL_PART1 = 'https://raw.githubusercontent.com/mcastro-wq/consulta_mef/main/data_2025_part_1.json';
+    const URL_PART2 = 'https://raw.githubusercontent.com/mcastro-wq/consulta_mef/main/data_2025_part_2.json';
+    const URL_2026 = 'https://raw.githubusercontent.com/mcastro-wq/consulta_mef/main/data_proyectos.json';
+    const URL_API_SCRIPT = 'https://script.google.com/macros/s/AKfycbzE3RjPk02QohR3kTnbkBa_Nfeatu5CICYQm9LzDLndk429Vsp7D3PAWOvsReul0sb2/exec';
 
-    // 2. CARGA Y UNIFICACIÓN DE DATOS
     async function fetchData() {
+        const anio = document.getElementById('selectAnio').value;
+        const loader = document.getElementById('loader-overlay');
+        const txtCorte = document.getElementById('txt-corte');
+        const mainTitle = document.getElementById('main-title');
+        const loaderText = document.getElementById('loader-text');
+
+        mainTitle.innerText = `Monitor de Ejecución Presupuestal ${anio}`;
+        loader.classList.remove('d-none');
+        txtCorte.innerText = "Conectando con GitHub...";
+
         try {
-            console.log("Iniciando descarga de datos desde GitHub...");
-            
-            // Descarga en paralelo de ambos archivos
-            const [res1, res2] = await Promise.all([
-                fetch(URL_GITHUB_PART1),
-                fetch(URL_GITHUB_PART2)
-            ]);
+            if (anio === '2025') {
+                loaderText.innerText = "Cargando Base 2025 (Uniendo Partes desde GitHub)...";
+                
+                // Descarga de textos planos para aplicar tu lógica de limpieza
+                const [res1, res2] = await Promise.all([
+                    fetch(URL_PART1).then(r => { if(!r.ok) throw new Error("Error Part 1"); return r.text(); }),
+                    fetch(URL_PART2).then(r => { if(!r.ok) throw new Error("Error Part 2"); return r.text(); })
+                ]);
 
-            if (!res1.ok || !res2.ok) throw new Error("Error al obtener archivos de GitHub");
+                // TU LÓGICA DE LIMPIEZA ORIGINAL (RESPALDADA)
+                let cleanPart1 = res1.trim().replace(/^\[/, "").replace(/\]$/, "").trim();
+                let cleanPart2 = res2.trim().replace(/^\[/, "").replace(/\]$/, "").trim();
 
-            const data1 = await res1.json();
-            const data2 = await res2.json();
+                if (cleanPart1.endsWith(',')) cleanPart1 = cleanPart1.slice(0, -1);
+                
+                const fullJsonText = "[" + cleanPart1 + "," + cleanPart2 + "]";
+                
+                allData = JSON.parse(fullJsonText);
+                txtCorte.innerText = "Datos 2025 Sincronizados";
 
-            // UNIFICACIÓN: Combinamos ambos arrays en uno solo
-            allData = [...data1, ...data2];
-            console.log("Datos unificados con éxito. Total registros:", allData.length);
-            
-            // Llenar selector de ejecutora
-            const ejecutoras = [...new Set(allData.map(item => item.EJECUTORA_NOMBRE))].sort();
+            } else {
+                loaderText.innerText = "Cargando Base de Datos 2026...";
+                const res = await fetch(URL_2026);
+                if (!res.ok) throw new Error("No se encontró el archivo 2026 en GitHub");
+                const json = await res.json();
+                allData = json.proyectos || json;
+                txtCorte.innerText = json.fecha_extraccion || "Actualizado 2026";
+            }
+
+            // Población de selectores
             const select = document.getElementById('selectEjecutora');
-            ejecutoras.forEach(e => {
-                const opt = document.createElement('option');
-                opt.value = e;
-                opt.textContent = e;
-                select.appendChild(opt);
-            });
+            if(select) {
+                select.innerHTML = '<option value="TODAS">-- TODAS LAS UNIDADES --</option>';
+                const ejecutoras = [...new Set(allData.map(p => p.EJECUTORA_NOMBRE))].filter(Boolean).sort();
+                ejecutoras.forEach(ej => {
+                    const opt = document.createElement('option');
+                    opt.value = ej; opt.innerText = ej;
+                    select.appendChild(opt);
+                });
+            }
 
-            filtrar(); // Primera ejecución del monitor
-        } catch (error) {
-            console.error("Error crítico:", error);
-            alert("Error: No se pudo cargar la data. Verifica las URLs RAW en el código.");
+            filtrar();
+        } catch (e) {
+            console.error("Error detallado:", e);
+            txtCorte.innerText = "Error: " + e.message;
+            alert("Error al cargar datos desde GitHub. Verifica que el repositorio sea público.");
+        } finally {
+            loader.classList.add('d-none');
         }
     }
 
-    // 3. FILTRADO LÓGICO ESTRICTO
     function filtrar() {
         clearTimeout(timeoutBusqueda);
         timeoutBusqueda = setTimeout(() => {
@@ -279,19 +305,18 @@
             const ejecSeleccionada = document.getElementById('selectEjecutora').value;
 
             const filtered = allData.filter(p => {
-                // Filtro por TIPO_ACT_PROY (2=Proyecto, 3=Actividad)
-                const esProyecto = (p.TIPO_ACT_PROY === "2");
-                const esActividad = (p.TIPO_ACT_PROY === "3");
+                // Filtro estricto por TIPO_ACT_PROY si existe, sino usa tu lógica de strings
+                const tipoRaw = (p.TIPO_ACT_PROY_NOMBRE || p.TIPO || "").toUpperCase();
+                const esProyecto = p.TIPO_ACT_PROY === "2" || tipoRaw.includes("PROYECTO");
+                const esActividad = p.TIPO_ACT_PROY === "3" || tipoRaw.includes("PRODUCTO") || tipoRaw.includes("ACTIVIDAD") || tipoRaw.includes("ACCION");
                 
-                let cumpleTipo = false;
-                if (verProyecto && esProyecto) cumpleTipo = true;
-                if (verActividad && esActividad) cumpleTipo = true;
-
                 const cumpleEjecutora = (ejecSeleccionada === "TODAS" || p.EJECUTORA_NOMBRE === ejecSeleccionada);
                 const cui = (p.PRODUCTO_PROYECTO || "").toString();
                 const nombre = (p.PRODUCTO_PROYECTO_NOMBRE || "").toLowerCase();
 
-                return cumpleEjecutora && cumpleTipo && (nombre.includes(query) || cui.includes(query));
+                return cumpleEjecutora &&
+                       ((verProyecto && esProyecto) || (verActividad && esActividad)) &&
+                       (nombre.includes(query) || cui.includes(query));
             });
 
             renderResumen(filtered, ejecSeleccionada);
@@ -302,20 +327,18 @@
         }, 250);
     }
 
-    // 4. CÁLCULO DE TOTALES Y RENDERIZADO
     function renderResumen(data, nombreEjecutora) {
         let t = { pia:0, pim:0, cer:0, can:0, cme:0, dev:0 };
         data.forEach(p => {
-            // Math.max(0...) evita que errores de fuente (negativos) afecten el global
-            t.pia += Math.max(0, parseFloat(p.MONTO_PIA) || 0); 
-            t.pim += Math.max(0, parseFloat(p.MONTO_PIM) || 0);
-            t.cer += Math.max(0, parseFloat(p.MONTO_CERTIFICADO) || 0); 
-            t.can += Math.max(0, parseFloat(p.MONTO_COMPROMETIDO_ANUAL) || 0);
-            t.cme += Math.max(0, parseFloat(p.MONTO_COMPROMETIDO) || 0); 
-            t.dev += Math.max(0, parseFloat(p.MONTO_DEVENGADO) || 0);
+            t.pia += parseFloat(p.MONTO_PIA) || 0; 
+            t.pim += parseFloat(p.MONTO_PIM) || 0;
+            t.cer += parseFloat(p.MONTO_CERTIFICADO) || 0; 
+            t.can += parseFloat(p.MONTO_COMPROMETIDO_ANUAL) || 0;
+            t.cme += parseFloat(p.MONTO_COMPROMETIDO) || 0; 
+            t.dev += parseFloat(p.MONTO_DEVENGADO) || 0;
         });
         
-        const titulo = nombreEjecutora === "TODAS" ? "GORE LAMBAYEQUE (CONSOLIDADO)" : nombreEjecutora;
+        const titulo = nombreEjecutora === "TODAS" ? "GORE LAMBAYEQUE (TODAS)" : nombreEjecutora;
         const perc = (v) => t.pim > 0 ? (v/t.pim*100).toFixed(1) + '%' : '0.0%';
         
         document.getElementById('resumen-ejecutora').innerHTML = `
@@ -331,31 +354,27 @@
 
     function renderTable(data) {
         const tbody = document.getElementById('tbody-main');
-        if(data.length === 0) { 
-            tbody.innerHTML = '<tr><td colspan="9" class="text-center p-4">No hay datos con los filtros seleccionados</td></tr>'; 
-            return; 
-        }
+        if(!tbody) return;
+        if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="8" class="text-center p-4">Sin datos coincidentes</td></tr>'; return; }
         
         tbody.innerHTML = data.map(p => {
-            const pim = Math.max(0, parseFloat(p.MONTO_PIM) || 0);
-            const dev = Math.max(0, parseFloat(p.MONTO_DEVENGADO) || 0);
-            const cert = Math.max(0, parseFloat(p.MONTO_CERTIFICADO) || 0);
-            
-            // Porcentaje inteligente: si PIM es 0 pero hay gasto, marcar como 100% ejecutado
-            const pDev = pim > 0 ? (dev / pim * 100).toFixed(1) : (dev > 0 ? "100.0" : "0.0");
-            const pCer = pim > 0 ? (cert / pim * 100).toFixed(1) : (cert > 0 ? "100.0" : "0.0");
+            const pim = parseFloat(p.MONTO_PIM) || 0;
+            const dev = parseFloat(p.MONTO_DEVENGADO) || 0;
+            const cert = parseFloat(p.MONTO_CERTIFICADO) || 0;
+            const pDev = pim > 0 ? (dev / pim * 100).toFixed(1) : "0.0";
+            const pCer = pim > 0 ? (cert / pim * 100).toFixed(1) : "0.0";
             
             let sem = 'status-bajo', txt = 'BAJO', clr = 'text-danger';
-            if (parseFloat(pDev) >= 75) { sem = 'status-alto'; txt = 'ALTO'; clr = 'text-success'; }
+            if (parseFloat(pDev) > 75) { sem = 'status-alto'; txt = 'ALTO'; clr = 'text-success'; }
             else if (parseFloat(pDev) >= 40) { sem = 'status-medio'; txt = 'MEDIO'; clr = 'text-warning'; }
 
             return `
                 <tr class="row-item" onclick="seleccionar('${p.PRODUCTO_PROYECTO}', this)">
-                    <td class="text-center fw-bold text-muted small">${p.PRODUCTO_PROYECTO}</td>
-                    <td class="text-start" style="font-size: 0.8rem; width:40%">${p.PRODUCTO_PROYECTO_NOMBRE}</td>
+                    <td class="text-center fw-bold text-muted">${p.PRODUCTO_PROYECTO}</td>
+                    <td class="text-start fw-bold" style="width:35%">${p.PRODUCTO_PROYECTO_NOMBRE}</td>
                     <td class="text-end">${pim.toLocaleString()}</td>
                     <td class="text-end">${cert.toLocaleString()}</td>
-                    <td class="text-center text-primary small">${pCer}%</td>
+                    <td class="text-center text-primary">${pCer}%</td>
                     <td class="text-end text-success fw-bold">${dev.toLocaleString()}</td>
                     <td class="text-center fw-bold text-success">${pDev}%</td>
                     <td class="text-center">
@@ -368,12 +387,10 @@
         }).join('');
     }
 
-    // 5. GESTIÓN DE SEGUIMIENTO (POST/GET A GOOGLE SHEETS)
     function seleccionar(cui, fila) {
         cuiSeleccionadoActual = cui;
         document.querySelectorAll('.row-item').forEach(r => r.classList.remove('selected-row'));
         fila.classList.add('selected-row');
-        
         document.getElementById('selected-cui-label').innerText = "CUI: " + cui;
         document.getElementById('form-cui').value = cui;
 
@@ -381,20 +398,17 @@
         if(p) {
             const pim = parseFloat(p.MONTO_PIM) || 0;
             const getP = (v) => pim > 0 ? (parseFloat(v || 0)/pim*100).toFixed(1) : 0;
-            
             updateG('g-cer', 'v-cer', getP(p.MONTO_CERTIFICADO));
             updateG('g-can', 'v-can', getP(p.MONTO_COMPROMETIDO_ANUAL));
             updateG('g-cme', 'v-cme', getP(p.MONTO_COMPROMETIDO));
             updateG('g-dev', 'v-dev', getP(p.MONTO_DEVENGADO));
             updateG('g-gir', 'v-gir', getP(p.MONTO_GIRADO));
-            
             cargarDetalleSeguimiento(cui);
         }
     }
 
     function guardarSeguimiento(event) {
-        const getVal = (id) => document.getElementById(id) ? document.getElementById(id).value : "";
-
+        const getVal = (id) => { const el = document.getElementById(id); return el ? el.value : ""; };
         const datos = {
             cui: getVal('form-cui'),
             estado_general: getVal('form-est-gral'),
@@ -406,37 +420,27 @@
             acciones_programadas: getVal('form-acciones')
         };
 
-        if (!datos.cui) return alert("Selecciona un registro primero.");
+        if (!datos.cui) { alert("⚠️ No se ha seleccionado un CUI válido."); return; }
 
         const btn = event.target.closest('button');
         const originalText = btn.innerHTML;
         btn.disabled = true;
         btn.innerHTML = 'Guardando...';
 
-        fetch(URL_APPS_SCRIPT, {
-            method: 'POST',
-            body: JSON.stringify(datos)
-        })
+        fetch(URL_API_SCRIPT, { method: 'POST', body: JSON.stringify(datos) })
         .then(() => {
-            alert("✅ ¡Guardado con éxito!");
+            alert("✅ ¡Registro enviado!");
             cargarDetalleSeguimiento(datos.cui);
             bootstrap.Modal.getInstance(document.getElementById('modalRegistro')).hide();
         })
-        .catch(() => alert("Error al guardar."))
-        .finally(() => {
-            btn.disabled = false;
-            btn.innerHTML = originalText;
-        });
+        .catch(error => { console.error('Error:', error); alert("❌ Error de comunicación."); })
+        .finally(() => { btn.disabled = false; btn.innerHTML = originalText; });
     }
 
     function cargarDetalleSeguimiento(cui) {
         document.querySelectorAll('.tracking-body').forEach(el => el.innerText = "Cargando...");
-
-        fetch(`${URL_APPS_SCRIPT}?cui=${cui.toString().trim()}`, {
-            method: 'GET',
-            redirect: 'follow'
-        })
-        .then(response => response.json())
+        fetch(`${URL_API_SCRIPT}?cui=${cui.toString().trim()}`, { method: 'GET', redirect: 'follow' })
+        .then(r => r.json())
         .then(res => {
             if (res.status === "success" && res.data) {
                 const d = res.data;
@@ -447,30 +451,21 @@
                 document.getElementById('track-sisgedo').innerText = d.sisgedo || "-";
                 document.getElementById('track-timeline').innerText = d.timeline_inversion || "-";
                 document.getElementById('track-acciones').innerText = d.acciones_programadas || "-";
-            } else {
-                limpiarCuadros();
-            }
+            } else { limpiarCuadros(); }
         })
         .catch(() => limpiarCuadros());
     }
 
-    // 6. UTILITARIOS DE GAUGE
     function actualizarGaugesGlobales(data) {
         let s = { pim:0, cer:0, can:0, cme:0, dev:0, gir:0 };
         data.forEach(r => {
-            s.pim += Math.max(0, parseFloat(r.MONTO_PIM) || 0); 
-            s.cer += Math.max(0, parseFloat(r.MONTO_CERTIFICADO) || 0);
-            s.can += Math.max(0, parseFloat(r.MONTO_COMPROMETIDO_ANUAL) || 0); 
-            s.cme += Math.max(0, parseFloat(r.MONTO_COMPROMETIDO) || 0);
-            s.dev += Math.max(0, parseFloat(r.MONTO_DEVENGADO) || 0); 
-            s.gir += Math.max(0, parseFloat(r.MONTO_GIRADO) || 0);
+            s.pim += parseFloat(r.MONTO_PIM) || 0; 
+            s.cer += parseFloat(r.MONTO_CERTIFICADO) || 0;
+            s.dev += parseFloat(r.MONTO_DEVENGADO) || 0; 
         });
         const getP = (v) => s.pim > 0 ? (v/s.pim*100).toFixed(1) : 0;
         updateG('g-cer', 'v-cer', getP(s.cer));
-        updateG('g-can', 'v-can', getP(s.can));
-        updateG('g-cme', 'v-cme', getP(s.cme));
         updateG('g-dev', 'v-dev', getP(s.dev));
-        updateG('g-gir', 'v-gir', getP(s.gir));
     }
 
     function updateG(id, tid, val) {
