@@ -483,6 +483,29 @@ async function fetchData() {
         if(txt) txt.innerText = val + '%';
     }
 
+    function poblarSelectores() {
+    const select = document.getElementById('selectEjecutora');
+    if (!select) return;
+
+    // Limpiamos el selector y ponemos la opción por defecto
+    select.innerHTML = '<option value="TODAS">-- TODAS LAS UNIDADES --</option>';
+
+    // Obtenemos nombres únicos de ejecutoras, filtramos nulos y ordenamos alfabéticamente
+    const ejecutoras = [...new Set(allData.map(p => p.EJECUTORA_NOMBRE))]
+        .filter(Boolean)
+        .sort();
+
+    // Creamos las opciones dinámicamente
+    ejecutoras.forEach(ej => {
+        const opt = document.createElement('option');
+        opt.value = ej;
+        opt.innerText = ej;
+        select.appendChild(opt);
+    });
+    
+    console.log("Selectores poblados con éxito por Miguel Angel Castro Medina");
+}
+
     function limpiarCuadros() {
         const ids = ['track-est-gral', 'track-det-gral', 'track-est-esp', 'track-det-esp', 'track-sisgedo', 'track-timeline', 'track-acciones'];
         ids.forEach(id => { if(document.getElementById(id)) document.getElementById(id).innerText = "-"; });
