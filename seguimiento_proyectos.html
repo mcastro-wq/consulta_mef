@@ -463,36 +463,45 @@ async function fetchData() {
     }
 
 function actualizarGaugesGlobales(data) {
-    // 1. Usamos un Map para asegurar que si un CUI aparece varias veces, 
-    // solo sumemos su valor más reciente o máximo para el total.
+    // 1. Depuración por CUI
     const unicos = new Map();
-    
     data.forEach(item => {
         const cui = item.PRODUCTO_PROYECTO;
-        // Si el CUI ya existe, comparamos y nos quedamos con el que tenga más PIM (asumiendo que es el consolidado)
         if (!unicos.has(cui) || parseFloat(item.MONTO_PIM) > parseFloat(unicos.get(cui).MONTO_PIM)) {
             unicos.set(cui, item);
         }
     });
 
-    let s = { pim: 0, cer: 0, can: 0, dev: 0 };
+    // CORRECCIÓN 1: Añadimos 'cme' al acumulador para guardar la suma del compromiso mensual
+    let s = { pim: 0, cer: 0, can: 0, cme: 0, dev: 0, gir: 0 };
 
-    // 2. Sumamos sobre los datos YA DEPURADOS por CUI
+    // 2. Sumamos sobre los datos depurados
     unicos.forEach(r => {
         s.pim += Math.max(0, parseFloat(r.MONTO_PIM) || 0);
         s.cer += Math.max(0, parseFloat(r.MONTO_CERTIFICADO) || 0);
         s.can += Math.max(0, parseFloat(r.MONTO_COMPROMETIDO_ANUAL) || 0);
+        
+        // CORRECCIÓN 2: Sumamos el campo MONTO_COMPROMETIDO (que es el mensual)
+        s.cme += Math.max(0, parseFloat(r.MONTO_COMPROMETIDO) || 0); 
+        
         s.dev += Math.max(0, parseFloat(r.MONTO_DEVENGADO) || 0);
+        s.gir += Math.max(0, parseFloat(r.MONTO_GIRADO) || 0);
     });
 
     const getP = (v) => s.pim > 0 ? (v / s.pim * 100).toFixed(2) : "0.00";
 
-    // 3. Actualizar Velocímetros (Fíjate que usamos toFixed(2) como en la web del GORE)
+    // 3. Actualización de Velocímetros
     updateG('g-cer', 'v-cer', getP(s.cer));
     updateG('g-can', 'v-can', getP(s.can));
     updateG('g-dev', 'v-dev', getP(s.dev));
-    updateG('g-cm', 'v-cm', getP(s.com)); // Compromiso Mensual (asegúrate que el ID sea 'g-cm')
     
+    // CORRECCIÓN 3: Los IDs en tu HTML son 'g-cme' y 'v-cme' (con la 'e')
+    // Y el dato está en 's.cme' (no en 's.com')
+    updateG('g-cme', 'v-cme', getP(s.cme)); 
+    
+    // También añadimos el de Girado para que no se quede en cero
+    updateG('g-gir', 'v-gir', getP(s.gir));
+
     console.log("Totales calculados sobre " + unicos.size + " proyectos únicos.");
 }
 
