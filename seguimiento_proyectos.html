@@ -237,67 +237,59 @@ async function fetchData() {
     const anio = document.getElementById('selectAnio').value;
     const loader = document.getElementById('loader-overlay');
     const txtCorte = document.getElementById('txt-corte');
-    const mainTitle = document.getElementById('main-title');
-    const loaderText = document.getElementById('loader-text');
-
-    mainTitle.innerText = `Monitor de Ejecución Presupuestal ${anio}`;
+    
     loader.classList.remove('d-none');
-    txtCorte.innerText = "Sincronizando...";
 
     try {
+        let rawData = [];
+
         if (anio === '2025') {
-            loaderText.innerText = "Procesando y Limpiando Base 2025...";
-            
+            const URL1 = 'https://raw.githubusercontent.com/mcastro-wq/consulta_mef/refs/heads/main/data_2025_diario_part1.json';
+            const URL2 = 'https://raw.githubusercontent.com/mcastro-wq/consulta_mef/refs/heads/main/data_2025_diario_part2.json';
+
             const [res1, res2] = await Promise.all([
-                fetch(URL_PART1).then(r => { if(!r.ok) throw new Error("Error Parte 1"); return r.text(); }),
-                fetch(URL_PART2).then(r => { if(!r.ok) throw new Error("Error Parte 2"); return r.text(); })
+                fetch(URL1).then(r => r.json()),
+                fetch(URL2).then(r => r.json())
             ]);
 
-            // LIMPIEZA AVANZADA
-            let clean1 = res1.trim().replace(/^\[/, "").replace(/\]$/, "").trim();
-            let clean2 = res2.trim().replace(/^\[/, "").replace(/\]$/, "").trim();
-
-            if (clean1.endsWith(',')) clean1 = clean1.slice(0, -1);
-            if (clean2.startsWith(',')) clean2 = clean2.substring(1);
-            
-            const fullJsonText = "[" + clean1 + "," + clean2 + "]";
-            
-            let rawData;
-            try {
-                rawData = JSON.parse(fullJsonText);
-            } catch (parseError) {
-                console.error("Error de formato en el JSON unido:", parseError);
-                throw new Error("El archivo de GitHub tiene un error de caracteres.");
-            }
-
-            // --- ELIMINACIÓN DE DUPLICADOS ---
-            const mapaUnicos = new Map();
-            rawData.forEach(item => {
-                const cui = item.PRODUCTO_PROYECTO?.toString().trim();
-                if (cui && !mapaUnicos.has(cui)) {
-                    mapaUnicos.set(cui, item);
-                }
-            });
-
-            allData = Array.from(mapaUnicos.values());
-            txtCorte.innerText = "Datos 2025 Depurados por Miguel Angel Castro";
-
+            // Unimos los arrays de forma nativa (sin manipular strings peligrosos)
+            rawData = [...res1, ...res2];
         } else {
-            // Lógica 2026
             const res = await fetch(URL_2026);
-            if (!res.ok) throw new Error("No se pudo conectar con 2026");
             const json = await res.json();
-            allData = json.proyectos || json;
-            txtCorte.innerText = json.fecha_extraccion || "Actualizado 2026";
+            rawData = json.proyectos || json;
         }
 
+        // --- CONSOLIDACIÓN MATEMÁTICA (Clave para que cuadre con el GORE) ---
+        // Muchos proyectos tienen varias filas por metas. Debemos agruparlos.
+        const mapaConsolidado = new Map();
+
+        rawData.forEach(item => {
+            const cui = item.PRODUCTO_PROYECTO?.toString().trim();
+            if (!cui) return;
+
+            if (!mapaConsolidado.has(cui)) {
+                mapaConsolidado.set(cui, { ...item });
+            } else {
+                // Si el CUI ya existe, sumamos sus valores financieros
+                const existente = mapaConsolidado.get(cui);
+                existente.MONTO_PIA = (parseFloat(existente.MONTO_PIA) || 0) + (parseFloat(item.MONTO_PIA) || 0);
+                existente.MONTO_PIM = (parseFloat(existente.MONTO_PIM) || 0) + (parseFloat(item.MONTO_PIM) || 0);
+                existente.MONTO_CERTIFICADO = (parseFloat(existente.MONTO_CERTIFICADO) || 0) + (parseFloat(item.MONTO_CERTIFICADO) || 0);
+                existente.MONTO_DEVENGADO = (parseFloat(existente.MONTO_DEVENGADO) || 0) + (parseFloat(item.MONTO_DEVENGADO) || 0);
+                // ... agrega aquí otros montos si los necesitas
+            }
+        });
+
+        allData = Array.from(mapaConsolidado.values());
+        txtCorte.innerText = "Sincronizado con base diaria 2025";
+        
         poblarSelectores();
         filtrar();
 
     } catch (e) {
-        console.error("Error detallado:", e);
-        txtCorte.innerText = "Error: " + e.message;
-        alert("Atención: " + e.message);
+        console.error("Error en carga:", e);
+        alert("Error cargando los datos de GitHub. Verifica la consola.");
     } finally {
         loader.classList.add('d-none');
     }
