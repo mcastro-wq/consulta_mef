@@ -255,47 +255,38 @@ async function fetchData() {
             rawData = [...res1, ...res2];
             txtCorte.innerText = "Sincronizado con base diaria 2025";
         } else {
-            // --- CARGA Y MAPEO PARA 2026 ---
+            // --- CARGA PARA 2026 (Usando el JSON de seguimiento.py) ---
             const res = await fetch(URL_2026);
             const json = await res.json();
-            const proyectos2026 = json.proyectos || [];
             
-            // <--- CAMBIO AQUÍ: Convertimos los nombres del JSON 2026 al formato que entiende el resto del script
-            rawData = proyectos2026.map(p => ({
-                PRODUCTO_PROYECTO: p.cui, 
-                PRODUCTO_PROYECTO_NOMBRE: p.NOMBRE,
-                MONTO_PIM: p.pim,
-                MONTO_CERTIFICADO: p.certificado || 0,
-                MONTO_COMPROMETIDO_ANUAL: p.compromiso_anual || 0,
-                MONTO_COMPROMETIDO: p.compromiso_mensual || 0,
-                MONTO_DEVENGADO: p.devengado,
-                MONTO_GIRADO: p.girado || 0,
-                EJECUTORA_NOMBRE: p.sector,
-                TIPO_ACT_PROY_NOMBRE: p.tipo || "PROYECTO"
-            }));
+            // IMPORTANTE: seguimiento.py ya genera los nombres correctos.
+            // NO usamos .map(), tomamos los proyectos directamente.
+            rawData = json.proyectos || [];
 
-            txtCorte.innerText = "Corte MEF: " + (json.ultima_actualizacion || "2026");
+            // Usamos la llave correcta que genera seguimiento.py
+            txtCorte.innerText = "Corte MEF: " + (json.fecha_extraccion || "2026");
         }
 
-        // --- CONSOLIDACIÓN MATEMÁTICA ---
+        // --- CONSOLIDACIÓN MATEMÁTICA (Universal para 2025 y 2026) ---
         const mapaConsolidado = new Map();
 
         rawData.forEach(item => {
-            const cui = item.PRODUCTO_PROYECTO?.toString().trim();
-            if (!cui) return;
+            const cui = (item.PRODUCTO_PROYECTO || item.CUI || "").toString().trim();
+            if (!cui || cui === "0") return;
 
             if (!mapaConsolidado.has(cui)) {
+                // Clonamos el objeto para no modificar el original
                 mapaConsolidado.set(cui, { ...item });
             } else {
-                const existente = mapaConsolidado.get(cui);
-                
-                existente.MONTO_PIA = (parseFloat(existente.MONTO_PIA) || 0) + Math.max(0, parseFloat(item.MONTO_PIA) || 0);
-                existente.MONTO_PIM = (parseFloat(existente.MONTO_PIM) || 0) + Math.max(0, parseFloat(item.MONTO_PIM) || 0);
-                existente.MONTO_CERTIFICADO = (parseFloat(existente.MONTO_CERTIFICADO) || 0) + Math.max(0, parseFloat(item.MONTO_CERTIFICADO) || 0);
-                existente.MONTO_COMPROMETIDO_ANUAL = (parseFloat(existente.MONTO_COMPROMETIDO_ANUAL) || 0) + Math.max(0, parseFloat(item.MONTO_COMPROMETIDO_ANUAL) || 0);
-                existente.MONTO_COMPROMETIDO = (parseFloat(existente.MONTO_COMPROMETIDO) || 0) + Math.max(0, parseFloat(item.MONTO_COMPROMETIDO) || 0);
-                existente.MONTO_DEVENGADO = (parseFloat(existente.MONTO_DEVENGADO) || 0) + Math.max(0, parseFloat(item.MONTO_DEVENGADO) || 0);
-                existente.MONTO_GIRADO = (parseFloat(existente.MONTO_GIRADO) || 0) + Math.max(0, parseFloat(item.MONTO_GIRADO) || 0);
+                const ex = mapaConsolidado.get(cui);
+                // Sumamos todas las fases numéricas
+                ex.MONTO_PIA = (parseFloat(ex.MONTO_PIA) || 0) + (parseFloat(item.MONTO_PIA) || 0);
+                ex.MONTO_PIM = (parseFloat(ex.MONTO_PIM) || 0) + (parseFloat(item.MONTO_PIM) || 0);
+                ex.MONTO_CERTIFICADO = (parseFloat(ex.MONTO_CERTIFICADO) || 0) + (parseFloat(item.MONTO_CERTIFICADO) || 0);
+                ex.MONTO_COMPROMETIDO_ANUAL = (parseFloat(ex.MONTO_COMPROMETIDO_ANUAL) || 0) + (parseFloat(item.MONTO_COMPROMETIDO_ANUAL) || 0);
+                ex.MONTO_COMPROMETIDO = (parseFloat(ex.MONTO_COMPROMETIDO) || 0) + (parseFloat(item.MONTO_COMPROMETIDO) || 0);
+                ex.MONTO_DEVENGADO = (parseFloat(ex.MONTO_DEVENGADO) || 0) + (parseFloat(item.MONTO_DEVENGADO) || 0);
+                ex.MONTO_GIRADO = (parseFloat(ex.MONTO_GIRADO) || 0) + (parseFloat(item.MONTO_GIRADO) || 0);
             }
         });
 
@@ -306,7 +297,7 @@ async function fetchData() {
 
     } catch (e) {
         console.error("Error en carga:", e);
-        alert("Error cargando los datos. Verifica la consola.");
+        alert("Error cargando los datos. Revisa la consola (F12).");
     } finally {
         loader.classList.add('d-none');
     }
