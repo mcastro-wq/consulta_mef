@@ -44,7 +44,7 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            height: 400px; /* Altura fija para que Chart.js no se salga */
+            height: 400px; 
         }
     </style>
 </head>
@@ -68,17 +68,16 @@
         
         <div class="row mb-3">
             <div class="col-12 d-flex justify-content-center">
-<div class="d-flex gap-2">
-    <span class="badge bg-light text-dark border fw-normal">
-        <i class="bi bi-clock-history text-success"></i> Actualización: 6h
-    </span>
-    <span class="badge bg-light text-dark border fw-normal">
-        <i class="bi bi-database-check text-primary"></i> MEF: <span id="fecha-actualizacion">...</span>
-    </span>
-</div>      
+                <div class="d-flex gap-2">
+                    <span class="badge bg-light text-dark border fw-normal">
+                        <i class="bi bi-clock-history text-success"></i> Actualización: 6h
+                    </span>
+                    <span class="badge bg-light text-dark border fw-normal">
+                        <i class="bi bi-database-check text-primary"></i> MEF: <span id="fecha-actualizacion">...</span>
+                    </span>
+                </div>      
             </div>
         </div>
-
 
         <div class="row mb-4">
             <div class="col-12">
@@ -93,27 +92,28 @@
             </div>
         </div>
 
-<div class="row mb-4 g-3"> <div class="col-md-4">
-        <div class="card card-kpi bg-primary text-center border-0 shadow-sm h-100">
-            <small class="text-white-50"><b>PIM TOTAL</b></small>
-            <h3 id="total-pim" class="fw-bold mb-0">S/ 0</h3>
-        </div>
-    </div>
+        <div class="row mb-4 g-3"> 
+            <div class="col-md-4">
+                <div class="card card-kpi bg-primary text-center border-0 shadow-sm h-100">
+                    <small class="text-white-50"><b>PIM TOTAL</b></small>
+                    <h3 id="total-pim" class="fw-bold mb-0">S/ 0</h3>
+                </div>
+            </div>
 
-    <div class="col-md-4">
-        <div class="card card-kpi bg-success text-center border-0 shadow-sm h-100">
-            <small class="text-white-50"><b>DEVENGADO TOTAL</b></small>
-            <h3 id="total-ejecutado" class="fw-bold mb-0">S/ 0</h3>
-        </div>
-    </div>
+            <div class="col-md-4">
+                <div class="card card-kpi bg-success text-center border-0 shadow-sm h-100">
+                    <small class="text-white-50"><b>DEVENGADO TOTAL</b></small>
+                    <h3 id="total-ejecutado" class="fw-bold mb-0">S/ 0</h3>
+                </div>
+            </div>
 
-    <div class="col-md-4">
-        <div class="card card-kpi text-center border-0 shadow-sm h-100" style="background-color: #fd7e14; color: white;">
-            <small class="text-white-50"><b>AVANCE GLOBAL</b></small>
-            <h3 id="avance-global" class="fw-bold mb-0">0%</h3>
+            <div class="col-md-4">
+                <div class="card card-kpi text-center border-0 shadow-sm h-100" style="background-color: #fd7e14; color: white;">
+                    <small class="text-white-50"><b>AVANCE GLOBAL</b></small>
+                    <h3 id="avance-global" class="fw-bold mb-0">0%</h3>
+                </div>
+            </div>
         </div>
-    </div>
-</div>
 
         <div class="row mb-4">
             <div class="col-lg-7 mb-4">
@@ -133,47 +133,11 @@
                 </div>
             </div>
         </div>
+        
+        <div id="estado" class="text-center mb-3 fw-bold text-muted">Cargando datos analíticos...</div>
 
-        <div class="card p-4 mb-4 shadow-sm border-0">
-            <div class="row g-2 align-items-end">
-                <div class="col-md-5">
-                    <label class="small fw-bold">🔎 BUSCAR PROYECTO</label>
-                    <input type="text" id="buscador" class="form-control" placeholder="Escriba nombre del proyecto...">
-                </div>
-                <div class="col-md-2">
-                    <label class="small fw-bold">📅 AÑO</label>
-                    <select id="select-anio" class="form-select"></select>
-                </div>
-                <div class="col-md-5">
-                    <label class="small fw-bold">📊 FILTRAR POR AVANCE</label>
-                    <div class="btn-group w-100">
-                        <button class="btn btn-outline-danger btn-sm" onclick="setRango('bajo')">Bajo</button>
-                        <button class="btn btn-outline-warning btn-sm text-dark" onclick="setRango('medio')">Medio</button>
-                        <button class="btn btn-outline-success btn-sm" onclick="setRango('alto')">Alto</button>
-                        <button class="btn btn-secondary btn-sm" onclick="setRango('todos')">Todos</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="estado" class="text-center mb-3 fw-bold text-muted">Cargando datos...</div>
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5" id="contenedor-proyectos">
-            </div>
     </div>
 
     <script src="script.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
