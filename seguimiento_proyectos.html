@@ -300,42 +300,36 @@ async function fetchData() {
     }
 }
 
-function filtrar() {
-    clearTimeout(timeoutBusqueda);
-    timeoutBusqueda = setTimeout(() => {
-        const query = document.getElementById('inputBusqueda').value.toLowerCase();
-        const verProyecto = document.getElementById('checkProyecto').checked;
-        const verActividad = document.getElementById('checkActividad').checked;
-        const ejecSeleccionada = document.getElementById('selectEjecutora').value;
+    function filtrar() {
+        clearTimeout(timeoutBusqueda);
+        timeoutBusqueda = setTimeout(() => {
+            const query = document.getElementById('inputBusqueda').value.toLowerCase();
+            const verProyecto = document.getElementById('checkProyecto').checked;
+            const verActividad = document.getElementById('checkActividad').checked;
+            const ejecSeleccionada = document.getElementById('selectEjecutora').value;
 
-        const filtered = allData.filter(p => {
-            // Identificación basada en tu JSON data_proyectos.json
-            const tipo = (p.TIPO || "").toUpperCase();
-            
-            // Es proyecto si el TIPO es PROYECTO
-            const esProyecto = tipo === "PROYECTO";
-            // Es actividad si el TIPO es ACTIVIDAD, PRODUCTO o ACCION
-            const esActividad = tipo.includes("ACTIVIDAD") || tipo.includes("PRODUCTO") || tipo.includes("ACCION");
-            
-            const cumpleEjecutora = (ejecSeleccionada === "TODAS" || p.EJECUTORA_NOMBRE === ejecSeleccionada);
-            const cui = (p.PRODUCTO_PROYECTO || "").toString();
-            const nombre = (p.PRODUCTO_PROYECTO_NOMBRE || "").toLowerCase();
+            const filtered = allData.filter(p => {
+                // Filtro estricto por TIPO_ACT_PROY si existe, sino usa tu lógica de strings pppp
+                const tipoRaw = (p.TIPO_ACT_PROY_NOMBRE || p.TIPO || "").toUpperCase();
+                const esProyecto = p.TIPO_ACT_PROY === "2" || tipoRaw.includes("PROYECTO");
+                const esActividad = p.TIPO_ACT_PROY === "3" || tipoRaw.includes("PRODUCTO") || tipoRaw.includes("ACTIVIDAD") || tipoRaw.includes("ACCION");
+                
+                const cumpleEjecutora = (ejecSeleccionada === "TODAS" || p.EJECUTORA_NOMBRE === ejecSeleccionada);
+                const cui = (p.PRODUCTO_PROYECTO || "").toString();
+                const nombre = (p.PRODUCTO_PROYECTO_NOMBRE || "").toLowerCase();
 
-            // Lógica de checks:
-            let pasaTipo = false;
-            if (verProyecto && esProyecto) pasaTipo = true;
-            if (verActividad && esActividad) pasaTipo = true;
+                return cumpleEjecutora &&
+                       ((verProyecto && esProyecto) || (verActividad && esActividad)) &&
+                       (nombre.includes(query) || cui.includes(query));
+            });
 
-            return cumpleEjecutora && pasaTipo && (nombre.includes(query) || cui.includes(query));
-        });
-
-        renderResumen(filtered, ejecSeleccionada);
-        actualizarGaugesGlobales(filtered);
-        document.getElementById('txt-contador').innerText = filtered.length;
-        renderTable(filtered.slice(0, 100)); 
-        document.getElementById('msg-limit').classList.toggle('d-none', filtered.length <= 100);
-    }, 250);
-}
+            renderResumen(filtered, ejecSeleccionada);
+            actualizarGaugesGlobales(filtered);
+            document.getElementById('txt-contador').innerText = filtered.length;
+            renderTable(filtered.slice(0, 100)); 
+            document.getElementById('msg-limit').classList.toggle('d-none', filtered.length <= 100);
+        }, 250);
+    }
 
     function renderResumen(data, nombreEjecutora) {
         let t = { pia:0, pim:0, cer:0, can:0, cme:0, dev:0 };
