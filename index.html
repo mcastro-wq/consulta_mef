@@ -3,141 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitor Regional Lambayeque</title>
+    <title>Monitor Lambayeque</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="styles.css">
     <style>
-        /* Estilos de la Navbar y Botón */
-        .navbar {
-            background-color: #801616; /* Color institucional */
+        :root {
+            --primary-color: #801616;
+            --bg-light: #f8f9fa;
         }
-        .btn-ranking {
-            background-color: #ffc107; /* Amarillo */
-            color: #000000 !important;
-            padding: 10px 20px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: bold;
-            display: inline-block;
-            transition: 0.3s;
-            border: 1px solid #e5ac00;
+        body { 
+            background-color: var(--bg-light); 
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            color: #333;
         }
-        .btn-ranking:hover {
-            background-color: #e5ac00;
-            color: #000000 !important;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-        /* Ajuste de tarjetas KPI */
-        .card-kpi {
-            padding: 20px;
-            border-radius: 10px;
-            color: white;
-            border: none;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        /* Contenedor de gráficos */
-        .card-chart {
+        .navbar { background-color: var(--primary-color) !important; border-bottom: 3px solid #ffc107; }
+        
+        .kpi-card {
             background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            height: 400px; 
+            border: none;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            transition: transform 0.2s;
         }
+        .kpi-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: #6c757d; font-weight: 700; }
+        .kpi-value { font-size: 1.8rem; font-weight: 800; margin: 5px 0; color: #222; }
+        
+        /* Barra de progreso elegante */
+        .progress-container { height: 8px; background: #eee; border-radius: 10px; overflow: hidden; margin-top: 10px; }
+        .progress-bar-fill { height: 100%; background: var(--primary-color); width: 0%; transition: width 1s ease-in-out; }
+        
+        .btn-minimal {
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+        }
+        .btn-minimal:hover { background: white; color: var(--primary-color); }
+        
+        .update-badge { font-size: 0.8rem; color: #6c757d; }
     </style>
 </head>
 <body>
 
-    <nav class="navbar navbar-dark mb-4 py-3">
+    <nav class="navbar navbar-dark py-3 mb-5">
         <div class="container d-flex justify-content-between align-items-center">
-            <span class="navbar-brand fw-bold fs-4 mb-0">🏛️ ANALÍTICA PRESUPUESTAL: LAMBAYEQUE</span>
-            <div>
-                <a href="consulta2.html" class="btn-ranking fw-bold rounded-pill px-4">
-                    📊 Ranking Regional
-                </a>
-                <a href="seguimiento_proyectos.html" class="btn-ranking fw-bold rounded-pill px-4">
-                    📊 Seguimiento
-                </a>
+            <span class="navbar-brand fw-bold mb-0">🏛️ ANALÍTICA LAMBAYEQUE</span>
+            <div class="d-flex gap-2">
+                <a href="consulta2.html" class="btn-minimal">Ranking</a>
+                <a href="seguimiento_proyectos.html" class="btn-minimal">Seguimiento</a>
             </div>
         </div>
     </nav>
 
     <div class="container">
-        
-        <div class="row mb-3">
-            <div class="col-12 d-flex justify-content-center">
-                <div class="d-flex gap-2">
-                    <span class="badge bg-light text-dark border fw-normal">
-                        <i class="bi bi-clock-history text-success"></i> Actualización: 6h
-                    </span>
-                    <span class="badge bg-light text-dark border fw-normal">
-                        <i class="bi bi-database-check text-primary"></i> MEF: <span id="fecha-actualizacion">...</span>
-                    </span>
-                </div>      
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <h2 class="fw-extrabold mb-0">Resumen de Inversión</h2>
+                <p class="text-muted small mb-0">Consolidado Regional (Nacional, Regional y Local)</p>
+            </div>
+            <div class="text-end update-badge">
+                <i class="bi bi-database-check"></i> MEF: <span id="fecha-actualizacion" class="fw-bold">Cargando...</span>
             </div>
         </div>
 
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="alert alert-info border-0 shadow-sm" style="border-left: 5px solid #0d6efd !important;">
-                    <h6 class="fw-bold"><i class="bi bi-info-circle-fill"></i> NOTA DE INVERSIÓN TERRITORIAL:</h6>
-                    <p class="small mb-0">
-                        El siguiente reporte refleja la <strong>Inversión Total en el Territorio de Lambayeque</strong>. 
-                        Suma los esfuerzos de todos los niveles de gobierno (Nacional, Regional y Local) y sectores (Salud, Educación, Transportes, etc.) 
-                        que ejecutan obras dentro de la región.
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <div class="row mb-4 g-3"> 
+        <div class="row g-4 mb-5">
             <div class="col-md-4">
-                <div class="card card-kpi bg-primary text-center border-0 shadow-sm h-100">
-                    <small class="text-white-50"><b>PIM TOTAL</b></small>
-                    <h3 id="total-pim" class="fw-bold mb-0">S/ 0</h3>
+                <div class="kpi-card">
+                    <div class="kpi-label">Presupuesto (PIM)</div>
+                    <div id="total-pim" class="kpi-value">S/ 0</div>
                 </div>
             </div>
-
             <div class="col-md-4">
-                <div class="card card-kpi bg-success text-center border-0 shadow-sm h-100">
-                    <small class="text-white-50"><b>DEVENGADO TOTAL</b></small>
-                    <h3 id="total-ejecutado" class="fw-bold mb-0">S/ 0</h3>
+                <div class="kpi-card">
+                    <div class="kpi-label">Ejecutado (Devengado)</div>
+                    <div id="total-ejecutado" class="kpi-value text-success">S/ 0</div>
                 </div>
             </div>
-
             <div class="col-md-4">
-                <div class="card card-kpi text-center border-0 shadow-sm h-100" style="background-color: #fd7e14; color: white;">
-                    <small class="text-white-50"><b>AVANCE GLOBAL</b></small>
-                    <h3 id="avance-global" class="fw-bold mb-0">0%</h3>
-                </div>
-            </div>
-        </div>
-
-        <div class="row mb-4">
-            <div class="col-lg-7 mb-4">
-                <div class="card-chart">
-                    <h6 class="fw-bold text-muted mb-3">INVERSIÓN POR SECTOR (PIM)</h6>
-                    <div style="height: 300px;">
-                        <canvas id="chartSectores"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-5 mb-4">
-                <div class="card-chart">
-                    <h6 class="fw-bold text-muted mb-3">ESTADO DE PROYECTOS</h6>
-                    <div style="height: 300px;">
-                        <canvas id="chartTorta"></canvas>
+                <div class="kpi-card">
+                    <div class="kpi-label">Avance Regional</div>
+                    <div id="avance-global" class="kpi-value" style="color: var(--primary-color);">0%</div>
+                    <div class="progress-container">
+                        <div id="progreso-barra" class="progress-bar-fill"></div>
                     </div>
                 </div>
             </div>
         </div>
 
+        <div id="estado" class="text-center small text-muted mt-5">
+            Sincronizando con el Portal de Transparencia Económica...
+        </div>
     </div>
 
     <script src="script.js"></script>
 </body>
 </html>
-
-
