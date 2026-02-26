@@ -263,7 +263,7 @@ async function fetchData() {
 
             // CORRECCIÓN AQUÍ: Intentamos leer ambos nombres de llave
             const fechaFinal = json.ultima_actualizacion || json.fecha_extraccion || "2026";
-            txtCorte.innerText = "Corte MEF: " + fechaFinal;
+            txtCorte.innerText = fechaFinal;
         }
 
         // --- CONSOLIDACIÓN MATEMÁTICA ---
