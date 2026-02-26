@@ -311,7 +311,7 @@ async function fetchData() {
             const ejecSeleccionada = document.getElementById('selectEjecutora').value;
 
             const filtered = allData.filter(p => {
-                // Filtro estricto por TIPO_ACT_PROY si existe, sino usa tu lógica de strings
+                // Filtro estricto por TIPO_ACT_PROY si existe, sino usa tu lógica de strings pppp
                 const tipoRaw = (p.TIPO_ACT_PROY_NOMBRE || p.TIPO || "").toUpperCase();
                 const esProyecto = p.TIPO_ACT_PROY === "2" || tipoRaw.includes("PROYECTO");
                 const esActividad = p.TIPO_ACT_PROY === "3" || tipoRaw.includes("PRODUCTO") || tipoRaw.includes("ACTIVIDAD") || tipoRaw.includes("ACCION");
