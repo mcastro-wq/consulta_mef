@@ -463,17 +463,30 @@ async function fetchData() {
         .catch(() => limpiarCuadros());
     }
 
-    function actualizarGaugesGlobales(data) {
-        let s = { pim:0, cer:0, can:0, cme:0, dev:0, gir:0 };
-        data.forEach(r => {
-            s.pim += parseFloat(r.MONTO_PIM) || 0; 
-            s.cer += parseFloat(r.MONTO_CERTIFICADO) || 0;
-            s.dev += parseFloat(r.MONTO_DEVENGADO) || 0; 
-        });
-        const getP = (v) => s.pim > 0 ? (v/s.pim*100).toFixed(1) : 0;
-        updateG('g-cer', 'v-cer', getP(s.cer));
-        updateG('g-dev', 'v-dev', getP(s.dev));
-    }
+function actualizarGaugesGlobales(data) {
+    // Inicializamos acumuladores en 0
+    let s = { pim: 0, cer: 0, can: 0, cme: 0, dev: 0, gir: 0 };
+
+    data.forEach(r => {
+        // Usamos parseFloat y || 0 para evitar que un dato vacío rompa la suma
+        s.pim += parseFloat(r.MONTO_PIM) || 0; 
+        s.cer += parseFloat(r.MONTO_CERTIFICADO) || 0;
+        s.can += parseFloat(r.MONTO_COMPROMETIDO_ANUAL) || 0;
+        s.cme += parseFloat(r.MONTO_COMPROMETIDO) || 0; // Se refiere al Mensual
+        s.dev += parseFloat(r.MONTO_DEVENGADO) || 0;
+        s.gir += parseFloat(r.MONTO_GIRADO) || 0;
+    });
+
+    // Función interna para calcular porcentajes seguros
+    const getP = (v) => s.pim > 0 ? (v / s.pim * 100).toFixed(1) : "0.0";
+
+    // Actualizamos cada velocímetro con su ID correspondiente en el HTML
+    updateG('g-cer', 'v-cer', getP(s.cer));
+    updateG('g-can', 'v-can', getP(s.can));
+    updateG('g-cme', 'v-cme', getP(s.cme));
+    updateG('g-dev', 'v-dev', getP(s.dev));
+    updateG('g-gir', 'v-gir', getP(s.gir));
+}
 
     function updateG(id, tid, val) {
         const off = 157 - (157 * (Math.min(val, 100) / 100));
