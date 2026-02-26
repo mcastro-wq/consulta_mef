@@ -45,7 +45,7 @@ def update_data():
                 "proyectos": processed
             }
             
-            with open('data_mef.json', 'w', encoding='utf-8') as f:
+            with open('data_proyectos.json', 'w', encoding='utf-8') as f:
                 json.dump(output, f, indent=2, ensure_ascii=False)
             print(f"✅ ¡Éxito! {len(processed)} registros procesados.")
             
