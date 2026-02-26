@@ -464,28 +464,36 @@ async function fetchData() {
     }
 
 function actualizarGaugesGlobales(data) {
-    // Inicializamos acumuladores en 0
-    let s = { pim: 0, cer: 0, can: 0, cme: 0, dev: 0, gir: 0 };
-
-    data.forEach(r => {
-        // Usamos parseFloat y || 0 para evitar que un dato vacío rompa la suma
-        s.pim += parseFloat(r.MONTO_PIM) || 0; 
-        s.cer += parseFloat(r.MONTO_CERTIFICADO) || 0;
-        s.can += parseFloat(r.MONTO_COMPROMETIDO_ANUAL) || 0;
-        s.cme += parseFloat(r.MONTO_COMPROMETIDO) || 0; // Se refiere al Mensual
-        s.dev += parseFloat(r.MONTO_DEVENGADO) || 0;
-        s.gir += parseFloat(r.MONTO_GIRADO) || 0;
+    // 1. Usamos un Map para asegurar que si un CUI aparece varias veces, 
+    // solo sumemos su valor más reciente o máximo para el total.
+    const unicos = new Map();
+    
+    data.forEach(item => {
+        const cui = item.PRODUCTO_PROYECTO;
+        // Si el CUI ya existe, comparamos y nos quedamos con el que tenga más PIM (asumiendo que es el consolidado)
+        if (!unicos.has(cui) || parseFloat(item.MONTO_PIM) > parseFloat(unicos.get(cui).MONTO_PIM)) {
+            unicos.set(cui, item);
+        }
     });
 
-    // Función interna para calcular porcentajes seguros
-    const getP = (v) => s.pim > 0 ? (v / s.pim * 100).toFixed(1) : "0.0";
+    let s = { pim: 0, cer: 0, can: 0, dev: 0 };
 
-    // Actualizamos cada velocímetro con su ID correspondiente en el HTML
+    // 2. Sumamos sobre los datos YA DEPURADOS por CUI
+    unicos.forEach(r => {
+        s.pim += Math.max(0, parseFloat(r.MONTO_PIM) || 0);
+        s.cer += Math.max(0, parseFloat(r.MONTO_CERTIFICADO) || 0);
+        s.can += Math.max(0, parseFloat(r.MONTO_COMPROMETIDO_ANUAL) || 0);
+        s.dev += Math.max(0, parseFloat(r.MONTO_DEVENGADO) || 0);
+    });
+
+    const getP = (v) => s.pim > 0 ? (v / s.pim * 100).toFixed(2) : "0.00";
+
+    // 3. Actualizar Velocímetros (Fíjate que usamos toFixed(2) como en la web del GORE)
     updateG('g-cer', 'v-cer', getP(s.cer));
     updateG('g-can', 'v-can', getP(s.can));
-    updateG('g-cme', 'v-cme', getP(s.cme));
     updateG('g-dev', 'v-dev', getP(s.dev));
-    updateG('g-gir', 'v-gir', getP(s.gir));
+    
+    console.log("Totales calculados sobre " + unicos.size + " proyectos únicos.");
 }
 
     function updateG(id, tid, val) {
