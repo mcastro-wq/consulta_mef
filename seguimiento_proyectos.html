@@ -249,46 +249,55 @@ async function fetchData() {
             loaderText.innerText = "Procesando y Limpiando Base 2025...";
             
             const [res1, res2] = await Promise.all([
-                fetch(URL_PART1).then(r => r.text()),
-                fetch(URL_PART2).then(r => r.text())
+                fetch(URL_PART1).then(r => { if(!r.ok) throw new Error("Error Parte 1"); return r.text(); }),
+                fetch(URL_PART2).then(r => { if(!r.ok) throw new Error("Error Parte 2"); return r.text(); })
             ]);
 
+            // LIMPIEZA AVANZADA
             let clean1 = res1.trim().replace(/^\[/, "").replace(/\]$/, "").trim();
             let clean2 = res2.trim().replace(/^\[/, "").replace(/\]$/, "").trim();
-            if (clean1.endsWith(',')) clean1 = clean1.slice(0, -1);
-            
-            const rawData = JSON.parse("[" + clean1 + "," + clean2 + "]");
 
-            // --- AQUÍ ESTÁ EL TRUCO PARA ELIMINAR DUPLICADOS ---
-            const mapaUnicos = new Map();
+            if (clean1.endsWith(',')) clean1 = clean1.slice(0, -1);
+            if (clean2.startsWith(',')) clean2 = clean2.substring(1);
             
+            const fullJsonText = "[" + clean1 + "," + clean2 + "]";
+            
+            let rawData;
+            try {
+                rawData = JSON.parse(fullJsonText);
+            } catch (parseError) {
+                console.error("Error de formato en el JSON unido:", parseError);
+                throw new Error("El archivo de GitHub tiene un error de caracteres.");
+            }
+
+            // --- ELIMINACIÓN DE DUPLICADOS ---
+            const mapaUnicos = new Map();
             rawData.forEach(item => {
-                const cui = item.PRODUCTO_PROYECTO;
-                // Si el CUI ya existe, comparamos y nos quedamos con el que tenga más PIM (o el más reciente)
-                if (!mapaUnicos.has(cui)) {
+                const cui = item.PRODUCTO_PROYECTO?.toString().trim();
+                if (cui && !mapaUnicos.has(cui)) {
                     mapaUnicos.set(cui, item);
                 }
             });
 
-            // Convertimos el mapa de nuevo a un array
             allData = Array.from(mapaUnicos.values());
-            txtCorte.innerText = "Datos 2025 Depurados";
+            txtCorte.innerText = "Datos 2025 Depurados por Miguel Angel Castro";
 
         } else {
-            // Lógica 2026 normal...
+            // Lógica 2026
             const res = await fetch(URL_2026);
+            if (!res.ok) throw new Error("No se pudo conectar con 2026");
             const json = await res.json();
             allData = json.proyectos || json;
             txtCorte.innerText = json.fecha_extraccion || "Actualizado 2026";
         }
 
-        // Actualizar selectores y tabla pundonor
         poblarSelectores();
         filtrar();
 
     } catch (e) {
-        console.error(e);
-        alert("Error en el procesamiento de datos.");
+        console.error("Error detallado:", e);
+        txtCorte.innerText = "Error: " + e.message;
+        alert("Atención: " + e.message);
     } finally {
         loader.classList.add('d-none');
     }
