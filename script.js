@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // 2. CARGA DE DATOS
 async function consultarMEF() {
     try {
-        const response = await fetch('data_mef.json?v=' + Math.random());
+        const response = await fetch('data_proyectos.json?v=' + Math.random());
         const dataTotal = await response.json();
         
         // Mostrar fecha en el banner
@@ -203,6 +203,7 @@ function renderizarCards(lista) {
 }
 
 function setRango(r) { filtroRango = r; filtrarTodo(); }
+
 
 
 
