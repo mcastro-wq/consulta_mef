@@ -264,22 +264,29 @@ async function fetchData() {
         // Muchos proyectos tienen varias filas por metas. Debemos agruparlos.
         const mapaConsolidado = new Map();
 
-        rawData.forEach(item => {
-            const cui = item.PRODUCTO_PROYECTO?.toString().trim();
-            if (!cui) return;
+     rawData.forEach(item => {
+    const cui = item.PRODUCTO_PROYECTO?.toString().trim();
+    if (!cui) return;
 
-            if (!mapaConsolidado.has(cui)) {
-                mapaConsolidado.set(cui, { ...item });
-            } else {
-                // Si el CUI ya existe, sumamos sus valores financieros
-                const existente = mapaConsolidado.get(cui);
-                existente.MONTO_PIA = (parseFloat(existente.MONTO_PIA) || 0) + (parseFloat(item.MONTO_PIA) || 0);
-                existente.MONTO_PIM = (parseFloat(existente.MONTO_PIM) || 0) + (parseFloat(item.MONTO_PIM) || 0);
-                existente.MONTO_CERTIFICADO = (parseFloat(existente.MONTO_CERTIFICADO) || 0) + (parseFloat(item.MONTO_CERTIFICADO) || 0);
-                existente.MONTO_DEVENGADO = (parseFloat(existente.MONTO_DEVENGADO) || 0) + (parseFloat(item.MONTO_DEVENGADO) || 0);
-                // ... agrega aquí otros montos si los necesitas ppp
-            }
-        });
+    if (!mapaConsolidado.has(cui)) {
+        // Creamos una copia limpia para no afectar el rawData original
+        mapaConsolidado.set(cui, { ...item });
+    } else {
+        const existente = mapaConsolidado.get(cui);
+        
+        // Sumamos asegurando que no entren valores negativos que distorsionen el total
+        existente.MONTO_PIA = (parseFloat(existente.MONTO_PIA) || 0) + Math.max(0, parseFloat(item.MONTO_PIA) || 0);
+        existente.MONTO_PIM = (parseFloat(existente.MONTO_PIM) || 0) + Math.max(0, parseFloat(item.MONTO_PIM) || 0);
+        existente.MONTO_CERTIFICADO = (parseFloat(existente.MONTO_CERTIFICADO) || 0) + Math.max(0, parseFloat(item.MONTO_CERTIFICADO) || 0);
+        
+        // Agregamos Compromiso Anual y Mensual (Importante para tus otros gauges)
+        existente.MONTO_COMPROMETIDO_ANUAL = (parseFloat(existente.MONTO_COMPROMETIDO_ANUAL) || 0) + Math.max(0, parseFloat(item.MONTO_COMPROMETIDO_ANUAL) || 0);
+        existente.MONTO_COMPROMETIDO = (parseFloat(existente.MONTO_COMPROMETIDO) || 0) + Math.max(0, parseFloat(item.MONTO_COMPROMETIDO) || 0);
+        
+        existente.MONTO_DEVENGADO = (parseFloat(existente.MONTO_DEVENGADO) || 0) + Math.max(0, parseFloat(item.MONTO_DEVENGADO) || 0);
+        existente.MONTO_GIRADO = (parseFloat(existente.MONTO_GIRADO) || 0) + Math.max(0, parseFloat(item.MONTO_GIRADO) || 0);
+    }
+});
 
         allData = Array.from(mapaConsolidado.values());
         txtCorte.innerText = "Sincronizado con base diaria 2025";
