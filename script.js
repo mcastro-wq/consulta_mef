@@ -1,209 +1,60 @@
-// 1. VARIABLES GLOBALES (Sin duplicados)
-let todosLosProyectos = [];
-let filtroRango = 'todos';
-let chartSectores = null;
-let chartTorta = null;
-
 document.addEventListener('DOMContentLoaded', () => {
     consultarMEF();
-    document.getElementById('buscador').addEventListener('input', filtrarTodo);
-    document.getElementById('select-anio').addEventListener('change', filtrarTodo);
 });
 
-// 2. CARGA DE DATOS
 async function consultarMEF() {
     try {
+        // 1. Carga del JSON (forzamos refresco para evitar caché)
         const response = await fetch('data_proyectos.json?v=' + Math.random());
         const dataTotal = await response.json();
         
-        // Mostrar fecha en el banner
-        if (dataTotal.ultima_actualizacion) {
-            const elFecha = document.getElementById('fecha-actualizacion');
-            if (elFecha) elFecha.innerText = dataTotal.ultima_actualizacion;
+        // 2. Mostrar fecha de actualización
+        // Buscamos la llave exacta de tu JSON: "fecha_extraccion"
+        const elFecha = document.getElementById('fecha-actualizacion');
+        if (elFecha) {
+            elFecha.innerText = dataTotal.fecha_extraccion || "Actualizado";
         }
 
-        // Extraer proyectos (soporta el nuevo formato con fecha)
-        todosLosProyectos = dataTotal.proyectos || (Array.isArray(dataTotal) ? dataTotal : []);
+        const proyectos = dataTotal.proyectos || [];
 
-        // Configurar selector de años
-        const anios = [...new Set(todosLosProyectos.map(p => p.anio))].sort((a,b) => b-a);
-        const selectAnio = document.getElementById('select-anio');
-        if (selectAnio && anios.length > 0) {
-            selectAnio.innerHTML = anios.map(a => `<option value="${a}">${a}</option>`).join('');
-        }
+        // 3. Cálculos de Totales
+        // IMPORTANTE: Usamos MONTO_PIM y MONTO_DEVENGADO tal cual están en tu JSON
+        let tPim = 0;
+        let tDev = 0;
+
+        proyectos.forEach(p => {
+            tPim += (Number(p.MONTO_PIM) || 0);
+            tDev += (Number(p.MONTO_DEVENGADO) || 0);
+        });
+
+        // 4. Renderizar en las Cards del index.html
+        const elPim = document.getElementById('total-pim');
+        const elDev = document.getElementById('total-ejecutado');
+        const elAvance = document.getElementById('avance-global');
+        const elBarra = document.getElementById('progreso-barra');
+
+        if (elPim) elPim.innerText = "S/ " + tPim.toLocaleString('es-PE');
+        if (elDev) elDev.innerText = "S/ " + tDev.toLocaleString('es-PE');
         
-        // Ejecutar primer renderizado
-        filtrarTodo();
+        // Calcular porcentaje
+        const avanceGlobal = tPim > 0 ? ((tDev / tPim) * 100).toFixed(1) : 0;
+        
+        if (elAvance) elAvance.innerText = avanceGlobal + "%";
+        
+        // 5. Mover la barra de progreso minimalista
+        if (elBarra) {
+            elBarra.style.width = avanceGlobal + "%";
+        }
+
+        // 6. Actualizar mensaje de estado inferior
+        const elEstado = document.getElementById('estado');
+        if (elEstado) {
+            elEstado.innerHTML = `Sincronización completa: <b>${proyectos.length}</b> proyectos procesados de Lambayeque.`;
+        }
 
     } catch (e) {
-        console.error("Error cargando JSON:", e);
-        const cont = document.getElementById('contenedor-proyectos');
-        if (cont) cont.innerHTML = "Error al conectar con la base de datos.";
+        console.error("Error cargando el JSON:", e);
+        const elEstado = document.getElementById('estado');
+        if (elEstado) elEstado.innerText = "Error: No se pudo leer el archivo de datos.";
     }
 }
-
-// 3. LÓGICA DE FILTROS
-function filtrarTodo() {
-    const busqueda = (document.getElementById('buscador')?.value || "").toLowerCase();
-    const anioSel = document.getElementById('select-anio')?.value;
-
-    const filtrados = todosLosProyectos.filter(p => {
-        const coincideAnio = String(p.anio) === anioSel;
-        const coincideTexto = (p.NOMBRE || "").toLowerCase().includes(busqueda);
-        let coincideRango = true;
-        if (filtroRango === 'bajo') coincideRango = p.avance <= 30;
-        else if (filtroRango === 'medio') coincideRango = p.avance > 30 && p.avance <= 70;
-        else if (filtroRango === 'alto') coincideRango = p.avance > 70;
-        return coincideAnio && coincideTexto && coincideRango;
-    });
-
-    actualizarKPIs(filtrados);
-    actualizarGraficos(filtrados);
-    renderizarCards(filtrados);
-}
-
-// 4. ACTUALIZAR KPIs
-function actualizarKPIs(lista) {
-    const tPim = lista.reduce((a, p) => a + (Number(p.pim) || 0), 0);
-    const tDev = lista.reduce((a, p) => a + (Number(p.devengado) || 0), 0);
-    
-    document.getElementById('total-pim').innerText = "S/ " + tPim.toLocaleString('es-PE');
-    document.getElementById('total-ejecutado').innerText = "S/ " + tDev.toLocaleString('es-PE');
-    
-    const avanceGlobal = tPim > 0 ? ((tDev / tPim) * 100).toFixed(1) : 0;
-    document.getElementById('avance-global').innerText = avanceGlobal + "%";
-}
-
-// 5. ACTUALIZAR GRÁFICOS (Color Granate #801616)
-// 5. ACTUALIZAR GRÁFICOS (Corregido para evitar desbordamientos)
-function actualizarGraficos(lista) {
-    const sectoresMap = {};
-    lista.forEach(p => { 
-        let s = (p.sector && String(p.sector).trim() !== "") ? p.sector.trim().toUpperCase() : "OTROS";
-        sectoresMap[s] = (sectoresMap[s] || 0) + (Number(p.pim) || 0); 
-    });
-    
-    const sorted = Object.entries(sectoresMap).sort((a, b) => b[1] - a[1]).slice(0, 8);
-
-    // --- GRÁFICO DE BARRAS ---
-    if (chartSectores) chartSectores.destroy();
-    chartSectores = new Chart(document.getElementById('chartSectores'), {
-        type: 'bar',
-        data: {
-            labels: sorted.map(s => s[0]),
-            datasets: [{ label: 'PIM', data: sorted.map(s => s[1]), backgroundColor: '#801616', borderRadius: 5 }]
-        },
-        options: { 
-            responsive: true, 
-            maintainAspectRatio: false,
-            layout: {
-                padding: {
-                    top: 10,
-                    bottom: 30, // Espacio extra para que no se corten las letras abajo
-                    left: 10,
-                    right: 20
-                }
-            },
-            plugins: { legend: { display: false } },
-            scales: { 
-                x: { 
-                    ticks: { 
-                        autoSkip: false, 
-                        maxRotation: 45, 
-                        minRotation: 45, 
-                        font: { size: 9 } 
-                    } 
-                },
-                y: {
-                    ticks: {
-                        font: { size: 10 },
-                        callback: function(value) { return 'S/ ' + (value / 1e6) + 'M'; } // Simplifica números largos
-                    }
-                }
-            }
-        }
-    });
-
-    // --- GRÁFICO DE TORTA (DOUGHNUT) ---
-    const counts = [
-        lista.filter(p => p.avance <= 30).length, 
-        lista.filter(p => p.avance > 30 && p.avance <= 70).length, 
-        lista.filter(p => p.avance > 70).length
-    ];
-    if (chartTorta) chartTorta.destroy();
-    chartTorta = new Chart(document.getElementById('chartTorta'), {
-        type: 'doughnut',
-        data: { 
-            labels: ['Crítico', 'Medio', 'Óptimo'], 
-            datasets: [{ data: counts, backgroundColor: ['#dc3545', '#ffc107', '#198754'] }] 
-        },
-        options: { 
-            responsive: true, 
-            maintainAspectRatio: false,
-            layout: {
-                padding: 25 // Esto encoge el círculo para que no se salga del contenedor
-            },
-            plugins: {
-                legend: {
-                    position: 'bottom', // Mover leyenda abajo da más espacio al círculo
-                    labels: { boxWidth: 12, font: { size: 11 } }
-                }
-            }
-        }
-    });
-}
-
-// 6. RENDERIZAR TARJETAS
-function renderizarCards(lista) {
-    const contenedor = document.getElementById('contenedor-proyectos');
-    if (!contenedor) return;
-    
-    document.getElementById('estado').innerHTML = `📍 Lambayeque: <b>${lista.length}</b> proyectos encontrados.`;
-
-    let html = '';
-    lista.forEach(p => {
-        const avanceNum = Number(p.avance) || 0;
-        const color = avanceNum > 70 ? "#198754" : (avanceNum > 30 ? "#ffc107" : "#dc3545");
-        
-        let valSector = p.sector || "OTROS";
-        let sectorTexto = String(valSector).replace(/[´`']/g, '').trim().toUpperCase();
-        if (sectorTexto === "") sectorTexto = "OTROS";
-
-        // Limpiamos el nombre para el atributo title (evita errores con comillas)
-        const nombreCompleto = (p.NOMBRE || 'SIN NOMBRE').replace(/"/g, '&quot;');
-
-        html += `
-        <div class="col">
-            <div class="proyecto-card" title="${nombreCompleto}">
-                <div>
-                    <span class="regiao">${sectorTexto}</span>
-                    <h3 style="cursor: help;">${nombreCompleto}</h3>
-                </div>
-                <div class="metricas-box">
-                    <div class="d-flex justify-content-between mb-1">
-                        <span class="text-muted small">PIM:</span>
-                        <span class="fw-bold">S/ ${(Number(p.pim) || 0).toLocaleString('es-PE')}</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-1">
-                        <span class="text-muted small">DEVENGADO:</span>
-                        <span class="text-primary fw-bold">S/ ${(Number(p.devengado) || 0).toLocaleString('es-PE')}</span>
-                    </div>
-                    <div class="d-flex justify-content-between mt-2">
-                        <span class="text-muted small">Avance:</span>
-                        <span style="color:${color}; font-weight:800;">${avanceNum}%</span>
-                    </div>
-                    <div class="barra-fondo">
-                        <div class="barra-progreso" style="width:${avanceNum}%; background:${color}"></div>
-                    </div>
-                </div>
-            </div>
-        </div>`;
-    });
-    contenedor.innerHTML = html;
-}
-
-function setRango(r) { filtroRango = r; filtrarTodo(); }
-
-
-
-
