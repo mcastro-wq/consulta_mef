@@ -264,14 +264,7 @@ async function fetchData() {
             rawData = json.proyectos || [];
 
             // Usamos la llave correcta que genera seguimiento.py
-            //txtCorte.innerText = "Corte MEF: " + (json.fecha_extraccion || "2026");
-
-            
-                    const elFecha = document.getElementById('fecha-actualizacion');
-        if (elFecha) {
-            elFecha.innerText = dataTotal.fecha_extraccion || "Actualizado";
-        }
-
+            txtCorte.innerText = "Corte MEF: " + (json.fecha_extraccion || "2026");
             
         }
 
