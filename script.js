@@ -46,15 +46,10 @@ async function consultarMEF() {
             elBarra.style.width = avanceGlobal + "%";
         }
 
-        // 6. Actualizar mensaje de estado inferior
-        const elEstado = document.getElementById('estado');
-        if (elEstado) {
-            elEstado.innerHTML = `Sincronización completa: <b>${proyectos.length}</b> proyectos procesados de Lambayeque.`;
-        }
-
     } catch (e) {
         console.error("Error cargando el JSON:", e);
         const elEstado = document.getElementById('estado');
         if (elEstado) elEstado.innerText = "Error: No se pudo leer el archivo de datos.";
     }
 }
+
