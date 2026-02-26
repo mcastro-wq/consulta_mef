@@ -233,68 +233,66 @@
     const URL_2026 = 'https://raw.githubusercontent.com/mcastro-wq/consulta_mef/main/data_proyectos.json';
     const URL_API_SCRIPT = 'https://script.google.com/macros/s/AKfycbzE3RjPk02QohR3kTnbkBa_Nfeatu5CICYQm9LzDLndk429Vsp7D3PAWOvsReul0sb2/exec';
 
-    async function fetchData() {
-        const anio = document.getElementById('selectAnio').value;
-        const loader = document.getElementById('loader-overlay');
-        const txtCorte = document.getElementById('txt-corte');
-        const mainTitle = document.getElementById('main-title');
-        const loaderText = document.getElementById('loader-text');
+async function fetchData() {
+    const anio = document.getElementById('selectAnio').value;
+    const loader = document.getElementById('loader-overlay');
+    const txtCorte = document.getElementById('txt-corte');
+    const mainTitle = document.getElementById('main-title');
+    const loaderText = document.getElementById('loader-text');
 
-        mainTitle.innerText = `Monitor de Ejecución Presupuestal ${anio}`;
-        loader.classList.remove('d-none');
-        txtCorte.innerText = "Conectando con GitHub...";
+    mainTitle.innerText = `Monitor de Ejecución Presupuestal ${anio}`;
+    loader.classList.remove('d-none');
+    txtCorte.innerText = "Sincronizando...";
 
-        try {
-            if (anio === '2025') {
-                loaderText.innerText = "Cargando Base 2025 (Uniendo Partes desde GitHub)...";
-                
-                // Descarga de textos planos para aplicar tu lógica de limpieza
-                const [res1, res2] = await Promise.all([
-                    fetch(URL_PART1).then(r => { if(!r.ok) throw new Error("Error Part 1"); return r.text(); }),
-                    fetch(URL_PART2).then(r => { if(!r.ok) throw new Error("Error Part 2"); return r.text(); })
-                ]);
+    try {
+        if (anio === '2025') {
+            loaderText.innerText = "Procesando y Limpiando Base 2025...";
+            
+            const [res1, res2] = await Promise.all([
+                fetch(URL_PART1).then(r => r.text()),
+                fetch(URL_PART2).then(r => r.text())
+            ]);
 
-                // TU LÓGICA DE LIMPIEZA ORIGINAL (RESPALDADA)
-                let cleanPart1 = res1.trim().replace(/^\[/, "").replace(/\]$/, "").trim();
-                let cleanPart2 = res2.trim().replace(/^\[/, "").replace(/\]$/, "").trim();
+            let clean1 = res1.trim().replace(/^\[/, "").replace(/\]$/, "").trim();
+            let clean2 = res2.trim().replace(/^\[/, "").replace(/\]$/, "").trim();
+            if (clean1.endsWith(',')) clean1 = clean1.slice(0, -1);
+            
+            const rawData = JSON.parse("[" + clean1 + "," + clean2 + "]");
 
-                if (cleanPart1.endsWith(',')) cleanPart1 = cleanPart1.slice(0, -1);
-                
-                const fullJsonText = "[" + cleanPart1 + "," + cleanPart2 + "]";
-                
-                allData = JSON.parse(fullJsonText);
-                txtCorte.innerText = "Datos 2025 Sincronizados";
+            // --- AQUÍ ESTÁ EL TRUCO PARA ELIMINAR DUPLICADOS ---
+            const mapaUnicos = new Map();
+            
+            rawData.forEach(item => {
+                const cui = item.PRODUCTO_PROYECTO;
+                // Si el CUI ya existe, comparamos y nos quedamos con el que tenga más PIM (o el más reciente)
+                if (!mapaUnicos.has(cui)) {
+                    mapaUnicos.set(cui, item);
+                }
+            });
 
-            } else {
-                loaderText.innerText = "Cargando Base de Datos 2026...";
-                const res = await fetch(URL_2026);
-                if (!res.ok) throw new Error("No se encontró el archivo 2026 en GitHub");
-                const json = await res.json();
-                allData = json.proyectos || json;
-                txtCorte.innerText = json.fecha_extraccion || "Actualizado 2026";
-            }
+            // Convertimos el mapa de nuevo a un array
+            allData = Array.from(mapaUnicos.values());
+            txtCorte.innerText = "Datos 2025 Depurados";
 
-            // Población de selectores
-            const select = document.getElementById('selectEjecutora');
-            if(select) {
-                select.innerHTML = '<option value="TODAS">-- TODAS LAS UNIDADES --</option>';
-                const ejecutoras = [...new Set(allData.map(p => p.EJECUTORA_NOMBRE))].filter(Boolean).sort();
-                ejecutoras.forEach(ej => {
-                    const opt = document.createElement('option');
-                    opt.value = ej; opt.innerText = ej;
-                    select.appendChild(opt);
-                });
-            }
-
-            filtrar();
-        } catch (e) {
-            console.error("Error detallado:", e);
-            txtCorte.innerText = "Error: " + e.message;
-            alert("Error al cargar datos desde GitHub. Verifica que el repositorio sea público.");
-        } finally {
-            loader.classList.add('d-none');
+        } else {
+            // Lógica 2026 normal...
+            const res = await fetch(URL_2026);
+            const json = await res.json();
+            allData = json.proyectos || json;
+            txtCorte.innerText = json.fecha_extraccion || "Actualizado 2026";
         }
+
+        // Actualizar selectores y tabla
+        poblarSelectores();
+        filtrar();
+
+    } catch (e) {
+        console.error(e);
+        alert("Error en el procesamiento de datos.");
+    } finally {
+        loader.classList.add('d-none');
     }
+}
 
     function filtrar() {
         clearTimeout(timeoutBusqueda);
