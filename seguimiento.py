@@ -54,7 +54,7 @@ def generate_seguimiento_detallado():
                 "proyectos": proyectos_data
             }
 
-            with open('data_mef.json', 'w', encoding='utf-8') as f:
+            with open('data_proyectos.json', 'w', encoding='utf-8') as f:
                 json.dump(objeto_final, f, indent=2, ensure_ascii=False)
             
             print(f"✅ ¡Éxito! JSON generado con {len(proyectos_data)} registros.")
