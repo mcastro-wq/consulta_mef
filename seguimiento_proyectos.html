@@ -255,20 +255,18 @@ async function fetchData() {
             rawData = [...res1, ...res2];
             txtCorte.innerText = "Sincronizado con base diaria 2025";
         } else {
-            // --- CARGA PARA 2026 (Usando el JSON de seguimiento.py) ---
-            const res = await fetch(URL_2026);
+            // --- CARGA PARA 2026 ---
+            const res = await fetch(URL_2026 + '?v=' + Math.random()); // Agregamos random para evitar caché
             const json = await res.json();
             
-            // IMPORTANTE: seguimiento.py ya genera los nombres correctos.
-            // NO usamos .map(), tomamos los proyectos directamente.
             rawData = json.proyectos || [];
 
-            // Usamos la llave correcta que genera seguimiento.py
-            txtCorte.innerText = "Corte MEF: " + (json.fecha_extraccion || "2026");
-            
+            // CORRECCIÓN AQUÍ: Intentamos leer ambos nombres de llave
+            const fechaFinal = json.ultima_actualizacion || json.fecha_extraccion || "2026";
+            txtCorte.innerText = "Corte MEF: " + fechaFinal;
         }
 
-        // --- CONSOLIDACIÓN MATEMÁTICA (Universal para 2025 y 2026) ---
+        // --- CONSOLIDACIÓN MATEMÁTICA ---
         const mapaConsolidado = new Map();
 
         rawData.forEach(item => {
@@ -276,11 +274,9 @@ async function fetchData() {
             if (!cui || cui === "0") return;
 
             if (!mapaConsolidado.has(cui)) {
-                // Clonamos el objeto para no modificar el original
                 mapaConsolidado.set(cui, { ...item });
             } else {
                 const ex = mapaConsolidado.get(cui);
-                // Sumamos todas las fases numéricas
                 ex.MONTO_PIA = (parseFloat(ex.MONTO_PIA) || 0) + (parseFloat(item.MONTO_PIA) || 0);
                 ex.MONTO_PIM = (parseFloat(ex.MONTO_PIM) || 0) + (parseFloat(item.MONTO_PIM) || 0);
                 ex.MONTO_CERTIFICADO = (parseFloat(ex.MONTO_CERTIFICADO) || 0) + (parseFloat(item.MONTO_CERTIFICADO) || 0);
@@ -298,7 +294,7 @@ async function fetchData() {
 
     } catch (e) {
         console.error("Error en carga:", e);
-        alert("Error cargando los datos. Revisa la consola (F12).");
+        alert("Error cargando los datos.");
     } finally {
         loader.classList.add('d-none');
     }
