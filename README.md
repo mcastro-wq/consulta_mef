@@ -41,14 +41,7 @@ El sistema sigue un flujo automatizado para garantizar que la información sea s
 
 ---
 
-📌 Notas de Uso
-Filtros: Al seleccionar una Unidad Ejecutora, los indicadores globales se recalculan automáticamente para reflejar solo esa unidad.
-
-Caché: Si los datos no parecen actualizarse, presiona Ctrl + F5 para limpiar la caché del navegador.
-
 👤 Créditos
-Desarrollado por: Miguel
-
 Fuente de información: Consulta Amigable - MEF.
 
 Propósito: Transparencia y optimización de la gestión pública en el GORE Lambayeque.
