@@ -1,5 +1,5 @@
 {
-  "ultima_actualizacion": "03/03/2026 09:32",
+  "ultima_actualizacion": "03/03/2026 14:53",
   "ranking": [
     {
       "pliego": "PIURA",
@@ -18,8 +18,8 @@
     {
       "pliego": "AREQUIPA",
       "pim": 686857114.0,
-      "devengado": 685669549.8699998,
-      "saldo": 1187564.1300002337,
+      "devengado": 685669549.8699999,
+      "saldo": 1187564.1300001144,
       "avance": 99.8
     },
     {
@@ -60,8 +60,8 @@
     {
       "pliego": "HUANUCO",
       "pim": 400919484.0,
-      "devengado": 385316688.7199999,
-      "saldo": 15602795.28000009,
+      "devengado": 385316688.71999985,
+      "saldo": 15602795.28000015,
       "avance": 96.1
     },
     {
@@ -123,8 +123,8 @@
     {
       "pliego": "ICA",
       "pim": 409997734.0,
-      "devengado": 377635278.86,
-      "saldo": 32362455.139999986,
+      "devengado": 377635278.85999995,
+      "saldo": 32362455.140000045,
       "avance": 92.1
     },
     {
@@ -137,8 +137,8 @@
     {
       "pliego": "MOQUEGUA",
       "pim": 315742833.0,
-      "devengado": 286244865.5399999,
-      "saldo": 29497967.460000098,
+      "devengado": 286244865.53999984,
+      "saldo": 29497967.460000157,
       "avance": 90.7
     },
     {
@@ -179,8 +179,8 @@
     {
       "pliego": "LA PROVINCIA CONSTITUCIONAL DEL CALLAO",
       "pim": 268227716.0,
-      "devengado": 177390388.21,
-      "saldo": 90837327.78999999,
+      "devengado": 177390388.20999995,
+      "saldo": 90837327.79000005,
       "avance": 66.1
     },
     {
