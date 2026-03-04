@@ -1,5 +1,5 @@
 {
-  "ultima_actualizacion": "04/03/2026 09:10",
+  "ultima_actualizacion": "04/03/2026 14:52",
   "ranking": [
     {
       "pliego": "PIURA",
@@ -18,8 +18,8 @@
     {
       "pliego": "AREQUIPA",
       "pim": 686857114.0,
-      "devengado": 685669549.8699999,
-      "saldo": 1187564.1300001144,
+      "devengado": 685669549.8699998,
+      "saldo": 1187564.1300002337,
       "avance": 99.8
     },
     {
@@ -60,8 +60,8 @@
     {
       "pliego": "HUANUCO",
       "pim": 400919484.0,
-      "devengado": 385316688.71999985,
-      "saldo": 15602795.28000015,
+      "devengado": 385316688.7199999,
+      "saldo": 15602795.28000009,
       "avance": 96.1
     },
     {
@@ -88,8 +88,8 @@
     {
       "pliego": "LORETO",
       "pim": 1050495264.0,
-      "devengado": 992912700.4000001,
-      "saldo": 57582563.599999905,
+      "devengado": 992912700.4,
+      "saldo": 57582563.600000024,
       "avance": 94.5
     },
     {
@@ -130,8 +130,8 @@
     {
       "pliego": "PASCO",
       "pim": 467615572.0,
-      "devengado": 429718330.5100002,
-      "saldo": 37897241.48999977,
+      "devengado": 429718330.5100003,
+      "saldo": 37897241.48999971,
       "avance": 91.9
     },
     {
@@ -158,15 +158,15 @@
     {
       "pliego": "LIMA",
       "pim": 586336422.0,
-      "devengado": 511983145.52000016,
-      "saldo": 74353276.47999984,
+      "devengado": 511983145.5200001,
+      "saldo": 74353276.4799999,
       "avance": 87.3
     },
     {
       "pliego": "LAMBAYEQUE",
       "pim": 754899572.0,
-      "devengado": 650093210.8900001,
-      "saldo": 104806361.1099999,
+      "devengado": 650093210.89,
+      "saldo": 104806361.11000001,
       "avance": 86.1
     },
     {
@@ -179,8 +179,8 @@
     {
       "pliego": "LA PROVINCIA CONSTITUCIONAL DEL CALLAO",
       "pim": 268227716.0,
-      "devengado": 177390388.20999995,
-      "saldo": 90837327.79000005,
+      "devengado": 177333888.21,
+      "saldo": 90893827.78999999,
       "avance": 66.1
     },
     {
