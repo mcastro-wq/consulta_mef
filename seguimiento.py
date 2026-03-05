@@ -2,69 +2,82 @@ import urllib.request, csv, json, io
 from datetime import datetime, timedelta
 
 def generate_seguimiento_detallado():
-    # URL del dataset 2026 (Asegúrate de que el año sea el correcto en el servidor del MEF)
-    # https://fs.datosabiertos.mef.gob.pe/datastorefiles/2026-Seguimiento-PI.csv
+    # URL de Gasto Diario
     url = "https://fs.datosabiertos.mef.gob.pe/datastorefiles/2026-Gasto-Diario.csv"
     headers = {'User-Agent': 'Mozilla/5.0'}
     
-    # El código de pliego para el Gobierno Regional de Lambayeque es 452
+    # Código del Pliego Lambayeque
     CODIGO_PLIEGO_LAMBAYEQUE = "452"
     
     try:
-        print(f"🚀 Descargando datos y filtrando por Pliego {CODIGO_PLIEGO_LAMBAYEQUE}...")
+        print(f"🚀 Descargando Gasto Diario y filtrando por Pliego {CODIGO_PLIEGO_LAMBAYEQUE}...")
         req = urllib.request.Request(url, headers=headers)
         
         with urllib.request.urlopen(req, timeout=600) as response:
+            # Importante: Algunos CSV del MEF usan latin-1 o utf-8-sig
             content = response.read().decode('utf-8-sig')
             reader = csv.DictReader(io.StringIO(content))
+            
+            # Limpiamos los nombres de las columnas por si tienen espacios invisibles
             reader.fieldnames = [f.strip() for f in reader.fieldnames]
             
             proyectos_data = []
 
             for r in reader:
-                # FILTRO EXACTO POR CÓDIGO DE PLIEGO
-                # Usamos .get('PLIEGO') para obtener el código numérico
-                pliego_codigo = str(r.get('PLIEGO', '')).strip()
-                
-                if pliego_codigo == CODIGO_PLIEGO_LAMBAYEQUE:
+                # Filtro por Pliego
+                if r.get('PLIEGO') == CODIGO_PLIEGO_LAMBAYEQUE:
                     try:
-                        def to_f(val): return float(val or 0)
+                        def to_f(val): 
+                            if not val: return 0.0
+                            try:
+                                return float(str(val).replace(',', ''))
+                            except:
+                                return 0.0
 
+                        # Mapeo corregido según el estándar de archivos del MEF
                         proyectos_data.append({
                             "TIPO": r.get('TIPO_ACT_PROY_NOMBRE', ''),
-                            "PRODUCTO_PROYECTO": r.get('PRODUCTO_PROYECTO', '0'),
+                            "PRODUCTO_PROYECTO": r.get('PRODUCTO_PROYECTO', ''),
                             "PRODUCTO_PROYECTO_NOMBRE": r.get('PRODUCTO_PROYECTO_NOMBRE', 'SIN NOMBRE'),
-                            "EJECUTORA_NOMBRE": r.get('EJECUTORA_NOMBRE', 'SIN EJECUTORA'),
+                            
+                            # Intentamos obtener el nombre de la ejecutora de varias formas comunes
+                            "EJECUTORA_NOMBRE": r.get('EJECUTORA_NOMBRE') or r.get('NOMBRE_EJECUTORA') or r.get('EJECUTORA_DESC', 'SIN NOMBRE'),
+                            
                             "FUENTE_FINANCIAMIENTO_NOMBRE": r.get('FUENTE_FINANCIAMIENTO_NOMBRE', ''),
-                            "MONTO_PIA": to_f(r.get('MONTO_PIA')),
-                            "MONTO_PIM": to_f(r.get('MONTO_PIM')),
-                            "MONTO_CERTIFICADO": to_f(r.get('MONTO_CERTIFICADO')),
-                            "MONTO_COMPROMETIDO_ANUAL": to_f(r.get('MONTO_COMPROMETIDO_ANUAL')),
-                            "MONTO_COMPROMETIDO": to_f(r.get('MONTO_COMPROMETIDO')),
-                            "MONTO_DEVENGADO": to_f(r.get('MONTO_DEVENGADO')),
-                            "MONTO_GIRADO": to_f(r.get('MONTO_GIRADO')),
-                            "MES_EJE": r.get('MES_EJE', '1')
+                            
+                            # Montos (Si no salen, es porque la columna se llama distinto en el CSV)
+                            "MONTO_PIA": to_f(r.get('MONTO_PIA') or r.get('PIA')),
+                            "MONTO_PIM": to_f(r.get('MONTO_PIM') or r.get('PIM')),
+                            "MONTO_CERTIFICADO": to_f(r.get('MONTO_CERTIFICADO') or r.get('CERTIFICADO')),
+                            "MONTO_COMPROMETIDO_ANUAL": to_f(r.get('MONTO_COMPROMETIDO_ANUAL') or r.get('COMPROMETIDO_ANUAL')),
+                            "MONTO_COMPROMETIDO": to_f(r.get('MONTO_COMPROMETIDO') or r.get('COMPROMETIDO')),
+                            "MONTO_DEVENGADO": to_f(r.get('MONTO_DEVENGADO') or r.get('DEVENGADO')),
+                            "MONTO_GIRADO": to_f(r.get('MONTO_GIRADO') or r.get('GIRADO')),
+                            
+                            "MES_EJE": r.get('MES_EJE', '1'),
+                            "ANO_EJE": r.get('ANO_EJE', '2026')
                         })
-                    except ValueError:
+                    except Exception as ex:
                         continue
 
-            hora_peru = datetime.now() - timedelta(hours=5)
-            fecha_texto = hora_peru.strftime("%d/%m/%Y %H:%M")
+            # Ordenar por Devengado de mayor a menor para que el JSON sea útil
+            proyectos_data.sort(key=lambda x: x['MONTO_DEVENGADO'], reverse=True)
 
+            hora_peru = datetime.now() - timedelta(hours=5)
             objeto_final = {
-                "fecha_extraccion": fecha_texto,
-                "pliego_filtrado": CODIGO_PLIEGO_LAMBAYEQUE,
-                "total_registros": len(proyectos_data),
+                "ultima_actualizacion": hora_peru.strftime("%d/%m/%Y %H:%M"),
+                "pliego": "452 - GOBIERNO REGIONAL DE LAMBAYEQUE",
+                "total_filas": len(proyectos_data),
                 "proyectos": proyectos_data
             }
 
-            with open('data_proyectos_lambayeque.json', 'w', encoding='utf-8') as f:
+            with open('data_gasto_lambayeque.json', 'w', encoding='utf-8') as f:
                 json.dump(objeto_final, f, indent=2, ensure_ascii=False)
             
-            print(f"✅ ¡Éxito! JSON generado con {len(proyectos_data)} registros del GORE Lambayeque.")
+            print(f"✅ ¡Éxito! Archivo generado con {len(proyectos_data)} registros.")
 
     except Exception as e:
-        print(f"🚨 Error: {e}")
+        print(f"🚨 Error crítico: {e}")
 
 if __name__ == "__main__":
     generate_seguimiento_detallado()
