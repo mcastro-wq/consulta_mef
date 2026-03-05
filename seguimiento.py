@@ -3,7 +3,8 @@ from datetime import datetime, timedelta
 
 def generate_seguimiento_detallado():
     # URL del dataset 2026 (Asegúrate de que el año sea el correcto en el servidor del MEF)
-    url = "https://fs.datosabiertos.mef.gob.pe/datastorefiles/2026-Seguimiento-PI.csv"
+    # https://fs.datosabiertos.mef.gob.pe/datastorefiles/2026-Seguimiento-PI.csv
+    url = "https://fs.datosabiertos.mef.gob.pe/datastorefiles/2026-Gasto-Diario.csv"
     headers = {'User-Agent': 'Mozilla/5.0'}
     
     # El código de pliego para el Gobierno Regional de Lambayeque es 452
