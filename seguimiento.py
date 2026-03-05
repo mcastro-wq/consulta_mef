@@ -1,86 +1,66 @@
 import urllib.request, csv, json, io
 from datetime import datetime, timedelta
 
+def to_f(val):
+    if val is None or str(val).strip() == "":
+        return 0.0
+    try:
+        # Limpieza profunda de caracteres no numéricos excepto el punto decimal
+        return float(str(val).replace(',', '').strip())
+    except:
+        return 0.0
+
 def generate_seguimiento_detallado():
-    # URL de Gasto Diario 2026
     url = "https://fs.datosabiertos.mef.gob.pe/datastorefiles/2026-Gasto-Diario.csv"
     headers = {'User-Agent': 'Mozilla/5.0'}
-    
-    # Código del Pliego Lambayeque
     CODIGO_PLIEGO_LAMBAYEQUE = "452"
     
     try:
-        print(f"🚀 Descargando Gasto Diario y filtrando por Pliego {CODIGO_PLIEGO_LAMBAYEQUE}...")
+        print(f"🚀 Procesando Gasto Diario...")
         req = urllib.request.Request(url, headers=headers)
         
         with urllib.request.urlopen(req, timeout=600) as response:
-            # Usamos utf-8-sig para manejar el BOM de Excel/MEF
             content = response.read().decode('utf-8-sig')
             reader = csv.DictReader(io.StringIO(content))
             
-            # Limpieza de encabezados por si el MEF envía espacios extra
-            reader.fieldnames = [f.strip() for f in reader.fieldnames]
+            # --- TRUCO MAESTRO: Normalizar todos los nombres de columnas ---
+            # Esto convierte ' MONTO_PIA ' en 'MONTO_PIA' automáticamente
+            reader.fieldnames = [f.strip().upper() for f in reader.fieldnames]
             
             proyectos_data = []
 
             for r in reader:
-                # El campo del diccionario es PLIEGO
-                if r.get('PLIEGO') == CODIGO_PLIEGO_LAMBAYEQUE:
-                    try:
-                        # Función robusta para limpiar números (maneja nulos, comas y espacios)
-                        def to_f(val): 
-                            if not val: return 0.0
-                            try:
-                                return float(str(val).replace(',', '').strip())
-                            except:
-                                return 0.0
+                # Normalizamos los datos de la fila actual para que coincidan con las llaves limpias
+                row = {k.strip().upper(): v for k, v in r.items()}
+                
+                if row.get('PLIEGO') == CODIGO_PLIEGO_LAMBAYEQUE:
+                    # FORZAMOS la creación de la llave en el diccionario final
+                    data_row = {
+                        "PRODUCTO_PROYECTO": row.get('PRODUCTO_PROYECTO', ''),
+                        "PRODUCTO_PROYECTO_NOMBRE": row.get('PRODUCTO_PROYECTO_NOMBRE', 'SIN NOMBRE'),
+                        "EJECUTORA_NOMBRE": row.get('EJECUTORA_NOMBRE', 'SIN NOMBRE'),
+                        "ANO_EJE": row.get('ANO_EJE', '2026'),
+                        
+                        # Aquí forzamos la lectura. Si el campo existe en el CSV, to_f lo captura.
+                        # Si es 0 o está vacío, to_f devuelve 0.0, pero LA LLAVE SE CREA.
+                        "MONTO_PIA": to_f(row.get('MONTO_PIA')),
+                        "MONTO_PIM": to_f(row.get('MONTO_PIM')),
+                        "MONTO_CERTIFICADO": to_f(row.get('MONTO_CERTIFICADO')),
+                        "MONTO_DEVENGADO": to_f(row.get('MONTO_DEVENGADO')),
+                        "MONTO_GIRADO": to_f(row.get('MONTO_GIRADO')),
+                        
+                        "TIPO_ACT_PROY_NOMBRE": row.get('TIPO_ACT_PROY_NOMBRE', '')
+                    }
+                    proyectos_data.append(data_row)
 
-                        # Mapeo alineado al diccionario y nombres comunes en CSV
-                        proyectos_data.append({
-                            "TIPO": r.get('TIPO_ACT_PROY_NOMBRE', ''),
-                            "PRODUCTO_PROYECTO": r.get('PRODUCTO_PROYECTO', ''),
-                            "PRODUCTO_PROYECTO_NOMBRE": r.get('PRODUCTO_PROYECTO_NOMBRE', 'SIN NOMBRE'),
-                            
-                            # Captura de EJECUTORA_NOMBRE (según tu diccionario)
-                            "EJECUTORA_NOMBRE": r.get('EJECUTORA_NOMBRE') or r.get('NOMBRE_EJECUTORA') or "SIN NOMBRE",
-                            "SEC_EJEC": r.get('SEC_EJEC', ''), # Útil para trazabilidad
-                            
-                            "FUENTE_FINANCIAMIENTO_NOMBRE": r.get('FUENTE_FINANCIAMIENTO_NOMBRE', ''),
-                            
-                            # Montos: Probamos nombre largo del diccionario y nombre corto común
-                            "MONTO_PIA": to_f(r.get('MONTO_PIA') or r.get('PIA')),
-                            "MONTO_PIM": to_f(r.get('MONTO_PIM') or r.get('PIM')),
-                            "MONTO_CERTIFICADO": to_f(r.get('MONTO_CERTIFICADO') or r.get('CERTIFICADO')),
-                            "MONTO_COMPROMETIDO_ANUAL": to_f(r.get('MONTO_COMPROMETIDO_ANUAL') or r.get('COMP_ANUAL')),
-                            "MONTO_COMPROMETIDO": to_f(r.get('MONTO_COMPROMETIDO') or r.get('COMPROMETIDO')),
-                            "MONTO_DEVENGADO": to_f(r.get('MONTO_DEVENGADO') or r.get('DEVENGADO')),
-                            "MONTO_GIRADO": to_f(r.get('MONTO_GIRADO') or r.get('GIRADO')),
-                            
-                            "MES_EJE": r.get('MES_EJE', '1'),
-                            "ANO_EJE": r.get('ANO_EJE', '2026')
-                        })
-                    except Exception:
-                        continue
-
-            # Ordenamos para que el reporte sea visualmente útil (de mayor a menor gasto)
-            proyectos_data.sort(key=lambda x: x['MONTO_DEVENGADO'], reverse=True)
-
-            hora_peru = datetime.now() - timedelta(hours=5)
-            objeto_final = {
-                "ultima_actualizacion": hora_peru.strftime("%d/%m/%Y %H:%M"),
-                "pliego_identificado": "452 - GOBIERNO REGIONAL DE LAMBAYEQUE",
-                "total_registros": len(proyectos_data),
-                "proyectos": proyectos_data
-            }
-
-            # Guardamos el archivo
+            # Guardar el JSON
             with open('data_gasto_lambayeque.json', 'w', encoding='utf-8') as f:
-                json.dump(objeto_final, f, indent=2, ensure_ascii=False)
+                json.dump({"proyectos": proyectos_data}, f, indent=2, ensure_ascii=False)
             
-            print(f"✅ ¡Éxito! JSON generado con {len(proyectos_data)} registros del GORE Lambayeque.")
+            print(f"✅ ¡Éxito! El campo MONTO_PIA ha sido forzado en {len(proyectos_data)} registros.")
 
     except Exception as e:
-        print(f"🚨 Error crítico de conexión o lectura: {e}")
+        print(f"🚨 Error: {e}")
 
 if __name__ == "__main__":
     generate_seguimiento_detallado()
