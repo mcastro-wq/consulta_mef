@@ -23,7 +23,7 @@ def generate_seguimiento_detallado():
             proyectos_data = []
 
             for r in reader:
-                # Filtro directo por Pliego
+                # Filtro directo por Pliegooo
                 if r.get('PLIEGO') == CODIGO_PLIEGO_LAMBAYEQUE:
                     
                     def to_f(val):
