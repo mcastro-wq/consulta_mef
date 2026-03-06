@@ -9,16 +9,16 @@ async function consultarMEF() {
         const dataTotal = await response.json();
         
         // 2. Mostrar fecha de actualización
-        // Buscamos la llave exacta de tu JSON: "fecha_extraccion"
+        // Ajustado a la llave: "ultima_actualizacion"
         const elFecha = document.getElementById('fecha-actualizacion');
         if (elFecha) {
-            elFecha.innerText = dataTotal.fecha_extraccion || "Actualizado";
+            elFecha.innerText = dataTotal.ultima_actualizacion || "Actualizado";
         }
 
-        const proyectos = dataTotal.proyectos || [];
+        // Ajustado a la llave: "ranking"
+        const proyectos = dataTotal.ranking || [];
 
         // 3. Cálculos de Totales
-        // IMPORTANTE: Usamos MONTO_PIM y MONTO_DEVENGADO tal cual están en tu JSON
         let tPim = 0;
         let tDev = 0;
 
@@ -33,16 +33,18 @@ async function consultarMEF() {
         const elAvance = document.getElementById('avance-global');
         const elBarra = document.getElementById('progreso-barra');
 
-        if (elPim) elPim.innerText = "S/ " + tPim.toLocaleString('es-PE');
-        if (elDev) elDev.innerText = "S/ " + tDev.toLocaleString('es-PE');
+        // Formato de moneda local (Soles)
+        if (elPim) elPim.innerText = "S/ " + tPim.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        if (elDev) elDev.innerText = "S/ " + tDev.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         
         // Calcular porcentaje
         const avanceGlobal = tPim > 0 ? ((tDev / tPim) * 100).toFixed(1) : 0;
         
         if (elAvance) elAvance.innerText = avanceGlobal + "%";
         
-        // 5. Mover la barra de progreso minimalista
+        // 5. Mover la barra de progreso
         if (elBarra) {
+            // Asegúrate de que el estilo de la barra permita transiciones
             elBarra.style.width = avanceGlobal + "%";
         }
 
@@ -52,6 +54,3 @@ async function consultarMEF() {
         if (elEstado) elEstado.innerText = "Error: No se pudo leer el archivo de datos.";
     }
 }
-
-
-
