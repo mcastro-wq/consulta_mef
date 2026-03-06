@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
 async function consultarMEF() {
     try {
         // 1. Carga del JSON (forzamos refresco para evitar caché)
-        const response = await fetch('data_proyectos.json?v=' + Math.random());
+        const response = await fetch('data_ranking.json?v=' + Math.random());
         const dataTotal = await response.json();
         
         // 2. Mostrar fecha de actualización
@@ -52,4 +52,5 @@ async function consultarMEF() {
         if (elEstado) elEstado.innerText = "Error: No se pudo leer el archivo de datos.";
     }
 }
+
 
