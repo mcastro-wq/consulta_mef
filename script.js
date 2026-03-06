@@ -23,8 +23,8 @@ async function consultarMEF() {
         let tDev = 0;
 
         proyectos.forEach(p => {
-            tPim += (Number(p.MONTO_PIM) || 0);
-            tDev += (Number(p.MONTO_DEVENGADO) || 0);
+            tPim += (Number(p.pim) || 0);
+            tDev += (Number(p.devengado) || 0);
         });
 
         // 4. Renderizar en las Cards del index.html
@@ -52,5 +52,6 @@ async function consultarMEF() {
         if (elEstado) elEstado.innerText = "Error: No se pudo leer el archivo de datos.";
     }
 }
+
 
 
