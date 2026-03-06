@@ -23,14 +23,13 @@ jobs:
         run: |
           python script.py
           python ranking.py # Ejecuta el nuevo script del ranking
-          python seguimiento.py
       # ... dentro de los pasos de tu workflow
 
       - name: Guardar cambios
         run: |
           git config --global user.name 'GitHub Action'
           git config --global user.email 'action@github.com'
-          git add data_ranking.json data_proyectos.json data_gasto_2026.json
+          git add data_ranking.json
           # El commit incluye la fecha para que el historial sea claro
           git commit -m "📊 Datos Reales MEF Actualizados: $(date)" || echo "Sin cambios para commitear"
           git push origin main
