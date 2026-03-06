@@ -4,48 +4,62 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function consultarMEF() {
     try {
-        // 1. Carga del JSON (forzamos refresco para evitar caché)
+        // 1. Carga del JSON con preventor de caché
         const response = await fetch('data_ranking.json?v=' + Math.random());
+        if (!response.ok) throw new Error("No se pudo cargar el archivo JSON");
+        
         const dataTotal = await response.json();
         
-        // 2. Mostrar fecha de actualización
-        // Ajustado a la llave: "ultima_actualizacion"
+        // 2. Mostrar fecha de actualización (usando la llave correcta del JSON)
         const elFecha = document.getElementById('fecha-actualizacion');
         if (elFecha) {
             elFecha.innerText = dataTotal.ultima_actualizacion || "Actualizado";
         }
 
-        // Ajustado a la llave: "ranking"
+        // 3. Filtrar específicamente Lambayeque
         const proyectos = dataTotal.ranking || [];
+        const lambayeque = proyectos.find(p => p.pliego === "LAMBAYEQUE");
 
-        // 3. Cálculos de Totales
-        let tPim = 0;
-        let tDev = 0;
+        if (lambayeque) {
+            // Extraemos los valores del objeto encontrado
+            const tPim = Number(lambayeque.pim) || 0;
+            const tDev = Number(lambayeque.devengado) || 0;
+            const avanceGlobal = lambayeque.avance || 0; // Usamos el avance que ya viene en el JSON
 
-        proyectos.forEach(p => {
-            tPim += (Number(p.pim) || 0);
-            tDev += (Number(p.devengado) || 0);
-        });
+            // 4. Renderizar en las Cards del index.html
+            const elPim = document.getElementById('total-pim');
+            const elDev = document.getElementById('total-ejecutado');
+            const elAvance = document.getElementById('avance-global');
+            const elBarra = document.getElementById('progreso-barra');
 
-        // 4. Renderizar en las Cards del index.html
-        const elPim = document.getElementById('total-pim');
-        const elDev = document.getElementById('total-ejecutado');
-        const elAvance = document.getElementById('avance-global');
-        const elBarra = document.getElementById('progreso-barra');
+            // Formatear a moneda Soles (S/ 0,000.00)
+            if (elPim) {
+                elPim.innerText = "S/ " + tPim.toLocaleString('es-PE', { 
+                    minimumFractionDigits: 2, 
+                    maximumFractionDigits: 2 
+                });
+            }
+            if (elDev) {
+                elDev.innerText = "S/ " + tDev.toLocaleString('es-PE', { 
+                    minimumFractionDigits: 2, 
+                    maximumFractionDigits: 2 
+                });
+            }
+            
+            // Mostrar porcentaje de avance
+            if (elAvance) {
+                elAvance.innerText = avanceGlobal + "%";
+            }
+            
+            // 5. Mover la barra de progreso
+            if (elBarra) {
+                elBarra.style.width = avanceGlobal + "%";
+            }
 
-        // Formato de moneda local (Soles)
-        if (elPim) elPim.innerText = "S/ " + tPim.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        if (elDev) elDev.innerText = "S/ " + tDev.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        
-        // Calcular porcentaje
-        const avanceGlobal = tPim > 0 ? ((tDev / tPim) * 100).toFixed(1) : 0;
-        
-        if (elAvance) elAvance.innerText = avanceGlobal + "%";
-        
-        // 5. Mover la barra de progreso
-        if (elBarra) {
-            // Asegúrate de que el estilo de la barra permita transiciones
-            elBarra.style.width = avanceGlobal + "%";
+        } else {
+            console.error("No se encontró el pliego 'LAMBAYEQUE' en el ranking.");
+            const elEstado = document.getElementById('estado');
+            if (elEstado) elEstado.innerText = "Error: Datos de Lambayeque no encontrados.";
         }
 
     } catch (e) {
