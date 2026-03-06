@@ -201,8 +201,8 @@
 
     function exportToExcel() {
         const table = document.getElementById("tablaMaster");
-        const wb = XLSX.utils.table_to_book(table, { sheet: "Ranking 2025" });
-        XLSX.writeFile(wb, "Ranking_Regional_Ejecucion_2025.xlsx");
+        const wb = XLSX.utils.table_to_book(table, { sheet: "Ranking 2026" });
+        XLSX.writeFile(wb, "Ranking_Regional_Ejecucion_2026.xlsx");
     }
 
     function exportToPDF() {
@@ -210,7 +210,7 @@
         const doc = new jsPDF('l', 'mm', 'a4');
         doc.setFontSize(16);
         doc.setTextColor(128, 22, 22);
-        doc.text("RANKING REGIONAL DE EJECUCIÓN 2025", 14, 15);
+        doc.text("RANKING REGIONAL DE EJECUCIÓN 2026", 14, 15);
         doc.setFontSize(10);
         doc.setTextColor(100);
         doc.text("Sincronización MEF: " + document.getElementById('fecha-actualizacion').innerText, 14, 22);
@@ -223,7 +223,7 @@
             styles: { fontSize: 8 },
             columnStyles: { 0:{halign:'center'}, 2:{halign:'right'}, 3:{halign:'right'}, 4:{halign:'center'}, 5:{halign:'right'} }
         });
-        doc.save("Ranking_Regional_Ejecucion_2025.pdf");
+        doc.save("Ranking_Regional_Ejecucion_2026.pdf");
     }
 
     document.addEventListener('DOMContentLoaded', cargarRanking);
