@@ -2,7 +2,7 @@ import urllib.request, csv, json, io
 from datetime import datetime, timedelta
 
 def generate_ranking():
-    url = "https://fs.datosabiertos.mef.gob.pe/datastorefiles/2025-Seguimiento-PI.csv"
+    url = "https://fs.datosabiertos.mef.gob.pe/datastorefiles/2026-Seguimiento-PI.csv"
     headers = {'User-Agent': 'Mozilla/5.0'}
     try:
         req = urllib.request.Request(url, headers=headers)
