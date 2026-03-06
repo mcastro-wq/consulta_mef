@@ -2,7 +2,7 @@ import urllib.request, csv, json, io
 from datetime import datetime, timedelta
 
 def update_data():
-    # URL para 2026
+    # URL para 2026m
     url = "https://fs.datosabiertos.mef.gob.pe/datastorefiles/2026-Seguimiento-PI.csv"
     headers = {'User-Agent': 'Mozilla/5.0'}
     
