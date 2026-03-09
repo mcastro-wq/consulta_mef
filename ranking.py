@@ -2,7 +2,8 @@ import urllib.request, csv, json, io
 from datetime import datetime, timedelta
 
 def generate_ranking():
-    url = "https://fs.datosabiertos.mef.gob.pe/datastorefiles/2026-Seguimiento-PI.csv"
+    # url = "https://fs.datosabiertos.mef.gob.pe/datastorefiles/2026-Seguimiento-PI.csv"
+    url = "https://fs.datosabiertos.mef.gob.pe/datastorefiles/2026-Gasto-Diario.csv"
     headers = {'User-Agent': 'Mozilla/5.0'}
     try:
         req = urllib.request.Request(url, headers=headers)
@@ -35,7 +36,7 @@ def generate_ranking():
 
                     try:
                         pim = float(r.get('MONTO_PIM', 0) or 0)
-                        dev = float(r.get('MONTO_DEVENGADO_ANO_EJE', 0) or 0)
+                        dev = float(r.get('MONTO_DEVENGADO', 0) or 0)
                         
                         if nombre not in ranking_data:
                             ranking_data[nombre] = {"pim": 0, "devengado": 0}
