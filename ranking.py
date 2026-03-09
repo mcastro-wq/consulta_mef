@@ -9,12 +9,18 @@ def generate_ranking():
         with urllib.request.urlopen(req, timeout=300) as response:
             content = response.read().decode('utf-8-sig')
             reader = csv.DictReader(io.StringIO(content))
+            # Limpiar espacios en los nombres de las columnas
             reader.fieldnames = [f.strip() for f in reader.fieldnames]
             
             ranking_data = {}
 
             for r in reader:
-                # FILTRO ESTRICTO: Solo nivel Regional o la Municipalidad de Lima claro
+                # FILTRO DE AÑO: Solo registros del 2026
+                ano_eje = str(r.get('ANO_EJE', '')).strip()
+                if ano_eje != "2026":
+                    continue
+
+                # FILTRO ESTRICTO: Solo nivel Regional o la Municipalidad de Lima
                 nivel = str(r.get('NIVEL_GOBIERNO_NOMBRE', '')).upper()
                 pliego_raw = str(r.get('PLIEGO_NOMBRE', '')).upper()
                 
@@ -36,7 +42,7 @@ def generate_ranking():
                         
                         ranking_data[nombre]["pim"] += pim
                         ranking_data[nombre]["devengado"] += dev
-                    except:
+                    except (ValueError, TypeError):
                         continue
 
             final_list = []
@@ -51,18 +57,21 @@ def generate_ranking():
                         "avance": round(avance, 1)
                     })
 
-            # Ordenar inicialmente por avance
+            # Ordenar por avance de mayor a menor
             final_list.sort(key=lambda x: x["avance"], reverse=True)
 
+            # Ajuste de hora (UTC-5 para Perú)
             hora_peru = datetime.now() - timedelta(hours=5)
             output = {
                 "ultima_actualizacion": hora_peru.strftime("%d/%m/%Y %H:%M"),
+                "anio_fiscal": "2026",
                 "ranking": final_list
             }
 
             with open('data_ranking.json', 'w', encoding='utf-8') as f:
                 json.dump(output, f, indent=2, ensure_ascii=False)
-            print(f"✅ Ranking Regional generado con {len(final_list)} entidades.")
+            
+            print(f"✅ Ranking Regional 2026 generado con {len(final_list)} entidades.")
 
     except Exception as e:
         print(f"🚨 Error: {e}")
