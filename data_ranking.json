@@ -1,195 +1,202 @@
 {
-  "ultima_actualizacion": "09/03/2026 08:35",
+  "ultima_actualizacion": "09/03/2026 09:10",
   "anio_fiscal": "2026",
   "ranking": [
     {
+      "pliego": "MANCOMUNIDAD REGIONAL HUANCAVELICA - ICA",
+      "pim": 70971.0,
+      "devengado": 65045.0,
+      "saldo": 5926.0,
+      "avance": 91.7
+    },
+    {
       "pliego": "MUNICIPALIDAD METROPOLITANA DE LIMA",
-      "pim": 32554910.0,
-      "devengado": 12886168.680000002,
-      "saldo": 19668741.32,
-      "avance": 39.6
-    },
-    {
-      "pliego": "AMAZONAS",
-      "pim": 423959141.0,
-      "devengado": 142864590.87000003,
-      "saldo": 281094550.13,
-      "avance": 33.7
-    },
-    {
-      "pliego": "LORETO",
-      "pim": 1045036886.0,
-      "devengado": 278743362.35999995,
-      "saldo": 766293523.6400001,
-      "avance": 26.7
-    },
-    {
-      "pliego": "TACNA",
-      "pim": 252444664.0,
-      "devengado": 64160133.18000003,
-      "saldo": 188284530.81999996,
-      "avance": 25.4
+      "pim": 60519019.0,
+      "devengado": 16073227.799999999,
+      "saldo": 44445791.2,
+      "avance": 26.6
     },
     {
       "pliego": "PASCO",
-      "pim": 492106751.0,
-      "devengado": 124463775.74000001,
-      "saldo": 367642975.26,
-      "avance": 25.3
+      "pim": 1280473127.0,
+      "devengado": 310180151.67,
+      "saldo": 970292975.3299999,
+      "avance": 24.2
     },
     {
-      "pliego": "JUNIN",
-      "pim": 939299928.0,
-      "devengado": 235430943.8900001,
-      "saldo": 703868984.1099999,
-      "avance": 25.1
+      "pliego": "AMAZONAS",
+      "pim": 1651245333.0,
+      "devengado": 373389156.029999,
+      "saldo": 1277856176.970001,
+      "avance": 22.6
+    },
+    {
+      "pliego": "LORETO",
+      "pim": 3827140532.0,
+      "devengado": 852289541.7299999,
+      "saldo": 2974850990.27,
+      "avance": 22.3
     },
     {
       "pliego": "MANCOMUNIDAD REGIONAL DE LOS ANDES",
-      "pim": 3885944.0,
-      "devengado": 819936.61,
-      "saldo": 3066007.39,
-      "avance": 21.1
+      "pim": 3943524.0,
+      "devengado": 876326.61,
+      "saldo": 3067197.39,
+      "avance": 22.2
     },
     {
-      "pliego": "PIURA",
-      "pim": 1159136740.0,
-      "devengado": 188247431.51000002,
-      "saldo": 970889308.49,
-      "avance": 16.2
+      "pliego": "JUNIN",
+      "pim": 3614861985.0,
+      "devengado": 709312828.730006,
+      "saldo": 2905549156.269994,
+      "avance": 19.6
+    },
+    {
+      "pliego": "TACNA",
+      "pim": 1037083940.0,
+      "devengado": 196504531.12999952,
+      "saldo": 840579408.8700005,
+      "avance": 18.9
     },
     {
       "pliego": "CAJAMARCA",
-      "pim": 688644759.0,
-      "devengado": 111182355.27,
-      "saldo": 577462403.73,
-      "avance": 16.1
-    },
-    {
-      "pliego": "MOQUEGUA",
-      "pim": 245058427.0,
-      "devengado": 37855727.58,
-      "saldo": 207202699.42000002,
-      "avance": 15.4
+      "pim": 3941797226.0,
+      "devengado": 706725298.6299981,
+      "saldo": 3235071927.370002,
+      "avance": 17.9
     },
     {
       "pliego": "ICA",
-      "pim": 326770105.0,
-      "devengado": 49995149.71,
-      "saldo": 276774955.29,
-      "avance": 15.3
+      "pim": 2088805269.0,
+      "devengado": 354175002.2199988,
+      "saldo": 1734630266.7800012,
+      "avance": 17.0
+    },
+    {
+      "pliego": "PIURA",
+      "pim": 4553708196.0,
+      "devengado": 765175626.66,
+      "saldo": 3788532569.34,
+      "avance": 16.8
     },
     {
       "pliego": "AYACUCHO",
-      "pim": 843794522.0,
-      "devengado": 124895939.83999999,
-      "saldo": 718898582.16,
-      "avance": 14.8
-    },
-    {
-      "pliego": "UCAYALI",
-      "pim": 708846818.0,
-      "devengado": 87485278.77000001,
-      "saldo": 621361539.23,
-      "avance": 12.3
+      "pim": 2764529113.0,
+      "devengado": 453353285.4899966,
+      "saldo": 2311175827.5100036,
+      "avance": 16.4
     },
     {
       "pliego": "SAN MARTIN",
-      "pim": 620345637.0,
-      "devengado": 75854840.79999997,
-      "saldo": 544490796.2,
-      "avance": 12.2
+      "pim": 2586279345.0,
+      "devengado": 422618720.72000027,
+      "saldo": 2163660624.2799997,
+      "avance": 16.3
+    },
+    {
+      "pliego": "MOQUEGUA",
+      "pim": 881204642.0,
+      "devengado": 142872325.49999988,
+      "saldo": 738332316.5000001,
+      "avance": 16.2
     },
     {
       "pliego": "LAMBAYEQUE",
-      "pim": 843136574.0,
-      "devengado": 90601373.88999997,
-      "saldo": 752535200.11,
-      "avance": 10.7
+      "pim": 2631547952.0,
+      "devengado": 422098948.2299994,
+      "saldo": 2209449003.7700005,
+      "avance": 16.0
+    },
+    {
+      "pliego": "UCAYALI",
+      "pim": 1995730657.0,
+      "devengado": 319597928.51999927,
+      "saldo": 1676132728.4800007,
+      "avance": 16.0
     },
     {
       "pliego": "APURIMAC",
-      "pim": 329698204.0,
-      "devengado": 28438362.029999997,
-      "saldo": 301259841.97,
-      "avance": 8.6
+      "pim": 1661630797.0,
+      "devengado": 255019137.25000036,
+      "saldo": 1406611659.7499995,
+      "avance": 15.3
     },
     {
       "pliego": "PUNO",
-      "pim": 859974234.0,
-      "devengado": 69919191.34999998,
-      "saldo": 790055042.65,
-      "avance": 8.1
-    },
-    {
-      "pliego": "LA LIBERTAD",
-      "pim": 1016119123.0,
-      "devengado": 82060208.69000003,
-      "saldo": 934058914.31,
-      "avance": 8.1
+      "pim": 3493945018.0,
+      "devengado": 531325416.3099987,
+      "saldo": 2962619601.6900015,
+      "avance": 15.2
     },
     {
       "pliego": "ANCASH",
-      "pim": 754309434.0,
-      "devengado": 54976949.78999999,
-      "saldo": 699332484.21,
-      "avance": 7.3
-    },
-    {
-      "pliego": "CUSCO",
-      "pim": 1096147178.0,
-      "devengado": 69918642.39999999,
-      "saldo": 1026228535.6,
-      "avance": 6.4
-    },
-    {
-      "pliego": "AREQUIPA",
-      "pim": 669774629.0,
-      "devengado": 40874983.8,
-      "saldo": 628899645.2,
-      "avance": 6.1
+      "pim": 3376589360.0,
+      "devengado": 499803554.43999743,
+      "saldo": 2876785805.5600023,
+      "avance": 14.8
     },
     {
       "pliego": "LIMA",
-      "pim": 455527520.0,
-      "devengado": 25907611.850000005,
-      "saldo": 429619908.15,
-      "avance": 5.7
-    },
-    {
-      "pliego": "MADRE DE DIOS",
-      "pim": 204611078.0,
-      "devengado": 10911763.550000004,
-      "saldo": 193699314.45,
-      "avance": 5.3
-    },
-    {
-      "pliego": "HUANUCO",
-      "pim": 469818256.0,
-      "devengado": 18283569.71,
-      "saldo": 451534686.29,
-      "avance": 3.9
-    },
-    {
-      "pliego": "LA PROVINCIA CONSTITUCIONAL DEL CALLAO",
-      "pim": 409114468.0,
-      "devengado": 5201636.73,
-      "saldo": 403912831.27,
-      "avance": 1.3
+      "pim": 2396648596.0,
+      "devengado": 353276947.58999896,
+      "saldo": 2043371648.410001,
+      "avance": 14.7
     },
     {
       "pliego": "TUMBES",
-      "pim": 170343220.0,
-      "devengado": 1556574.5100000002,
-      "saldo": 168786645.49,
-      "avance": 0.9
+      "pim": 768456535.0,
+      "devengado": 111885424.22999999,
+      "saldo": 656571110.77,
+      "avance": 14.6
+    },
+    {
+      "pliego": "AREQUIPA",
+      "pim": 3010975359.0,
+      "devengado": 429184694.8799983,
+      "saldo": 2581790664.120002,
+      "avance": 14.3
     },
     {
       "pliego": "HUANCAVELICA",
-      "pim": 244385255.0,
-      "devengado": 1615387.6600000001,
-      "saldo": 242769867.34,
-      "avance": 0.7
+      "pim": 1545207953.0,
+      "devengado": 221365004.34999937,
+      "saldo": 1323842948.6500006,
+      "avance": 14.3
+    },
+    {
+      "pliego": "HUANUCO",
+      "pim": 2307885457.0,
+      "devengado": 327718050.8199985,
+      "saldo": 1980167406.1800015,
+      "avance": 14.2
+    },
+    {
+      "pliego": "LA LIBERTAD",
+      "pim": 4421551590.0,
+      "devengado": 625897085.6499975,
+      "saldo": 3795654504.3500023,
+      "avance": 14.2
+    },
+    {
+      "pliego": "CUSCO",
+      "pim": 3823859645.0,
+      "devengado": 533824775.73999935,
+      "saldo": 3290034869.2600007,
+      "avance": 14.0
+    },
+    {
+      "pliego": "LA PROVINCIA CONSTITUCIONAL DEL CALLAO",
+      "pim": 1974821258.0,
+      "devengado": 244949721.10000008,
+      "saldo": 1729871536.8999999,
+      "avance": 12.4
+    },
+    {
+      "pliego": "MADRE DE DIOS",
+      "pim": 637913355.0,
+      "devengado": 78355521.93999986,
+      "saldo": 559557833.0600002,
+      "avance": 12.3
     }
   ]
 }
