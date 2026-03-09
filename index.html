@@ -18,6 +18,7 @@
         }
         .navbar { background-color: var(--primary-color) !important; border-bottom: 3px solid #ffc107; }
         
+        /* Ajuste para que todas las cards midan lo mismo */
         .kpi-card {
             background: white;
             border: none;
@@ -25,13 +26,43 @@
             padding: 1.5rem;
             box-shadow: 0 2px 10px rgba(0,0,0,0.03);
             transition: transform 0.2s;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Distribuye el contenido uniformemente */
         }
-        .kpi-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: #6c757d; font-weight: 700; }
-        .kpi-value { font-size: 1.8rem; font-weight: 800; margin: 5px 0; color: #222; }
+        
+        .kpi-label { 
+            font-size: 0.75rem; 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            color: #6c757d; 
+            font-weight: 700; 
+            margin-bottom: 10px;
+        }
+        
+        .kpi-value { 
+            font-size: 1.6rem; /* Ajustado para evitar desbordamiento */
+            font-weight: 800; 
+            margin: 0; 
+            color: #222; 
+            line-height: 1.2;
+        }
         
         /* Barra de progreso elegante */
-        .progress-container { height: 8px; background: #eee; border-radius: 10px; overflow: hidden; margin-top: 10px; }
-        .progress-bar-fill { height: 100%; background: var(--primary-color); width: 0%; transition: width 1s ease-in-out; }
+        .progress-container { 
+            height: 8px; 
+            background: #eee; 
+            border-radius: 10px; 
+            overflow: hidden; 
+            margin-top: 15px; 
+        }
+        .progress-bar-fill { 
+            height: 100%; 
+            background: var(--primary-color); 
+            width: 0%; 
+            transition: width 1s ease-in-out; 
+        }
         
         .btn-minimal {
             border: 1px solid rgba(255,255,255,0.3);
@@ -52,73 +83,58 @@
 <nav class="navbar navbar-dark py-3 mb-5">
     <div class="container">
         <div class="d-flex align-items-center w-100">
-            
             <div class="d-flex flex-column align-items-start">
-                    <h4 class="fw-bold mb-0 text-white">ANALÍTICA LAMBAYEQUE</h4>
-
-                <span class="badge bg-light text-dark border fw-normal">
+                <h4 class="fw-bold mb-0 text-white">ANALÍTICA LAMBAYEQUE</h4>
+                <span class="badge bg-light text-dark border fw-normal mt-1">
                     <i class="bi bi-database-check text-primary"></i> MEF: <span id="fecha-actualizacion">...</span>
                 </span>
             </div>
-            
-            <div class="d-flex gap-2 ms-auto">
+            <div class="ms-auto">
                 <a href="consulta2.html" class="btn-minimal">Ranking</a>
             </div>
-            
         </div>
     </div>
 </nav>
 
-    <div class="container">
-        <div class="d-flex justify-content-between align-items-end mb-4">
-            <div>
-                <h2 class="fw-extrabold mb-0">Resumen de Inversión 2026</h2>
-                <p class="text-muted small mb-0">Consolidado Gobierno Regional de Lambayeque</p>
-            </div>
-        </div>
+<div class="container">
+    <div class="mb-4">
+        <h2 class="fw-bold mb-0">Resumen de Inversión 2026</h2>
+        <p class="text-muted small">Consolidado Gobierno Regional de Lambayeque</p>
+    </div>
 
-        <div class="row g-4 mb-5">
-            <div class="col-md-4">
-                <div class="kpi-card">
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="kpi-card">
+                <div>
                     <div class="kpi-label">Presupuesto (PIM)</div>
                     <div id="total-pim" class="kpi-value">S/ 0</div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="kpi-card">
+        </div>
+        
+        <div class="col-md-4">
+            <div class="kpi-card">
+                <div>
                     <div class="kpi-label">Ejecutado (Devengado)</div>
                     <div id="total-ejecutado" class="kpi-value text-success">S/ 0</div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="kpi-card">
+        </div>
+        
+        <div class="col-md-4">
+            <div class="kpi-card">
+                <div>
                     <div class="kpi-label">Avance Regional</div>
                     <div id="avance-global" class="kpi-value" style="color: var(--primary-color);">0%</div>
-                    <div class="progress-container">
-                        <div id="progreso-barra" class="progress-bar-fill"></div>
-                    </div>
+                </div>
+                <div class="progress-container">
+                    <div id="progreso-barra" class="progress-bar-fill"></div>
                 </div>
             </div>
         </div>
-
     </div>
+</div>
 
-    <script src="script.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
