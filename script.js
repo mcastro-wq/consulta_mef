@@ -24,7 +24,13 @@ async function consultarMEF() {
             // Extraemos los valores del objeto encontrado
             const tPim = Number(lambayeque.pim) || 0;
             const tDev = Number(lambayeque.devengado) || 0;
-            const avanceGlobal = lambayeque.avance || 0; // Usamos el avance que ya viene en el JSON
+
+            // usamos el avance con el truncado
+            const avanceReal = (tDev / tPim * 100);
+            const avanceGlobal = (Math.floor(avanceReal * 10) / 10).toFixed(1);
+            // usamos el avance con el truncado
+            
+            //const avanceGlobal = lambayeque.avance || 0; // Usamos el avance que ya viene en el JSON
 
             // 4. Renderizar en las Cards del index.html
             const elPim = document.getElementById('total-pim');
@@ -68,3 +74,4 @@ async function consultarMEF() {
         if (elEstado) elEstado.innerText = "Error: No se pudo leer el archivo de datos.";
     }
 }
+
