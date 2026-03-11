@@ -1,10 +1,11 @@
 {
-  "ultima_actualizacion": "11/03/2026 14:57",
+  "ultima_actualizacion": "11/03/2026 15:39",
   "anio_fiscal": "2026",
   "ranking": [
     {
       "pliego": "MANCOMUNIDAD REGIONAL HUANCAVELICA - ICA",
       "pim": 70971.0,
+      "certificado": 65045.0,
       "devengado": 65045.0,
       "saldo": 5926.0,
       "avance": 91.7
@@ -12,6 +13,7 @@
     {
       "pliego": "MUNICIPALIDAD METROPOLITANA DE LIMA",
       "pim": 60519019.0,
+      "certificado": 33122407.950000007,
       "devengado": 16194240.429999998,
       "saldo": 44324778.57,
       "avance": 26.8
@@ -19,6 +21,7 @@
     {
       "pliego": "PASCO",
       "pim": 1280577763.0,
+      "certificado": 816702934.9400017,
       "devengado": 313339787.4499997,
       "saldo": 967237975.5500003,
       "avance": 24.5
@@ -26,6 +29,7 @@
     {
       "pliego": "AMAZONAS",
       "pim": 1651245333.0,
+      "certificado": 1270659064.1300006,
       "devengado": 377975465.889999,
       "saldo": 1273269867.110001,
       "avance": 22.9
@@ -33,6 +37,7 @@
     {
       "pliego": "LORETO",
       "pim": 3828299738.0,
+      "certificado": 1163832517.080001,
       "devengado": 873459666.9199998,
       "saldo": 2954840071.08,
       "avance": 22.8
@@ -40,6 +45,7 @@
     {
       "pliego": "MANCOMUNIDAD REGIONAL DE LOS ANDES",
       "pim": 3943524.0,
+      "certificado": 3537212.88,
       "devengado": 895687.51,
       "saldo": 3047836.49,
       "avance": 22.7
@@ -47,6 +53,7 @@
     {
       "pliego": "JUNIN",
       "pim": 3619469114.0,
+      "certificado": 994227630.6000036,
       "devengado": 723546603.200006,
       "saldo": 2895922510.799994,
       "avance": 20.0
@@ -54,6 +61,7 @@
     {
       "pliego": "TACNA",
       "pim": 1042990194.0,
+      "certificado": 789343806.6200002,
       "devengado": 202931158.4599995,
       "saldo": 840059035.5400004,
       "avance": 19.5
@@ -61,6 +69,7 @@
     {
       "pliego": "CAJAMARCA",
       "pim": 3954350680.0,
+      "certificado": 2791452401.3199987,
       "devengado": 716092357.5699986,
       "saldo": 3238258322.4300013,
       "avance": 18.1
@@ -68,6 +77,7 @@
     {
       "pliego": "ICA",
       "pim": 2089116353.0,
+      "certificado": 1625744203.7799995,
       "devengado": 363452706.4499994,
       "saldo": 1725663646.5500007,
       "avance": 17.4
@@ -75,6 +85,7 @@
     {
       "pliego": "PIURA",
       "pim": 4556730175.0,
+      "certificado": 1132291786.890001,
       "devengado": 779607851.87,
       "saldo": 3777122323.13,
       "avance": 17.1
@@ -82,6 +93,7 @@
     {
       "pliego": "AYACUCHO",
       "pim": 2764572288.0,
+      "certificado": 942129811.7400028,
       "devengado": 465117251.6299968,
       "saldo": 2299455036.370003,
       "avance": 16.8
@@ -89,6 +101,7 @@
     {
       "pliego": "SAN MARTIN",
       "pim": 2588240864.0,
+      "certificado": 2071075792.259998,
       "devengado": 430411037.3900002,
       "saldo": 2157829826.6099997,
       "avance": 16.6
@@ -96,6 +109,7 @@
     {
       "pliego": "LAMBAYEQUE",
       "pim": 2635089181.0,
+      "certificado": 2310637862.32,
       "devengado": 435617535.40999955,
       "saldo": 2199471645.5900006,
       "avance": 16.5
@@ -103,6 +117,7 @@
     {
       "pliego": "UCAYALI",
       "pim": 1995763345.0,
+      "certificado": 592285080.33,
       "devengado": 328914821.7399994,
       "saldo": 1666848523.2600007,
       "avance": 16.5
@@ -110,6 +125,7 @@
     {
       "pliego": "MOQUEGUA",
       "pim": 881589107.0,
+      "certificado": 298054297.0499999,
       "devengado": 144503377.12999985,
       "saldo": 737085729.8700001,
       "avance": 16.4
@@ -117,6 +133,7 @@
     {
       "pliego": "APURIMAC",
       "pim": 1662373979.0,
+      "certificado": 536813504.15999794,
       "devengado": 257386399.13000026,
       "saldo": 1404987579.8699996,
       "avance": 15.5
@@ -124,6 +141,7 @@
     {
       "pliego": "PUNO",
       "pim": 3496973931.0,
+      "certificado": 2622566848.7399993,
       "devengado": 540027349.4599985,
       "saldo": 2956946581.5400014,
       "avance": 15.4
@@ -131,6 +149,7 @@
     {
       "pliego": "LIMA",
       "pim": 2398180866.0,
+      "certificado": 1001749697.6500016,
       "devengado": 358862153.93999875,
       "saldo": 2039318712.0600014,
       "avance": 15.0
@@ -138,6 +157,7 @@
     {
       "pliego": "ANCASH",
       "pim": 3397713113.0,
+      "certificado": 1191013060.88,
       "devengado": 506794812.69999737,
       "saldo": 2890918300.3000026,
       "avance": 14.9
@@ -145,6 +165,7 @@
     {
       "pliego": "AREQUIPA",
       "pim": 3011133052.0,
+      "certificado": 781960422.2200016,
       "devengado": 442553959.31999826,
       "saldo": 2568579092.6800017,
       "avance": 14.7
@@ -152,6 +173,7 @@
     {
       "pliego": "TUMBES",
       "pim": 768456535.0,
+      "certificado": 580399258.4300001,
       "devengado": 112787531.17999999,
       "saldo": 655669003.82,
       "avance": 14.7
@@ -159,6 +181,7 @@
     {
       "pliego": "LA LIBERTAD",
       "pim": 4422049120.0,
+      "certificado": 3139873878.1200104,
       "devengado": 639829316.969998,
       "saldo": 3782219803.030002,
       "avance": 14.5
@@ -166,6 +189,7 @@
     {
       "pliego": "HUANCAVELICA",
       "pim": 1545809875.0,
+      "certificado": 546619768.8299949,
       "devengado": 222970509.66999945,
       "saldo": 1322839365.3300006,
       "avance": 14.4
@@ -173,6 +197,7 @@
     {
       "pliego": "HUANUCO",
       "pim": 2307885457.0,
+      "certificado": 1142072366.99,
       "devengado": 332782589.50999886,
       "saldo": 1975102867.4900012,
       "avance": 14.4
@@ -180,6 +205,7 @@
     {
       "pliego": "CUSCO",
       "pim": 3825402350.0,
+      "certificado": 1376791284.8000014,
       "devengado": 544396495.6599994,
       "saldo": 3281005854.3400006,
       "avance": 14.2
@@ -187,6 +213,7 @@
     {
       "pliego": "LA PROVINCIA CONSTITUCIONAL DEL CALLAO",
       "pim": 1974821258.0,
+      "certificado": 1267142214.9000003,
       "devengado": 250295549.76000008,
       "saldo": 1724525708.24,
       "avance": 12.7
@@ -194,6 +221,7 @@
     {
       "pliego": "MADRE DE DIOS",
       "pim": 637913355.0,
+      "certificado": 206356488.1499998,
       "devengado": 79678129.7099999,
       "saldo": 558235225.2900001,
       "avance": 12.5
