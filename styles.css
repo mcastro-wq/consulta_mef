@@ -1,61 +1,62 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
 
+/* 1. Definición de Paleta de Colores */
+:root {
+    --bg-body: #f1f3f7;
+    --bg-card: #ffffff;
+    --text-main: #333333;
+    --text-muted: #6c757d;
+    --border-color: #dee2e6;
+    --shadow: 0 4px 10px rgba(0,0,0,0.05);
+    --nav-bg: #801616;
+    --nav-accent: #ffc107;
+}
+
+/* 2. Paleta Modo Oscuro */
+body.dark-mode {
+    --bg-body: #121212;
+    --bg-card: #1e1e1e;
+    --text-main: #e0e0e0;
+    --text-muted: #a0a0a0;
+    --border-color: #333333;
+    --shadow: 0 4px 15px rgba(0,0,0,0.4);
+    --nav-bg: #4a0b0b; /* Un rojo un poco más oscuro para no lastimar la vista */
+}
+
+/* 3. Estilos Base */
 body { 
     font-family: 'Inter', sans-serif; 
-    background-color: #f1f3f7; 
-    padding-bottom: 50px; 
+    background-color: var(--bg-body); 
+    color: var(--text-main);
+    padding-bottom: 50px;
+    transition: background-color 0.3s, color 0.3s; /* Transición suave */
 }
 
-.proyecto-card h3 {
-    display: -webkit-box;
-    -webkit-line-clamp: 3; /* Número de líneas antes de cortar */
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    cursor: help; /* Cambia el cursor para indicar que hay más info */
-}
-
-
-@keyframes blink {
-    0% { opacity: 1; }
-    50% { opacity: 0.3; }
-    100% { opacity: 1; }
-}
 .navbar { 
-    background-color: #801616 !important; 
-    border-bottom: 5px solid #ffc107; 
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+    background-color: var(--nav-bg) !important; 
+    border-bottom: 5px solid var(--nav-accent); 
+    box-shadow: var(--shadow); 
 }
 
-.card-kpi { border: none; border-radius: 12px; color: white; padding: 20px; }
-
-.card-chart { 
-    background: white; 
+/* 4. Tarjetas y Contenedores */
+.proyecto-card, .card-chart { 
+    background: var(--bg-card); 
     border-radius: 15px; 
     padding: 20px; 
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
-    height: 400px; /* Altura fija para evitar que el gráfico crezca */
-    position: relative;
+    box-shadow: var(--shadow); 
+    transition: transform 0.3s, box-shadow 0.3s, background-color 0.3s;
 }
 
-.proyecto-card { 
-    background: white; 
-    padding: 20px; 
-    border-radius: 15px; 
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
-    height: 100%;
-    display: flex; 
-    flex-direction: column; 
-    justify-content: space-between;
-    transition: 0.3s;
+.proyecto-card:hover { 
+    transform: translateY(-5px); 
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15); 
 }
 
-.proyecto-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-
-h3 { 
+/* 5. Tipografía y Detalles */
+h3, .proyecto-card h3 { 
     font-size: 0.85rem; 
     font-weight: 700; 
-    color: #333; 
+    color: var(--text-main); 
     margin: 10px 0; 
     line-height: 1.4;
     display: -webkit-box;
@@ -64,49 +65,44 @@ h3 {
     overflow: hidden;
 }
 
+.regiao { 
+    font-size: 0.65rem; 
+    color: #448aff; /* Azul más vibrante para que resalte en oscuro */
+    font-weight: 800; 
+    text-transform: uppercase; 
+}
+
 .badge.rounded-pill {
     font-weight: 500;
     letter-spacing: 0.5px;
-    background-color: #f8f9fa !important;
-    color: #6c757d !important;
-    border: 1px solid #dee2e6 !important;
+    background-color: var(--bg-body) !important;
+    color: var(--text-muted) !important;
+    border: 1px solid var(--border-color) !important;
 }
 
-/* Efecto de pulso para el puntito verde */
-.text-success {
-    animation: blink 2s infinite;
-}
+/* 6. Métricas y Barras */
+.metricas-box { border-top: 1px solid var(--border-color); padding-top: 12px; }
+.barra-fondo { background: var(--border-color); height: 8px; border-radius: 10px; overflow: hidden; margin-top: 8px; }
+.barra-progreso { height: 100%; border-radius: 10px; transition: width 0.5s; }
 
-.card-kpi {
+/* 7. KPIs y Animaciones */
+.card-kpi { 
+    border: none; 
+    border-radius: 12px; 
+    color: white; 
+    padding: 20px; 
     display: flex;
     flex-direction: column;
     justify-content: center;
-    min-height: 100px; /* Forzamos una altura mínima igual para todas */
+    min-height: 100px;
     transition: transform 0.2s;
 }
 
-.card-kpi:hover {
-    transform: translateY(-3px); /* Un pequeño efecto profesional al pasar el mouse */
-}
+.card-kpi:hover { transform: translateY(-3px); }
 
 @keyframes blink {
     0% { opacity: 1; }
     50% { opacity: 0.3; }
     100% { opacity: 1; }
 }
-
-.regiao { font-size: 0.65rem; color: #0d47a1; font-weight: 800; text-transform: uppercase; }
-
-.metricas-box { border-top: 1px solid #eee; padding-top: 12px; }
-
-.barra-fondo { background: #eee; height: 8px; border-radius: 10px; overflow: hidden; margin-top: 8px; }
-
-.barra-progreso { height: 100%; border-radius: 10px; transition: width 0.5s; }
-
-
-
-
-
-
-
-
+.text-success { animation: blink 2s infinite; }
