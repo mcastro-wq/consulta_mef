@@ -53,6 +53,7 @@ def generate_ranking():
                     final_list.append({
                         "pliego": nombre,
                         "pim": montos["pim"],
+                        "monto_certificado": montos.get("monto_certificado", 0),
                         "devengado": montos["devengado"],
                         "saldo": montos["pim"] - montos["devengado"],
                         "avance": round(avance, 1)
