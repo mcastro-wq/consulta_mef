@@ -121,6 +121,36 @@
             transition: all 0.3s ease;
             cursor: pointer;
         }
+
+        /* Esto obliga a las celdas a usar el color de fondo de la tarjeta */
+.table td, .table th {
+    background-color: var(--bg-card) !important;
+    color: var(--text-main) !important;
+    border-color: var(--border-color) !important;
+}
+
+/* Para que el efecto hover (pasar el mouse) funcione en modo oscuro */
+.table-hover tbody tr:hover td {
+    background-color: var(--row-hover) !important;
+}
+
+/* Ajuste para que el encabezado no se pierda */
+.table thead th {
+    background-color: var(--nav-accent) !important;
+    color: #000 !important; /* El texto del encabezado siempre negro para contraste */
+}
+
+/* Lambayeque resaltado */
+.highlight-lambayeque td {
+    background-color: rgba(128, 22, 22, 0.1) !important; /* Rojo muy suave */
+    font-weight: bold;
+}
+
+body.dark-mode .highlight-lambayeque td {
+    background-color: rgba(255, 193, 7, 0.1) !important; /* Dorado suave en modo oscuro */
+    border-top: 1px solid var(--nav-accent) !important;
+    border-bottom: 1px solid var(--nav-accent) !important;
+}
         .btn-theme:hover { background: rgba(255, 255, 255, 0.3); color: var(--nav-accent); }
 
         .btn-export { font-size: 0.85rem; font-weight: 600; transition: all 0.2s; }
