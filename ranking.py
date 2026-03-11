@@ -37,12 +37,14 @@ def generate_ranking():
                     try:
                         pim = float(r.get('MONTO_PIM', 0) or 0)
                         dev = float(r.get('MONTO_DEVENGADO', 0) or 0)
+                        cer = float(r.get('MONTO_CERTIFICADO', 0) or 0)
                         
                         if nombre not in ranking_data:
                             ranking_data[nombre] = {"pim": 0, "devengado": 0}
                         
                         ranking_data[nombre]["pim"] += pim
                         ranking_data[nombre]["devengado"] += dev
+                        ranking_data[nombre]["certificado"] += cer
                     except (ValueError, TypeError):
                         continue
 
@@ -53,7 +55,7 @@ def generate_ranking():
                     final_list.append({
                         "pliego": nombre,
                         "pim": montos["pim"],
-                        "monto_certificado": montos.get("monto_certificado", 0),
+                        "certificado": montos["certificado"],
                         "devengado": montos["devengado"],
                         "saldo": montos["pim"] - montos["devengado"],
                         "avance": round(avance, 1)
