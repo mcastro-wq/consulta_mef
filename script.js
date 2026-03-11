@@ -75,3 +75,21 @@ async function consultarMEF() {
     }
 }
 
+
+function toggleDarkMode() {
+    const body = document.body;
+    body.classList.toggle('dark-mode');
+    
+    // Guardamos la elección del usuario para la próxima visita
+    const mode = body.classList.contains('dark-mode') ? 'dark' : 'light';
+    localStorage.setItem('theme', mode);
+}
+
+// Al cargar la página, verificamos si ya tenía el modo oscuro activado
+window.onload = () => {
+    if (localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-mode');
+    }
+};
+
+
