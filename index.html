@@ -142,6 +142,19 @@
 </div>
 
 <script src="script.js"></script>
+<script>
+function toggleDarkMode() {
+    const body = document.body;
+    body.classList.toggle('dark-mode');
+    
+    // Guardamos la elección del usuario para la próxima visita
+    const mode = body.classList.contains('dark-mode') ? 'dark' : 'light';
+    localStorage.setItem('theme', mode);
+}
+</script>
+
+    
 </body>
 </html>
+
 
