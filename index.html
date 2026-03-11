@@ -143,18 +143,28 @@
 
 <script src="script.js"></script>
 <script>
-function toggleDarkMode() {
     const body = document.body;
-    body.classList.toggle('dark-mode');
-    
-    // Guardamos la elección del usuario para la próxima visita
-    const mode = body.classList.contains('dark-mode') ? 'dark' : 'light';
-    localStorage.setItem('theme', mode);
-}
+
+    // 1. Verificar si ya existía una preferencia guardada
+    if (localStorage.getItem('theme') === 'dark') {
+        body.classList.add('dark-mode');
+    }
+
+    function toggleDarkMode() {
+        body.classList.toggle('dark-mode');
+        
+        // 2. Guardar la elección
+        if (body.classList.contains('dark-mode')) {
+            localStorage.setItem('theme', 'dark');
+        } else {
+            localStorage.setItem('theme', 'light');
+        }
+    }
 </script>
 
     
 </body>
 </html>
+
 
 
