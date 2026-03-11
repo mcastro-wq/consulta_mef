@@ -7,59 +7,125 @@
     <title>Ranking Regional - MEF</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f4f6f9; font-family: 'Segoe UI', sans-serif; }
-        .header-mef { background-color: #801616; color: white; padding: 25px 0; border-bottom: 5px solid #ffc107; }
-        .table-container { background: white; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); padding: 20px; }
-        .table thead { background-color: #ffc107; color: white; cursor: pointer; }
-        .table thead th:hover { background-color: #ffc107; }
+        :root {
+            --primary-color: #801616;
+            --nav-accent: #ffc107;
+            --bg-body: #f4f6f9;
+            --bg-card: #ffffff;
+            --text-main: #222;
+            --text-muted: #555;
+            --border-color: #dee2e6;
+            --shadow: 0 10px 30px rgba(0,0,0,0.1);
+            --row-hover: #fff0f0;
+        }
+
+        /* Variables Modo Oscuro */
+        body.dark-mode {
+            --bg-body: #0f1113;
+            --bg-card: #1a1d21;
+            --text-main: #f1f1f1;
+            --text-muted: #adb5bd;
+            --border-color: #2d3238;
+            --shadow: 0 10px 30px rgba(0,0,0,0.4);
+            --row-hover: #2d1a1a;
+        }
+
+        body { 
+            background-color: var(--bg-body); 
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            color: var(--text-main);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .header-mef { 
+            background-color: var(--primary-color); 
+            color: white; 
+            padding: 25px 0; 
+            border-bottom: 5px solid var(--nav-accent); 
+        }
+
+        .table-container { 
+            background: var(--bg-card); 
+            border-radius: 12px; 
+            box-shadow: var(--shadow); 
+            padding: 20px; 
+            border: 1px solid var(--border-color);
+            transition: background-color 0.3s;
+        }
+
+        /* Estilos de Tabla */
+        .table { color: var(--text-main); border-color: var(--border-color); }
+        .table thead { background-color: var(--nav-accent); color: #000; cursor: pointer; }
         
-        /* Barra de progreso mejorada */
-        .progress { height: 22px; border-radius: 11px; background-color: #eee; position: relative; border: 1px solid #ccc; overflow: hidden; }
-        .progress-bar-text { position: absolute; width: 100%; text-align: center; font-size: 0.75rem; font-weight: 800; color: #000; z-index: 5; line-height: 20px; }
+        .table-hover tbody tr:hover td {
+            background-color: var(--row-hover) !important;
+            transition: background-color 0.2s ease;
+        }
+
+        .highlight-lambayeque { 
+            background-color: rgba(128, 22, 22, 0.08) !important; 
+            border: 2px solid var(--primary-color) !important; 
+            font-weight: bold; 
+        }
+        
+        body.dark-mode .highlight-lambayeque { 
+            background-color: rgba(128, 22, 22, 0.25) !important; 
+        }
+
+        /* Barras de Progreso */
+        .progress { 
+            height: 22px; 
+            border-radius: 11px; 
+            background-color: var(--border-color); 
+            position: relative; 
+            border: 1px solid #ccc; 
+            overflow: hidden; 
+        }
+        .progress-bar-text { 
+            position: absolute; 
+            width: 100%; 
+            text-align: center; 
+            font-size: 0.75rem; 
+            font-weight: 800; 
+            color: #000; 
+            z-index: 5; 
+            line-height: 20px; 
+            text-shadow: 0 0 2px white;
+        }
         .bar-fill { height: 100%; z-index: 1; transition: width 0.8s ease-in-out; }
-        
-        /* Tipografía de números unificada y exactas */
+
         .monto { 
-            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace; 
+            font-family: 'SFMono-Regular', Consolas, monospace; 
             font-weight: 600; 
             letter-spacing: -0.3px;
         }
 
-        .highlight-lambayeque { background-color: #fff4f4 !important; border: 2px solid #801616 !important; font-weight: bold; }
-        .th-sort::after { content: ' ↕'; opacity: 0.5; font-size: 0.8em; }
-        
         .alert-custom {
-            border-left: 5px solid #801616 !important;
-            background-color: #fff9e6;
+            border-left: 5px solid var(--primary-color) !important;
+            background-color: var(--bg-card);
+            box-shadow: var(--shadow);
+            color: var(--text-muted);
         }
 
-        /* Botones de Exportación */
+        /* Botones de Tema y Exportación */
+        .btn-theme {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .btn-theme:hover { background: rgba(255, 255, 255, 0.3); color: var(--nav-accent); }
+
         .btn-export { font-size: 0.85rem; font-weight: 600; transition: all 0.2s; }
         .btn-excel { background-color: #1D6F42; color: white; border: none; }
-        .btn-excel:hover { background-color: #155231; color: white; }
         .btn-pdf { background-color: #AD0B00; color: white; border: none; }
-        .btn-pdf:hover { background-color: #850900; color: white; }
-
-
-
-        /* Color cuando pasas el mouse por encima de cualquier fila normal */
-.table-hover tbody tr:hover td {
-    background-color: #fff0f0 !important; 
-    transition: background-color 0.2s ease;
-}
-
-/* Color especial cuando pasas el mouse sobre la fila de Lambayeque */
-.table-hover tbody tr.highlight-lambayeque:hover td {
-    background-color: #ffe5e5 !important; 
-}
-
-/* Para que el puntero indique que se puede interactuar */
-.table-hover tbody tr {
-    cursor: pointer;
-}
-
-
-        
     </style>
 </head>
 <body>
@@ -68,25 +134,30 @@
     <div class="container d-flex justify-content-between align-items-center">
         <div>
             <h4 class="fw-bold mb-0">RANKING REGIONAL DE EJECUCIÓN 2026</h4>
-            <span class="badge bg-light text-dark border fw-normal">
+            <span class="badge bg-light text-dark border fw-normal mt-1">
                 <i class="bi bi-database-check text-primary"></i> MEF: <span id="fecha-actualizacion">...</span>
             </span>
         </div>
-        <a href="index.html" class="btn btn-warning fw-bold rounded-pill px-4">
-            <i class="bi bi-arrow-left"></i> Volver al Monitor
-        </a>
+        <div class="d-flex align-items-center gap-3">
+            <button onclick="toggleDarkMode()" class="btn-theme" id="theme-toggle" title="Cambiar modo">
+                <i class="bi bi-moon-stars"></i>
+            </button>
+            <a href="index.html" class="btn btn-warning fw-bold rounded-pill px-4 shadow-sm">
+                <i class="bi bi-arrow-left me-2"></i>Volver
+            </a>
+        </div>
     </div>
 </div>
 
 <div class="container mb-5">
     <div class="row">
         <div class="col-12">
-            <div class="alert alert-custom border-0 shadow-sm mb-4">
-                <h6 class="fw-bold" style="color: #801616;">
-                    <i class="bi bi-info-circle-fill me-2"></i>NOTA DE DESEMPEÑO INSTITUCIONAL:
+            <div class="alert alert-custom border-0 mb-4">
+                <h6 class="fw-bold" style="color: var(--primary-color);">
+                    <i class="bi bi-info-circle-fill me-2"></i>NOTA DE DESEMPEÑO:
                 </h6>
-                <p class="small mb-0" style="color: #555; text-align: justify;">
-                    Este ranking mide exclusivamente la eficiencia del <strong>Pliego: Gobierno Regional de Lambayeque</strong> frente a los otros 24 Gobiernos Regionales del país al cierre del año 2026.
+                <p class="small mb-0" style="text-align: justify;">
+                    Este ranking mide exclusivamente la eficiencia del <strong>Pliego: Gobierno Regional de Lambayeque</strong> frente a los otros 24 Gobiernos Regionales al cierre del 2026.
                 </p>
             </div>
         </div>
@@ -108,10 +179,10 @@
                     <tr>
                         <th onclick="sortTable(0)" class="text-center">N°</th>
                         <th onclick="sortTable(1)" class="th-sort">PLIEGO</th>
-                        <th onclick="sortTable(2)" class="th-sort text-center">PIM (S/)</th>
-                        <th onclick="sortTable(3)" class="th-sort text-center">DEVENGADO (S/)</th>
-                        <th onclick="sortTable(4)" class="th-sort text-center">AVANCE (%)</th>
-                        <th onclick="sortTable(5)" class="th-sort text-center">POR DEVENGAR (S/)</th>
+                        <th onclick="sortTable(2)" class="text-center">PIM (S/)</th>
+                        <th onclick="sortTable(3)" class="text-center">DEVENGADO (S/)</th>
+                        <th onclick="sortTable(4)" class="text-center">AVANCE (%)</th>
+                        <th onclick="sortTable(5)" class="text-center">POR DEVENGAR (S/)</th>
                     </tr>
                 </thead>
                 <tbody id="tabla-ranking"></tbody>
@@ -127,7 +198,22 @@
 <script>
     let rawData = [];
     let sortOrder = [true, true, true, true, true, true];
+    const body = document.body;
+    const btnTheme = document.getElementById('theme-toggle');
 
+    // --- LÓGICA MODO OSCURO ---
+    function actualizarIcono(isDark) {
+        const icon = btnTheme.querySelector('i');
+        icon.className = isDark ? 'bi bi-sun' : 'bi bi-moon-stars';
+    }
+
+    function toggleDarkMode() {
+        const isDark = body.classList.toggle('dark-mode');
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        actualizarIcono(isDark);
+    }
+
+    // --- CARGA DE DATOS ---
     async function cargarRanking() {
         try {
             const res = await fetch('data_ranking.json?v=' + Math.random());
@@ -136,7 +222,7 @@
             rawData = data.ranking;
             renderTable(rawData);
         } catch (error) {
-            console.error("Error cargando el ranking:", error);
+            console.error("Error:", error);
         }
     }
 
@@ -145,88 +231,64 @@
         tbody.innerHTML = '';
         data.forEach((reg, index) => {
             const esLambayeque = reg.pliego.toUpperCase().includes("LAMBAYEQUE");
-
-            // TRUNCADO MATEMÁTICO (Evita que 99.98% sea 100%)
             const avanceReal = (reg.devengado / reg.pim * 100);
             const avanceVisible = (Math.floor(avanceReal * 10) / 10).toFixed(1);
 
-            let color;
-            let semaforo;
-            
-            if (avanceReal >= 100) {
-                color = "#059669"; semaforo = "💎"; 
-            } else if (avanceReal >= 90) {
-                color = "#10b981"; semaforo = "🟢";
-            } else if (avanceReal > 70) {
-                color = "#34d399"; semaforo = "🟢";
-            } else if (avanceReal > 30) {
-                color = "#fbbf24"; semaforo = "🟡";
-            } else {
-                color = "#ef4444"; semaforo = "🔴";
-            }
+            let color = avanceReal >= 90 ? "#10b981" : avanceReal > 70 ? "#34d399" : avanceReal > 30 ? "#fbbf24" : "#ef4444";
+            let semaforo = avanceReal >= 90 ? "🟢" : avanceReal > 30 ? "🟡" : "🔴";
 
             tbody.innerHTML += `
                 <tr class="${esLambayeque ? 'highlight-lambayeque' : ''}">
                     <td class="text-center">${index + 1}</td>
                     <td class="text-uppercase">${reg.pliego}</td>
-                    <td class="text-end monto">${reg.pim.toLocaleString('es-PE', {minimumFractionDigits: 2})}</td>
-                    <td class="text-end monto text-primary">${reg.devengado.toLocaleString('es-PE', {minimumFractionDigits: 2})}</td>
+                    <td class="text-end monto">${reg.pim.toLocaleString('es-PE')}</td>
+                    <td class="text-end monto text-primary">${reg.devengado.toLocaleString('es-PE')}</td>
                     <td>
                         <div class="d-flex align-items-center gap-2">
-                            <span style="font-size: 0.9rem;">${semaforo}</span>
+                            <span>${semaforo}</span>
                             <div class="progress flex-grow-1">
                                 <div class="progress-bar-text">${avanceVisible}%</div>
                                 <div class="bar-fill" style="width: ${avanceVisible}%; background-color: ${color};"></div>
                             </div>
                         </div>
                     </td>
-                    <td class="text-end monto text-danger">${reg.saldo.toLocaleString('es-PE', {minimumFractionDigits: 2})}</td>
+                    <td class="text-end monto text-danger">${reg.saldo.toLocaleString('es-PE')}</td>
                 </tr>`;
         });
     }
 
+    // --- FUNCIONES EXTRA ---
     function sortTable(colIndex) {
         const keys = ['index', 'pliego', 'pim', 'devengado', 'avance', 'saldo'];
         const key = keys[colIndex];
         sortOrder[colIndex] = !sortOrder[colIndex];
         rawData.sort((a, b) => {
-            let valA = a[key]; let valB = b[key];
-            if (typeof valA === 'string') {
-                return sortOrder[colIndex] ? valA.localeCompare(valB) : valB.localeCompare(valA);
-            }
-            return sortOrder[colIndex] ? valA - valB : valB - valA;
+            let valA = a[key], valB = b[key];
+            return sortOrder[colIndex] ? (valA > valB ? 1 : -1) : (valA < valB ? 1 : -1);
         });
         renderTable(rawData);
     }
 
     function exportToExcel() {
-        const table = document.getElementById("tablaMaster");
-        const wb = XLSX.utils.table_to_book(table, { sheet: "Ranking 2026" });
-        XLSX.writeFile(wb, "Ranking_Regional_Ejecucion_2026.xlsx");
+        XLSX.writeFile(XLSX.utils.table_to_book(document.getElementById("tablaMaster")), "Ranking_2026.xlsx");
     }
 
     function exportToPDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('l', 'mm', 'a4');
-        doc.setFontSize(16);
-        doc.setTextColor(128, 22, 22);
-        doc.text("RANKING REGIONAL DE EJECUCIÓN 2026", 14, 15);
-        doc.setFontSize(10);
-        doc.setTextColor(100);
-        doc.text("Sincronización MEF: " + document.getElementById('fecha-actualizacion').innerText, 14, 22);
-
-        doc.autoTable({
-            html: '#tablaMaster',
-            startY: 28,
-            theme: 'grid',
-            headStyles: { fillColor: [128, 22, 22] },
-            styles: { fontSize: 8 },
-            columnStyles: { 0:{halign:'center'}, 2:{halign:'right'}, 3:{halign:'right'}, 4:{halign:'center'}, 5:{halign:'right'} }
-        });
-        doc.save("Ranking_Regional_Ejecucion_2026.pdf");
+        doc.text("RANKING REGIONAL 2026", 14, 15);
+        doc.autoTable({ html: '#tablaMaster', startY: 20, theme: 'grid', headStyles: {fillColor: [128, 22, 22]} });
+        doc.save("Ranking_2026.pdf");
     }
 
-    document.addEventListener('DOMContentLoaded', cargarRanking);
+    // Inicialización al cargar la página
+    window.addEventListener('DOMContentLoaded', () => {
+        if (localStorage.getItem('theme') === 'dark') {
+            body.classList.add('dark-mode');
+            actualizarIcono(true);
+        }
+        cargarRanking();
+    });
 </script>
 </body>
 </html>
