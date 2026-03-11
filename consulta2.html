@@ -274,6 +274,7 @@ body.dark-mode .highlight-lambayeque td {
                     <td class="text-center">${index + 1}</td>
                     <td class="text-uppercase">${reg.pliego}</td>
                     <td class="text-end monto">${reg.pim.toLocaleString('es-PE')}</td>
+                    <td class="text-end monto">${reg.certificado.toLocaleString('es-PE')}</td>
                     <td class="text-end monto text-primary">${reg.devengado.toLocaleString('es-PE')}</td>
                     <td>
                         <div class="d-flex align-items-center gap-2">
@@ -291,7 +292,7 @@ body.dark-mode .highlight-lambayeque td {
 
     // --- FUNCIONES EXTRA ---
     function sortTable(colIndex) {
-        const keys = ['index', 'pliego', 'pim', 'devengado', 'avance', 'saldo'];
+        const keys = ['index', 'pliego', 'pim', 'certificado', 'devengado', 'avance', 'saldo'];
         const key = keys[colIndex];
         sortOrder[colIndex] = !sortOrder[colIndex];
         rawData.sort((a, b) => {
