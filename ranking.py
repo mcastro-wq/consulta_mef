@@ -40,7 +40,7 @@ def generate_ranking():
                         cer = float(r.get('MONTO_CERTIFICADO', 0) or 0)
                         
                         if nombre not in ranking_data:
-                            ranking_data[nombre] = {"pim": 0, "devengado": 0}
+                            ranking_data[nombre] = {"pim": 0, "certificado": 0,"devengado": 0}
                         
                         ranking_data[nombre]["pim"] += pim
                         ranking_data[nombre]["devengado"] += dev
