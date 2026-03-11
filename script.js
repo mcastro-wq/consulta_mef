@@ -24,6 +24,8 @@ async function consultarMEF() {
             // Extraemos los valores del objeto encontrado
             const tPim = Number(lambayeque.pim) || 0;
             const tDev = Number(lambayeque.devengado) || 0;
+            //nuevo certificado
+            const tCer = Number(lambayeque.certificado) || 0;
 
             // usamos el avance con el truncado
             const avanceReal = (tDev / tPim * 100);
@@ -34,6 +36,7 @@ async function consultarMEF() {
 
             // 4. Renderizar en las Cards del index.html
             const elPim = document.getElementById('total-pim');
+            const elCer = document.getElementById('total-cer');
             const elDev = document.getElementById('total-ejecutado');
             const elAvance = document.getElementById('avance-global');
             const elBarra = document.getElementById('progreso-barra');
@@ -47,6 +50,12 @@ async function consultarMEF() {
             }
             if (elDev) {
                 elDev.innerText = "S/ " + tDev.toLocaleString('es-PE', { 
+                    minimumFractionDigits: 2, 
+                    maximumFractionDigits: 2 
+                });
+            }
+            if (elCer) {
+                elCer.innerText = "S/ " + elCer.toLocaleString('es-PE', { 
                     minimumFractionDigits: 2, 
                     maximumFractionDigits: 2 
                 });
@@ -84,6 +93,7 @@ window.onload = () => {
         document.body.classList.add('dark-mode');
     }
 };
+
 
 
 
