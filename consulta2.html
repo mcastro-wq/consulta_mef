@@ -122,6 +122,11 @@
             display: flex; align-items: center; justify-content: center;
             transition: all 0.3s ease;
         }
+
+        .table thead th:hover {
+        background-color: #e5ad06 !important; /* Un tono más oscuro del amarillo */
+        transition: 0.2s;
+        }
         .btn-theme:hover { background: rgba(255, 255, 255, 0.3); color: var(--nav-accent); }
         .btn-excel { background-color: #1D6F42; color: white; border: none; }
         .btn-pdf { background-color: #AD0B00; color: white; border: none; }
@@ -201,28 +206,22 @@
 
 <script>
     let rawData = [];
-    let sortOrder = [true, true, true, true, true, true, true];
+    let currentData = []; // Guardará los datos filtrados actuales
+    let sortOrder = [true, true, true, true, true, true, true]; // Para alternar Asc/Desc
 
     async function cargarRanking() {
         try {
-            // Usamos un timestamp para evitar caché del navegador
             const res = await fetch('data_ranking.json?v=' + Date.now());
             const json = await res.json();
             
-            console.log("Datos cargados:", json); // Para depuración en F12
-
             if (json.ultima_actualizacion) {
                 document.getElementById('fecha-actualizacion').innerText = json.ultima_actualizacion;
             }
             
-            // Validamos que 'data' exista en el JSON
             if (json.data && Array.isArray(json.data)) {
                 rawData = json.data; 
                 filtrarYMostrar();
-            } else {
-                throw new Error("El formato del JSON no contiene la clave 'data'");
             }
-
         } catch (error) {
             console.error("Error crítico:", error);
             document.getElementById('tabla-ranking').innerHTML = `<tr><td colspan="7" class="text-center text-danger">Error: ${error.message}</td></tr>`;
@@ -231,10 +230,8 @@
 
     function filtrarYMostrar() {
         const filtro = document.getElementById('tipoProyecto').value;
-        let datosParaMostrar = [];
 
         if (filtro === "TODOS") {
-            // AGRUPAR: Sumamos Proyectos + Actividades de cada región
             const agrupado = {};
             rawData.forEach(item => {
                 const nombrePliego = item.pliego;
@@ -253,39 +250,82 @@
                 agrupado[nombrePliego].saldo += parseFloat(item.saldo || 0);
             });
 
-            // Convertimos el objeto en array y calculamos el nuevo porcentaje total
-            datosParaMostrar = Object.values(agrupado).map(item => {
+            currentData = Object.values(agrupado).map(item => {
                 item.avance = item.pim > 0 ? (item.devengado / item.pim) * 100 : 0;
                 return item;
             });
         } else {
-            // FILTRAR: Solo comparamos contra "tipo_nombre"
-            datosParaMostrar = rawData.filter(reg => reg.tipo_nombre.toUpperCase() === filtro);
+            currentData = rawData.filter(reg => reg.tipo_nombre.toUpperCase() === filtro);
         }
 
-        renderTable(datosParaMostrar);
+        // Por defecto, al filtrar, ordenamos por avance descendente (índice 5)
+        sortOrder[5] = false; 
+        sortTable(5, true); 
+    }
+
+    /**
+     * Función de Ordenamiento
+     * @param n Índice de la columna
+     * @param isDefault Si es el orden automático inicial
+     */
+    function sortTable(n, isDefault = false) {
+        if (!isDefault) sortOrder[n] = !sortOrder[n];
+        const asc = sortOrder[n];
+
+        currentData.sort((a, b) => {
+            let valA, valB;
+
+            // Mapeo de columnas a propiedades del objeto
+            switch(n) {
+                case 0: return 0; // El N° se recalcula en el render, no se ordena
+                case 1: valA = a.pliego; valB = b.pliego; break;
+                case 2: valA = a.pim; valB = b.pim; break;
+                case 3: valA = a.certificado; valB = b.certificado; break;
+                case 4: valA = a.devengado; valB = b.devengado; break;
+                case 5: valA = a.avance; valB = b.avance; break;
+                case 6: valA = a.saldo; valB = b.saldo; break;
+                default: return 0;
+            }
+
+            if (typeof valA === 'string') {
+                return asc ? valA.localeCompare(valB) : valB.localeCompare(valA);
+            } else {
+                return asc ? valA - valB : valB - valA;
+            }
+        });
+
+        renderTable(currentData);
+        actualizarIconosOrden(n, asc);
+    }
+
+    function actualizarIconosOrden(n, asc) {
+        const headers = document.querySelectorAll("#tablaMaster th");
+        headers.forEach((h, i) => {
+            // Limpiar otros encabezados (opcional, podrías añadir iconos <i> aquí)
+            if (i === n) {
+                h.style.textDecoration = "underline";
+                h.title = asc ? "Orden Ascendente" : "Orden Descendente";
+            } else {
+                h.style.textDecoration = "none";
+            }
+        });
     }
 
     function renderTable(data) {
         const tbody = document.getElementById('tabla-ranking');
         if (!tbody) return;
-        
         tbody.innerHTML = '';
 
-        // Ordenar por avance descendente
-        const dataOrdenada = [...data].sort((a, b) => (b.avance || 0) - (a.avance || 0));
-
-        if (dataOrdenada.length === 0) {
+        if (data.length === 0) {
             tbody.innerHTML = '<tr><td colspan="7" class="text-center">No se encontraron datos</td></tr>';
             return;
         }
 
-        dataOrdenada.forEach((reg, index) => {
+        data.forEach((reg, index) => {
             const esLambayeque = reg.pliego.toUpperCase().includes("LAMBAYEQUE");
             const avanceVal = parseFloat(reg.avance || 0);
             const avanceVisible = avanceVal.toFixed(1);
 
-            // Colores del semáforo
             let color = avanceVal >= 90 ? "#10b981" : avanceVal > 70 ? "#34d399" : avanceVal > 30 ? "#fbbf24" : "#ef4444";
             let semaforo = avanceVal >= 90 ? "🟢" : avanceVal > 30 ? "🟡" : "🔴";
 
@@ -295,9 +335,9 @@
             row.innerHTML = `
                 <td class="text-center fw-bold">${index + 1}</td>
                 <td class="text-uppercase small">${reg.pliego}</td>
-                <td class="text-end monto">${reg.pim.toLocaleString('es-PE', {minimumFractionDigits: 0, maximumFractionDigits: 0})}</td>
-                <td class="text-end monto">${reg.certificado.toLocaleString('es-PE', {minimumFractionDigits: 0, maximumFractionDigits: 0})}</td>
-                <td class="text-end monto text-primary">${reg.devengado.toLocaleString('es-PE', {minimumFractionDigits: 0, maximumFractionDigits: 0})}</td>
+                <td class="text-end monto">${reg.pim.toLocaleString('es-PE', {minimumFractionDigits: 0})}</td>
+                <td class="text-end monto">${reg.certificado.toLocaleString('es-PE', {minimumFractionDigits: 0})}</td>
+                <td class="text-end monto text-primary">${reg.devengado.toLocaleString('es-PE', {minimumFractionDigits: 0})}</td>
                 <td>
                     <div class="d-flex align-items-center gap-2">
                         <span style="font-size: 10px;">${semaforo}</span>
@@ -307,13 +347,13 @@
                         </div>
                     </div>
                 </td>
-                <td class="text-end monto text-danger">${reg.saldo.toLocaleString('es-PE', {minimumFractionDigits: 0, maximumFractionDigits: 0})}</td>
+                <td class="text-end monto text-danger">${reg.saldo.toLocaleString('es-PE', {minimumFractionDigits: 0})}</td>
             `;
             tbody.appendChild(row);
         });
     }
 
-    // Funciones adicionales de exportación
+    // Funciones de UI y Exportación (Se mantienen igual)
     function toggleDarkMode() {
         const isDark = document.body.classList.toggle('dark-mode');
         localStorage.setItem('theme', isDark ? 'dark' : 'light');
