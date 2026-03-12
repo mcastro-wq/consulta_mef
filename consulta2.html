@@ -127,6 +127,24 @@
         background-color: #e5ad06 !important; /* Un tono más oscuro del amarillo */
         transition: 0.2s;
         }
+
+        .table thead th {
+    background-color: var(--nav-accent) !important;
+    color: #000 !important;
+    cursor: pointer;
+    white-space: nowrap; /* Evita que el texto y el icono se rompan en dos líneas */
+    transition: background-color 0.2s ease;
+    user-select: none; /* Evita que se seleccione el texto al hacer muchos clics */
+}
+
+.table thead th:hover {
+    background-color: #f1b400 !important; /* Un amarillo un poco más fuerte */
+}
+
+/* Estilo para los iconos activos */
+.table thead th i {
+    transition: transform 0.2s ease;
+}
         .btn-theme:hover { background: rgba(255, 255, 255, 0.3); color: var(--nav-accent); }
         .btn-excel { background-color: #1D6F42; color: white; border: none; }
         .btn-pdf { background-color: #AD0B00; color: white; border: none; }
@@ -183,17 +201,17 @@
 
         <div class="table-responsive">
             <table class="table table-hover align-middle" id="tablaMaster">
-                <thead>
-                    <tr>
-                        <th onclick="sortTable(0)" class="text-center">N°</th>
-                        <th onclick="sortTable(1)">PLIEGO</th>
-                        <th onclick="sortTable(2)" class="text-center">PIM (S/)</th>
-                        <th onclick="sortTable(3)" class="text-center">CERT. (S/)</th>
-                        <th onclick="sortTable(4)" class="text-center">DEVENGADO (S/)</th>
-                        <th onclick="sortTable(5)" class="text-center">AVANCE (%)</th>
-                        <th onclick="sortTable(6)" class="text-center">POR DEVENGAR (S/)</th>
-                    </tr>
-                </thead>
+<thead>
+    <tr>
+        <th onclick="sortTable(0)" class="text-center">N° <i class="bi bi-hash"></i></th>
+        <th onclick="sortTable(1)">PLIEGO <i id="sort-icon-1" class="bi bi-arrow-down-up small ms-1 opacity-50"></i></th>
+        <th onclick="sortTable(2)" class="text-center">PIM (S/) <i id="sort-icon-2" class="bi bi-arrow-down-up small ms-1 opacity-50"></i></th>
+        <th onclick="sortTable(3)" class="text-center">CERT. (S/) <i id="sort-icon-3" class="bi bi-arrow-down-up small ms-1 opacity-50"></i></th>
+        <th onclick="sortTable(4)" class="text-center">DEVENGADO (S/) <i id="sort-icon-4" class="bi bi-arrow-down-up small ms-1 opacity-50"></i></th>
+        <th onclick="sortTable(5)" class="text-center">AVANCE (%) <i id="sort-icon-5" class="bi bi-arrow-down-up small ms-1 opacity-50"></i></th>
+        <th onclick="sortTable(6)" class="text-center">POR DEVENGAR (S/) <i id="sort-icon-6" class="bi bi-arrow-down-up small ms-1 opacity-50"></i></th>
+    </tr>
+</thead>
                 <tbody id="tabla-ranking"></tbody>
             </table>
         </div>
@@ -298,18 +316,34 @@
         actualizarIconosOrden(n, asc);
     }
 
-    function actualizarIconosOrden(n, asc) {
-        const headers = document.querySelectorAll("#tablaMaster th");
-        headers.forEach((h, i) => {
-            // Limpiar otros encabezados (opcional, podrías añadir iconos <i> aquí)
-            if (i === n) {
-                h.style.textDecoration = "underline";
-                h.title = asc ? "Orden Ascendente" : "Orden Descendente";
-            } else {
-                h.style.textDecoration = "none";
-            }
-        });
+function actualizarIconosOrden(n, asc) {
+    // 1. Limpiar todos los iconos a su estado inicial (flechas arriba-abajo opacas)
+    for (let i = 1; i <= 6; i++) {
+        const icon = document.getElementById(`sort-icon-${i}`);
+        if (icon) {
+            icon.className = "bi bi-arrow-down-up small ms-1 opacity-50";
+        }
     }
+
+    // 2. Aplicar el icono de orden específico a la columna seleccionada
+    const activeIcon = document.getElementById(`sort-icon-${n}`);
+    if (activeIcon) {
+        // bi-sort-numeric-down o bi-sort-alpha-down dependiendo del tipo, 
+        // pero usaremos flechas simples para consistencia visual
+        activeIcon.className = asc ? "bi bi-arrow-up-short ms-1 fw-bold" : "bi bi-arrow-down-short ms-1 fw-bold";
+        activeIcon.classList.remove("opacity-50");
+    }
+
+    // 3. Resaltar visualmente el encabezado activo
+    const headers = document.querySelectorAll("#tablaMaster th");
+    headers.forEach((h, i) => {
+        if (i === n) {
+            h.classList.add("text-decoration-underline");
+        } else {
+            h.classList.remove("text-decoration-underline");
+        }
+    });
+}
 
     function renderTable(data) {
         const tbody = document.getElementById('tabla-ranking');
