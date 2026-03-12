@@ -4,96 +4,69 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function consultarMEF() {
     try {
-        // 1. Carga del JSON con preventor de caché
-        const response = await fetch('data_ranking.json?v=' + Math.random());
-        if (!response.ok) throw new Error("No se pudo cargar el archivo JSON");
+        // Fetch con timestamp para evitar caché
+        const response = await fetch('data_ranking.json?v=' + Date.now());
+        if (!response.ok) throw new Error("Error al cargar data_ranking.json");
         
-        const dataTotal = await response.json();
+        const jsonData = await response.json();
         
-        // 2. Mostrar fecha de actualización (usando la llave correcta del JSON)
+        // 1. Actualizar fecha en el UI
         const elFecha = document.getElementById('fecha-actualizacion');
-        if (elFecha) {
-            elFecha.innerText = dataTotal.ultima_actualizacion || "Actualizado";
-        }
+        if (elFecha) elFecha.innerText = jsonData.ultima_actualizacion;
 
-        // 3. Filtrar específicamente Lambayeque
-        const proyectos = dataTotal.ranking || [];
-        const lambayeque = proyectos.find(p => p.pliego === "LAMBAYEQUE");
+        // 2. Filtrar todos los registros que pertenezcan a LAMBAYEQUE
+        // Usamos filter porque hay un registro para "ACTIVIDADES" y otro para "PROYECTOS"
+        const registrosLambayeque = jsonData.data.filter(item => 
+            item.pliego.toUpperCase().includes("LAMBAYEQUE")
+        );
 
-        if (lambayeque) {
-            // Extraemos los valores del objeto encontrado
-            const tPim = Number(lambayeque.pim) || 0;
-            const tDev = Number(lambayeque.devengado) || 0;
-            //nuevo certificado
-            const tCer = Number(lambayeque.certificado) || 0;
+        if (registrosLambayeque.length > 0) {
+            let sumaPim = 0;
+            let sumaDev = 0;
+            let sumaCer = 0;
 
-            // usamos el avance con el truncado
-            const avanceReal = (tDev / tPim * 100);
-            const avanceGlobal = (Math.floor(avanceReal * 10) / 10).toFixed(1);
-            // usamos el avance con el truncado
+            // 3. Sumar valores de ambos tipos (Proyectos + Actividades)
+            registrosLambayeque.forEach(reg => {
+                sumaPim += parseFloat(reg.pim || 0);
+                sumaDev += parseFloat(reg.devengado || 0);
+                sumaCer += parseFloat(reg.certificado || 0);
+            });
+
+            // 4. Calcular avance global
+            const porcentajeAvance = sumaPim > 0 ? (sumaDev / sumaPim) * 100 : 0;
+
+            // 5. Formatear y mostrar en pantalla
+            const configSoles = { 
+                style: 'currency', 
+                currency: 'PEN', 
+                minimumFractionDigits: 0, 
+                maximumFractionDigits: 0 
+            };
+
+            // Asignar valores a los IDs del HTML
+            document.getElementById('total-pim').innerText = sumaPim.toLocaleString('es-PE', configSoles);
+            document.getElementById('total-cer').innerText = sumaCer.toLocaleString('es-PE', configSoles);
+            document.getElementById('total-ejecutado').innerText = sumaDev.toLocaleString('es-PE', configSoles);
             
-            //const avanceGlobal = lambayeque.avance || 0; // Usamos el avance que ya viene en el JSON
-
-            // 4. Renderizar en las Cards del index.html
-            const elPim = document.getElementById('total-pim');
-            const elCer = document.getElementById('total-cer');
-            const elDev = document.getElementById('total-ejecutado');
-            const elAvance = document.getElementById('avance-global');
+            const elAvanceText = document.getElementById('avance-global');
             const elBarra = document.getElementById('progreso-barra');
 
-            // Formatear a moneda Soles (S/ 0,000.00)
-            if (elPim) {
-                elPim.innerText = "S/ " + tPim.toLocaleString('es-PE', { 
-                    minimumFractionDigits: 2, 
-                    maximumFractionDigits: 2 
-                });
-            }
-            if (elDev) {
-                elDev.innerText = "S/ " + tDev.toLocaleString('es-PE', { 
-                    minimumFractionDigits: 2, 
-                    maximumFractionDigits: 2 
-                });
-            }
-            if (elCer) {
-                elCer.innerText = "S/ " + elCer.toLocaleString('es-PE', { 
-                    minimumFractionDigits: 2, 
-                    maximumFractionDigits: 2 
-                });
-            }
+            if (elAvanceText) elAvanceText.innerText = porcentajeAvance.toFixed(1) + "%";
             
-            // Mostrar porcentaje de avance
-            if (elAvance) {
-                elAvance.innerText = avanceGlobal + "%";
-            }
-            
-            // 5. Mover la barra de progreso
             if (elBarra) {
-                elBarra.style.width = avanceGlobal + "%";
+                elBarra.style.width = porcentajeAvance.toFixed(1) + "%";
+                // Cambiar color de barra según tramo de ejecución
+                if (porcentajeAvance < 30) elBarra.style.backgroundColor = "#ef4444";
+                else if (porcentajeAvance < 70) elBarra.style.backgroundColor = "#fbbf24";
+                else elBarra.style.backgroundColor = "#10b981";
             }
 
         } else {
-            console.error("No se encontró el pliego 'LAMBAYEQUE' en el ranking.");
-            const elEstado = document.getElementById('estado');
-            if (elEstado) elEstado.innerText = "Error: Datos de Lambayeque no encontrados.";
+            console.error("No se encontraron registros de Lambayeque en el JSON.");
+            document.getElementById('total-pim').innerText = "Sin datos";
         }
 
-    } catch (e) {
-        console.error("Error cargando el JSON:", e);
-        const elEstado = document.getElementById('estado');
-        if (elEstado) elEstado.innerText = "Error: No se pudo leer el archivo de datos.";
+    } catch (error) {
+        console.error("Error cargando el Dashboard:", error);
     }
 }
-
-
-
-
-// Al cargar la página, verificamos si ya tenía el modo oscuro activado
-window.onload = () => {
-    if (localStorage.getItem('theme') === 'dark') {
-        document.body.classList.add('dark-mode');
-    }
-};
-
-
-
-
