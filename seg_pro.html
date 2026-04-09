@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta de Seguimiento de Inversiones - SSI</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #801616;
+            --nav-accent: #ffc107;
+            --bg-body: #f4f6f9;
+            --bg-card: #ffffff;
+            --text-main: #222;
+            --text-muted: #555;
+            --border-color: #dee2e6;
+            --shadow: 0 10px 30px rgba(0,0,0,0.1);
+            --row-hover: #fff0f0;
+        }
+
+        body.dark-mode {
+            --bg-body: #0f1113;
+            --bg-card: #1a1d21;
+            --text-main: #f1f1f1;
+            --text-muted: #adb5bd;
+            --border-color: #2d3238;
+            --shadow: 0 10px 30px rgba(0,0,0,0.4);
+            --row-hover: #2d1a1a;
+        }
+
+        body { 
+            background-color: var(--bg-body); 
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            color: var(--text-main);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .header-mef { 
+            background-color: var(--primary-color); 
+            color: white; 
+            padding: 20px 0; 
+            border-bottom: 5px solid var(--nav-accent); 
+        }
+
+        .table-container { 
+            background: var(--bg-card); 
+            border-radius: 12px; 
+            box-shadow: var(--shadow); 
+            padding: 20px; 
+            border: 1px solid var(--border-color);
+        }
+
+        .table td, .table th {
+            background-color: var(--bg-card) !important;
+            color: var(--text-main) !important;
+            border-color: var(--border-color) !important;
+        }
+
+        .table thead th {
+            background-color: var(--nav-accent) !important;
+            color: #000 !important;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: 0.2s;
+            user-select: none;
+        }
+
+        .table thead th:hover { background-color: #f1b400 !important; }
+
+        .highlight-row td {
+            background-color: rgba(128, 22, 22, 0.05) !important;
+            font-weight: 600;
+        }
+
+        .filter-box {
+            background: var(--bg-card);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            margin-bottom: 25px;
+        }
+
+        .form-select-mef, .form-control-mef {
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+        }
+
+        .form-select-mef:focus {
+            border-color: var(--primary-color);
+            box-shadow: none;
+        }
+
+        .progress { 
+            height: 18px; 
+            border-radius: 10px; 
+            background-color: var(--border-color); 
+            position: relative; 
+            overflow: hidden; 
+        }
+
+        .progress-bar-text { 
+            position: absolute; 
+            width: 100%; 
+            text-align: center; 
+            font-size: 0.65rem; 
+            font-weight: 800; 
+            color: #000; 
+            z-index: 5; 
+            line-height: 18px; 
+        }
+
+        .bar-fill { height: 100%; transition: width 0.8s ease; }
+
+        .monto { font-family: 'SFMono-Regular', Consolas, monospace; font-weight: 600; }
+
+        .btn-theme {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 50%;
+            width: 35px; height: 35px;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .btn-theme:hover { background: rgba(255, 255, 255, 0.3); color: var(--nav-accent); }
+        
+        .btn-mef-primary { background-color: var(--primary-color); color: white; border: none; }
+        .btn-mef-primary:hover { background-color: #a01d1d; color: white; }
+
+        .status-pill {
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header-mef mb-4">
+    <div class="container d-flex justify-content-between align-items-center">
+        <div>
+            <h4 class="fw-bold mb-0"><i class="bi bi-search-selection"></i> SSI - SEGUIMIENTO DE INVERSIONES</h4>
+            <span class="badge bg-light text-dark border fw-normal mt-1">
+                <i class="bi bi-clock-history text-danger"></i> Corte al: <span id="fecha-corte">09/04/2026</span>
+            </span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <button onclick="toggleDarkMode()" class="btn-theme" id="theme-toggle">
+                <i class="bi bi-moon-stars"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="filter-box">
+        <h6 class="fw-bold border-bottom pb-2 mb-3"><i class="bi bi-funnel"></i> Filtros de Búsqueda</h6>
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label class="small fw-bold">Nivel de Gobierno</label>
+                <select id="filtroGobierno" class="form-select form-select-mef" onchange="aplicarFiltros()">
+                    <option value="TODOS">Todos los Niveles</option>
+                    <option value="NACIONAL">Gobierno Nacional</option>
+                    <option value="REGIONAL">Gobierno Regional</option>
+                    <option value="LOCAL">Gobierno Local</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="small fw-bold">Estado</label>
+                <select id="filtroEstado" class="form-select form-select-mef" onchange="aplicarFiltros()">
+                    <option value="TODOS">Todos los Estados</option>
+                    <option value="ACTIVO">Activo</option>
+                    <option value="CERRADO">Cerrado</option>
+                    <option value="DESACTIVADO">Desactivado</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="small fw-bold">Buscar por CUI o Nombre</label>
+                <input type="text" id="busquedaGeneral" class="form-control form-control-mef" placeholder="Ej: 234567..." onkeyup="aplicarFiltros()">
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button class="btn btn-mef-primary w-100" onclick="resetFiltros()">
+                    <i class="bi bi-arrow-clockwise"></i> Limpiar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-container mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0 fw-bold text-uppercase" style="color: var(--primary-color)">Listado de Inversiones</h5>
+            <div class="d-flex gap-2">
+                <button onclick="exportToExcel()" class="btn btn-sm btn-outline-success">
+                    <i class="bi bi-file-earmark-excel"></i> Exportar
+                </button>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle" id="tablaInversiones">
+                <thead>
+                    <tr>
+                        <th onclick="ordenarTabla(0)" class="text-center">CUI <i class="bi bi-sort-down"></i></th>
+                        <th onclick="ordenarTabla(1)">Nombre de la Inversión</th>
+                        <th onclick="ordenarTabla(2)" class="text-center">PIM (S/)</th>
+                        <th onclick="ordenarTabla(3)" class="text-center">Devengado</th>
+                        <th onclick="ordenarTabla(4)" class="text-center">Avance %</th>
+                        <th onclick="ordenarTabla(5)" class="text-center">Estado</th>
+                    </tr>
+                </thead>
+                <tbody id="cuerpo-tabla">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<script>
+    // Datos de ejemplo (Simulando API)
+    const datosBase = [
+        { cui: "2456781", nombre: "MEJORAMIENTO DE SERVICIOS DE SALUD EN CHICLAYO", pim: 15000000, devengado: 4500000, gobierno: "REGIONAL", estado: "ACTIVO" },
+        { cui: "2109842", nombre: "CONSTRUCCION DE PUENTE PEATONAL AV. BRASIL", pim: 2300000, devengado: 2100000, gobierno: "LOCAL", estado: "ACTIVO" },
+        { cui: "2678123", nombre: "ADQUISICIÓN DE AMBULANCIAS PARA SAMU NACIONAL", pim: 50000000, devengado: 48500000, gobierno: "NACIONAL", estado: "ACTIVO" },
+        { cui: "2334455", nombre: "INSTALACION DE SISTEMA DE RIEGO EN CAJAMARCA", pim: 1200000, devengado: 100000, gobierno: "REGIONAL", estado: "DESACTIVADO" },
+        { cui: "2556677", nombre: "REHABILITACION DE COLEGIO EMBLEMATICO", pim: 8500000, devengado: 3200000, gobierno: "NACIONAL", estado: "CERRADO" },
+        { cui: "2112233", nombre: "CREACION DE PARQUE INFANTIL EN PIMENTEL", pim: 450000, devengado: 445000, gobierno: "LOCAL", estado: "ACTIVO" }
+    ];
+
+    let datosFiltrados = [...datosBase];
+
+    function renderizarTabla() {
+        const tbody = document.getElementById('cuerpo-tabla');
+        tbody.innerHTML = '';
+
+        datosFiltrados.forEach(item => {
+            const avance = (item.devengado / item.pim) * 100;
+            const colorBarra = avance > 80 ? '#198754' : (avance > 40 ? '#ffc107' : '#dc3545');
+            
+            const row = document.createElement('tr');
+            if(item.nombre.includes("CHICLAYO")) row.className = "highlight-row";
+            
+            row.innerHTML = `
+                <td class="text-center fw-bold text-primary">${item.cui}</td>
+                <td class="small fw-bold">${item.nombre}</td>
+                <td class="text-end monto">${item.pim.toLocaleString('es-PE')}</td>
+                <td class="text-end monto">${item.devengado.toLocaleString('es-PE')}</td>
+                <td style="width: 150px">
+                    <div class="progress">
+                        <div class="progress-bar-text">${avance.toFixed(1)}%</div>
+                        <div class="bar-fill" style="width: ${avance}%; background-color: ${colorBarra}"></div>
+                    </div>
+                </td>
+                <td class="text-center">
+                    <span class="status-pill bg-opacity-10 ${getEstadoColor(item.estado)}">
+                        ${item.estado}
+                    </span>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    function getEstadoColor(estado) {
+        switch(estado) {
+            case 'ACTIVO': return 'bg-success text-success';
+            case 'CERRADO': return 'bg-secondary text-secondary';
+            case 'DESACTIVADO': return 'bg-danger text-danger';
+            default: return 'bg-dark text-dark';
+        }
+    }
+
+    function aplicarFiltros() {
+        const nivel = document.getElementById('filtroGobierno').value;
+        const estado = document.getElementById('filtroEstado').value;
+        const busqueda = document.getElementById('busquedaGeneral').value.toLowerCase();
+
+        datosFiltrados = datosBase.filter(item => {
+            const matchNivel = nivel === "TODOS" || item.gobierno === nivel;
+            const matchEstado = estado === "TODOS" || item.estado === estado;
+            const matchTexto = item.nombre.toLowerCase().includes(busqueda) || item.cui.includes(busqueda);
+            return matchNivel && matchEstado && matchTexto;
+        });
+
+        renderizarTabla();
+    }
+
+    function resetFiltros() {
+        document.getElementById('filtroGobierno').value = "TODOS";
+        document.getElementById('filtroEstado').value = "TODOS";
+        document.getElementById('busquedaGeneral').value = "";
+        aplicarFiltros();
+    }
+
+    function ordenarTabla(colIndex) {
+        // Lógica de ordenamiento básica
+        datosFiltrados.sort((a, b) => {
+            const valA = Object.values(a)[colIndex];
+            const valB = Object.values(b)[colIndex];
+            return isNaN(valA) ? valA.localeCompare(valB) : valA - valB;
+        });
+        renderizarTabla();
+    }
+
+    function toggleDarkMode() {
+        const body = document.body;
+        body.classList.toggle('dark-mode');
+        const icon = document.querySelector('#theme-toggle i');
+        icon.className = body.classList.contains('dark-mode') ? 'bi bi-sun' : 'bi bi-moon-stars';
+    }
+
+    function exportToExcel() {
+        const table = document.getElementById("tablaInversiones");
+        const wb = XLSX.utils.table_to_book(table, { sheet: "Inversiones" });
+        XLSX.writeFile(wb, "Seguimiento_Inversiones_MEF.xlsx");
+    }
+
+    // Inicio
+    document.addEventListener('DOMContentLoaded', renderizarTabla);
+</script>
+
+</body>
+</html>
