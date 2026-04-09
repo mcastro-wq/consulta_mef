@@ -1,38 +1,40 @@
 import requests
 from bs4 import BeautifulSoup
 import json
+import os
 
-def scrapear_ssi_mef(cui):
-    # URL que devuelve el detalle técnico de la inversión
+def scrapear_mef(cui):
     url = f"https://ofi5.mef.gob.pe/ssi/Home/ArquitecturaCUI?codigo={cui}"
-    
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36",
-        "Referer": "https://ofi5.mef.gob.pe/ssi/"
-    }
-
+    headers = {"User-Agent": "Mozilla/5.0"}
     try:
-        response = requests.get(url, headers=headers, timeout=15)
-        response.raise_for_status()
+        res = requests.get(url, headers=headers, timeout=15)
+        soup = BeautifulSoup(res.text, 'html.parser')
         
-        # El contenido suele ser una vista parcial HTML o JSON dependiendo del endpoint
-        soup = BeautifulSoup(response.text, 'html.parser')
+        # Extraer datos exactos de tus capturas
+        nombre = soup.find("span", id="lblNombreProyecto").text.strip() if soup.find("span", id="lblNombreProyecto") else "No encontrado"
+        estado = soup.find("span", id="lblEstado").text.strip() if soup.find("span", id="lblEstado") else "N/A"
+        costo = soup.find("span", id="lblCostoActualizado").text.strip() if soup.find("span", id="lblCostoActualizado") else "0"
         
-        # Ejemplo de extracción de datos generales del proyecto
-        # Nota: Los selectores dependen de la estructura actual del HTML retornado
-        data = {
-            "CUI": cui,
-            "Proyecto": soup.find("span", {"id": "lblNombreProyecto"}).text.strip() if soup.find("span", {"id": "lblNombreProyecto"}) else "No encontrado",
-            "Estado": soup.find("span", {"id": "lblEstado"}).text.strip() if soup.find("span", {"id": "lblEstado"}) else "N/A",
-            # Aquí puedes agregar más campos buscando por IDs o clases
+        return {
+            "cui": cui,
+            "nombre": nombre,
+            "estado": estado,
+            "pim": float(costo.replace(',', '')),
+            "devengado": 0, # Requiere scraping adicional
+            "actualizado": "09/04/2026"
         }
-        
-        return data
+    except:
+        return None
 
-    except Exception as e:
-        return {"error": str(e)}
+# Lista de CUIs que quieres seguir
+lista_cuis = ["2199528", "2456781"] 
+resultados = []
 
-# Uso:
-cui_ejemplo = "2199528" # Reemplaza con un CUI real
-resultado = scrapear_ssi_mef(cui_ejemplo)
-print(json.dumps(resultado, indent=4, ensure_ascii=False))
+for cui in lista_cuis:
+    data = scrapear_mef(cui)
+    if data:
+        resultados.append(data)
+
+# Guardar en archivo que leerá el HTML
+with open("data.json", "w", encoding='utf-8') as f:
+    json.dump(resultados, f, ensure_ascii=False, indent=4)
