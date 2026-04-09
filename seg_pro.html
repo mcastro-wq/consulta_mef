@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Consulta de Seguimiento de Inversiones - SSI</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstFrap.min.css" rel="stylesheet">
     <style>
         :root {
             --primary-color: #801616;
@@ -233,36 +233,35 @@
         }
     }
 
-    function renderizarTabla() {
-        const tbody = document.getElementById('cuerpo-tabla');
-        tbody.innerHTML = '';
+   function renderizarTabla() {
+    const tbody = document.getElementById('cuerpo-tabla');
+    tbody.innerHTML = '';
 
-        datosInversion.forEach(item => {
-            // Cálculo de avance seguro (evitar división por cero)
-            const avance = item.pim > 0 ? (item.devengado / item.pim) * 100 : 0;
-            const colorBarra = avance > 80 ? '#198754' : (avance > 40 ? '#ffc107' : '#dc3545');
-            
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td class="text-center fw-bold text-primary">${item.cui}</td>
-                <td class="small fw-bold">${item.nombre}</td>
-                <td class="text-end monto">${item.pim.toLocaleString('es-PE')}</td>
-                <td class="text-end monto">${item.devengado.toLocaleString('es-PE')}</td>
-                <td style="width: 150px">
-                    <div class="progress">
-                        <div class="progress-bar-text">${avance.toFixed(1)}%</div>
-                        <div class="bar-fill" style="width: ${avance}%; background-color: ${colorBarra}"></div>
-                    </div>
-                </td>
-                <td class="text-center">
-                    <span class="status-pill bg-opacity-10 ${getEstadoColor(item.estado)}">
-                        ${item.estado}
-                    </span>
-                </td>
-            `;
-            tbody.appendChild(row);
-        });
-    }
+    datosInversion.forEach(item => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td class="text-center fw-bold text-primary">${item.cui}</td>
+            <td class="small fw-bold">
+                ${item.nombre}<br>
+                <small class="text-muted">SITUACIÓN: ${item.situacion}</small>
+            </td>
+            <td class="text-end monto">S/ ${item.pim.toLocaleString('es-PE', {minimumFractionDigits: 2})}</td>
+            <td class="text-end monto">S/ 0.00</td>
+            <td style="width: 150px">
+                <div class="progress">
+                    <div class="progress-bar-text">0.0%</div>
+                    <div class="bar-fill" style="width: 0%; background-color: #dc3545"></div>
+                </div>
+            </td>
+            <td class="text-center">
+                <span class="status-pill bg-opacity-10 ${getEstadoColor(item.estado)}">
+                    ${item.estado}
+                </span>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
 
     function getEstadoColor(estado) {
         if (!estado) return 'bg-dark text-dark';
