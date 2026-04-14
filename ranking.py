@@ -16,7 +16,7 @@ def generate_ranking():
         req = urllib.request.Request(url, headers=headers)
         
         # Añadimos 'context=context' en el urlopen
-        with urllib.request.urlopen(req, timeout=300, context=context) as response:
+        with urllib.request.urlopen(req, timeout=1200, context=context) as response:
             content = response.read().decode('utf-8-sig')
             reader = csv.DictReader(io.StringIO(content))
             
