@@ -1,34 +1,39 @@
-import urllib.request, csv, json, io, ssl  # <--- Agregamos ssl
+import urllib.request, csv, json, io, ssl, codecs
 from datetime import datetime, timedelta
 
 def generate_ranking():
-    # URL del dataset de Gasto Diario 2026
     url = "https://fs.datosabiertos.mef.gob.pe/datastorefiles/2026-Gasto-Diario.csv"
     headers = {'User-Agent': 'Mozilla/5.0'}
     
-    print("⏳ Descargando y procesando datos del MEF...")
+    print("⏳ Iniciando descarga por flujo (streaming) del MEF...")
     
     try:
-        # --- SOLUCIÓN AL ERROR SSL ---
-        # Creamos un contexto que no verifica el certificado caducado del MEF
         context = ssl._create_unverified_context()
-        
         req = urllib.request.Request(url, headers=headers)
         
-        # Añadimos 'context=context' en el urlopen
+        # Aumentamos el timeout a 20 minutos (1200 seg)
         with urllib.request.urlopen(req, timeout=1200, context=context) as response:
-            content = response.read().decode('utf-8-sig')
-            reader = csv.DictReader(io.StringIO(content))
+            # USAMOS STREAMING: codecs permite leer el flujo sin descargar todo el archivo primero
+            decoder = codecs.getreader("utf-8-sig")(response)
+            reader = csv.DictReader(decoder)
             
-            # El resto de tu código se mantiene igual...
+            # Limpiar nombres de columnas
             reader.fieldnames = [f.strip() for f in reader.fieldnames]
             
             db = {}
+            count = 0
 
             for r in reader:
+                count += 1
+                # Feedback cada 500,000 líneas para que GitHub no piense que el proceso se colgó
+                if count % 500000 == 0:
+                    print(f"📡 Procesando {count} líneas...")
+
+                # Filtro de Año
                 if str(r.get('ANO_EJE', '')).strip() != "2026":
                     continue
 
+                # Filtro de Nivel de Gobierno
                 nivel = str(r.get('NIVEL_GOBIERNO_NOMBRE', '')).upper()
                 pliego_raw = str(r.get('PLIEGO_NOMBRE', '')).upper()
                 
@@ -60,12 +65,12 @@ def generate_ranking():
                     except (ValueError, TypeError):
                         continue
 
+            # --- Transformación de datos (Igual a tu código anterior) ---
             final_data = []
             for pliego, tipos in db.items():
                 for t_id, montos in tipos.items():
                     nombre_tipo = "PROYECTOS" if t_id == "2" else "ACTIVIDADES" if t_id == "3" else "OTROS"
                     avance = round((montos["dev"] / montos["pim"] * 100), 1) if montos["pim"] > 0 else 0
-                    
                     final_data.append({
                         "pliego": pliego,
                         "tipo_id": int(t_id),
@@ -89,7 +94,7 @@ def generate_ranking():
             with open('data_ranking.json', 'w', encoding='utf-8') as f:
                 json.dump(output, f, indent=2, ensure_ascii=False)
             
-            print(f"✅ Proceso terminado. {len(final_data)} filas generadas.")
+            print(f"✅ Proceso terminado con éxito. {len(final_data)} pliegos procesados.")
 
     except Exception as e:
         print(f"🚨 Error crítico: {e}")
