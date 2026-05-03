@@ -1,5 +1,5 @@
 {
-  "ultima_actualizacion": "03/05/2026 08:22",
+  "ultima_actualizacion": "03/05/2026 14:04",
   "anio_fiscal": "2026",
   "data": [
     {
@@ -117,7 +117,7 @@
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
       "pim": 2805733104.0,
-      "certificado": 1195478266.320002,
+      "certificado": 1196485625.5100021,
       "devengado": 1034812217.9400024,
       "saldo": 1770920886.0599976,
       "avance": 36.9
@@ -156,11 +156,11 @@
       "pliego": "LAMBAYEQUE",
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
-      "pim": 1826305392.0,
+      "pim": 1832665546.0,
       "certificado": 1773422790.5000005,
       "devengado": 611609690.5200001,
-      "saldo": 1214695701.48,
-      "avance": 33.5
+      "saldo": 1221055855.48,
+      "avance": 33.4
     },
     {
       "pliego": "TUMBES",
@@ -217,7 +217,7 @@
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
       "pim": 2652610813.0,
-      "certificado": 2463873187.910002,
+      "certificado": 2463876850.8600025,
       "devengado": 861392929.2099916,
       "saldo": 1791217883.7900085,
       "avance": 32.5
@@ -257,7 +257,7 @@
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
       "pim": 1340338203.0,
-      "certificado": 627249137.5099992,
+      "certificado": 627278772.909999,
       "devengado": 427427926.0399951,
       "saldo": 912910276.9600049,
       "avance": 31.9
@@ -267,7 +267,7 @@
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
       "pim": 1314094900.0,
-      "certificado": 611821713.4599948,
+      "certificado": 612345324.4599948,
       "devengado": 419209653.4499926,
       "saldo": 894885246.5500073,
       "avance": 31.9
@@ -278,7 +278,7 @@
       "tipo_nombre": "ACTIVIDADES",
       "pim": 1956719007.0,
       "certificado": 1163333070.3400075,
-      "devengado": 623781019.3400007,
+      "devengado": 623781019.3400006,
       "saldo": 1332937987.6599994,
       "avance": 31.9
     },
@@ -287,7 +287,7 @@
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
       "pim": 645429173.0,
-      "certificado": 292186422.52999973,
+      "certificado": 292180997.52999973,
       "devengado": 205781575.93999922,
       "saldo": 439647597.0600008,
       "avance": 31.9
@@ -297,7 +297,7 @@
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
       "pim": 3435976688.0,
-      "certificado": 1258899015.7499986,
+      "certificado": 1259855849.2499986,
       "devengado": 1097413983.2200012,
       "saldo": 2338562704.779999,
       "avance": 31.9
@@ -358,8 +358,8 @@
       "tipo_nombre": "ACTIVIDADES",
       "pim": 3440505420.0,
       "certificado": 2936384161.4100113,
-      "devengado": 1040039673.969997,
-      "saldo": 2400465746.030003,
+      "devengado": 1040055573.969997,
+      "saldo": 2400449846.030003,
       "avance": 30.2
     },
     {
@@ -387,7 +387,7 @@
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
       "pim": 1580507782.0,
-      "certificado": 1272348666.5900006,
+      "certificado": 1272906266.5900006,
       "devengado": 471153689.5999993,
       "saldo": 1109354092.4000006,
       "avance": 29.8
@@ -486,11 +486,11 @@
       "pliego": "LAMBAYEQUE",
       "tipo_id": 2,
       "tipo_nombre": "PROYECTOS",
-      "pim": 829009416.0,
+      "pim": 822649262.0,
       "certificado": 716646130.49,
       "devengado": 167648585.49,
-      "saldo": 661360830.51,
-      "avance": 20.2
+      "saldo": 655000676.51,
+      "avance": 20.4
     },
     {
       "pliego": "PUNO",
