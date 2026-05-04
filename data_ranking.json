@@ -1,5 +1,5 @@
 {
-  "ultima_actualizacion": "04/05/2026 03:34",
+  "ultima_actualizacion": "04/05/2026 09:08",
   "anio_fiscal": "2026",
   "data": [
     {
@@ -163,16 +163,6 @@
       "avance": 33.4
     },
     {
-      "pliego": "TUMBES",
-      "tipo_id": 3,
-      "tipo_nombre": "ACTIVIDADES",
-      "pim": 617717281.0,
-      "certificado": 537273295.3100001,
-      "devengado": 203734723.57999942,
-      "saldo": 413982557.42000055,
-      "avance": 33.0
-    },
-    {
       "pliego": "SAN MARTIN",
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
@@ -180,6 +170,16 @@
       "certificado": 1791654058.1599984,
       "devengado": 661489500.5399982,
       "saldo": 1340090093.460002,
+      "avance": 33.0
+    },
+    {
+      "pliego": "TUMBES",
+      "tipo_id": 3,
+      "tipo_nombre": "ACTIVIDADES",
+      "pim": 617717281.0,
+      "certificado": 537273295.3100001,
+      "devengado": 203734723.57999942,
+      "saldo": 413982557.42000055,
       "avance": 33.0
     },
     {
@@ -217,7 +217,7 @@
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
       "pim": 2652610813.0,
-      "certificado": 2463876850.8600025,
+      "certificado": 2463893446.8600025,
       "devengado": 861392929.2099916,
       "saldo": 1791217883.7900085,
       "avance": 32.5
@@ -267,7 +267,7 @@
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
       "pim": 1314094900.0,
-      "certificado": 612345324.4599948,
+      "certificado": 613435351.4599948,
       "devengado": 419209653.4499926,
       "saldo": 894885246.5500073,
       "avance": 31.9
@@ -358,8 +358,8 @@
       "tipo_nombre": "ACTIVIDADES",
       "pim": 3440505420.0,
       "certificado": 2936384161.4100113,
-      "devengado": 1040055573.969997,
-      "saldo": 2400449846.030003,
+      "devengado": 1040118225.199997,
+      "saldo": 2400387194.800003,
       "avance": 30.2
     },
     {
@@ -487,7 +487,7 @@
       "tipo_id": 2,
       "tipo_nombre": "PROYECTOS",
       "pim": 822649262.0,
-      "certificado": 716646130.49,
+      "certificado": 716022812.4900001,
       "devengado": 167648585.49,
       "saldo": 655000676.51,
       "avance": 20.4
@@ -518,8 +518,8 @@
       "tipo_nombre": "PROYECTOS",
       "pim": 1033970875.0,
       "certificado": 588521340.1499999,
-      "devengado": 152758698.60999998,
-      "saldo": 881212176.39,
+      "devengado": 152784558.60999998,
+      "saldo": 881186316.39,
       "avance": 14.8
     },
     {
