@@ -1,5 +1,5 @@
 {
-  "ultima_actualizacion": "10/05/2026 08:32",
+  "ultima_actualizacion": "10/05/2026 14:07",
   "anio_fiscal": "2026",
   "data": [
     {
@@ -48,8 +48,8 @@
       "tipo_nombre": "PROYECTOS",
       "pim": 424373700.0,
       "certificado": 339772170.4600002,
-      "devengado": 204053270.42999983,
-      "saldo": 220320429.57000017,
+      "devengado": 204050270.42999983,
+      "saldo": 220323429.57000017,
       "avance": 48.1
     },
     {
@@ -68,8 +68,8 @@
       "tipo_nombre": "PROYECTOS",
       "pim": 495248576.0,
       "certificado": 467416928.90000004,
-      "devengado": 203610469.06,
-      "saldo": 291638106.94,
+      "devengado": 203608503.18,
+      "saldo": 291640072.82,
       "avance": 41.1
     },
     {
@@ -88,8 +88,8 @@
       "tipo_nombre": "PROYECTOS",
       "pim": 283313649.0,
       "certificado": 180386592.49999985,
-      "devengado": 114001809.38000008,
-      "saldo": 169311839.61999992,
+      "devengado": 113952270.34000008,
+      "saldo": 169361378.6599999,
       "avance": 40.2
     },
     {
@@ -98,8 +98,8 @@
       "tipo_nombre": "PROYECTOS",
       "pim": 954755019.0,
       "certificado": 600823961.04,
-      "devengado": 383267284.63999987,
-      "saldo": 571487734.3600001,
+      "devengado": 383234254.6399999,
+      "saldo": 571520764.3600001,
       "avance": 40.1
     },
     {
@@ -108,8 +108,8 @@
       "tipo_nombre": "ACTIVIDADES",
       "pim": 795161009.0,
       "certificado": 648781881.5300016,
-      "devengado": 300826348.93999976,
-      "saldo": 494334660.06000024,
+      "devengado": 300820473.21999973,
+      "saldo": 494340535.78000027,
       "avance": 37.8
     },
     {
@@ -117,9 +117,9 @@
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
       "pim": 2805733104.0,
-      "certificado": 1211798143.440001,
-      "devengado": 1049494298.790003,
-      "saldo": 1756238805.2099972,
+      "certificado": 1211783680.680001,
+      "devengado": 1049563098.790003,
+      "saldo": 1756170005.2099972,
       "avance": 37.4
     },
     {
@@ -127,9 +127,9 @@
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
       "pim": 1245550654.0,
-      "certificado": 1177733635.5800004,
-      "devengado": 441744165.5699984,
-      "saldo": 803806488.4300016,
+      "certificado": 1177753058.1200004,
+      "devengado": 441685308.71999836,
+      "saldo": 803865345.2800016,
       "avance": 35.5
     },
     {
@@ -138,8 +138,8 @@
       "tipo_nombre": "ACTIVIDADES",
       "pim": 3271967339.0,
       "certificado": 2689288529.5699997,
-      "devengado": 1115795287.3000047,
-      "saldo": 2156172051.699995,
+      "devengado": 1115786471.7700047,
+      "saldo": 2156180867.2299953,
       "avance": 34.1
     },
     {
@@ -148,8 +148,8 @@
       "tipo_nombre": "ACTIVIDADES",
       "pim": 1319370100.0,
       "certificado": 578742426.6299969,
-      "devengado": 446752682.4099978,
-      "saldo": 872617417.5900022,
+      "devengado": 446701995.30999786,
+      "saldo": 872668104.6900022,
       "avance": 33.9
     },
     {
@@ -158,8 +158,8 @@
       "tipo_nombre": "ACTIVIDADES",
       "pim": 2002091042.0,
       "certificado": 1801197383.8599987,
-      "devengado": 674066799.2799981,
-      "saldo": 1328024242.720002,
+      "devengado": 673989404.8799982,
+      "saldo": 1328101637.1200018,
       "avance": 33.7
     },
     {
@@ -168,8 +168,8 @@
       "tipo_nombre": "PROYECTOS",
       "pim": 829634821.0,
       "certificado": 570989601.7099999,
-      "devengado": 276168858.45000005,
-      "saldo": 553465962.55,
+      "devengado": 276168668.45000005,
+      "saldo": 553466152.55,
       "avance": 33.3
     },
     {
@@ -177,9 +177,9 @@
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
       "pim": 1849494963.0,
-      "certificado": 1777604517.8600006,
-      "devengado": 614688138.7599998,
-      "saldo": 1234806824.2400002,
+      "certificado": 1777562017.8600006,
+      "devengado": 614651245.6599998,
+      "saldo": 1234843717.3400002,
       "avance": 33.2
     },
     {
@@ -198,8 +198,8 @@
       "tipo_nombre": "ACTIVIDADES",
       "pim": 1909007065.0,
       "certificado": 1593445186.1200001,
-      "devengado": 632692986.4299971,
-      "saldo": 1276314078.570003,
+      "devengado": 632686474.849997,
+      "saldo": 1276320590.150003,
       "avance": 33.1
     },
     {
@@ -208,8 +208,8 @@
       "tipo_nombre": "ACTIVIDADES",
       "pim": 790831869.0,
       "certificado": 685867744.7399998,
-      "devengado": 260981284.42999956,
-      "saldo": 529850584.5700004,
+      "devengado": 260919409.39999956,
+      "saldo": 529912459.60000044,
       "avance": 33.0
     },
     {
@@ -218,8 +218,8 @@
       "tipo_nombre": "ACTIVIDADES",
       "pim": 2703937961.0,
       "certificado": 1148975440.4200106,
-      "devengado": 889550772.9700032,
-      "saldo": 1814387188.0299969,
+      "devengado": 888915962.1300032,
+      "saldo": 1815021998.8699968,
       "avance": 32.9
     },
     {
@@ -228,8 +228,8 @@
       "tipo_nombre": "ACTIVIDADES",
       "pim": 1953688793.0,
       "certificado": 865339026.8000009,
-      "devengado": 636186444.4999998,
-      "saldo": 1317502348.5000002,
+      "devengado": 636185329.4999998,
+      "saldo": 1317503463.5000002,
       "avance": 32.6
     },
     {
@@ -248,8 +248,8 @@
       "tipo_nombre": "ACTIVIDADES",
       "pim": 3437671661.0,
       "certificado": 1291946980.0499995,
-      "devengado": 1119273514.1600022,
-      "saldo": 2318398146.839998,
+      "devengado": 1119709487.050002,
+      "saldo": 2317962173.949998,
       "avance": 32.6
     },
     {
@@ -257,9 +257,9 @@
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
       "pim": 2652610813.0,
-      "certificado": 2511153798.8000016,
-      "devengado": 863557346.7399919,
-      "saldo": 1789053466.260008,
+      "certificado": 2511172348.8000016,
+      "devengado": 863495480.0999919,
+      "saldo": 1789115332.9000082,
       "avance": 32.6
     },
     {
@@ -278,8 +278,8 @@
       "tipo_nombre": "ACTIVIDADES",
       "pim": 1956919007.0,
       "certificado": 1154557186.290007,
-      "devengado": 632468781.0600014,
-      "saldo": 1324450225.9399986,
+      "devengado": 632460254.9200014,
+      "saldo": 1324458752.0799985,
       "avance": 32.3
     },
     {
@@ -287,9 +287,9 @@
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
       "pim": 1340338203.0,
-      "certificado": 631267507.8999988,
-      "devengado": 431474886.87999487,
-      "saldo": 908863316.1200051,
+      "certificado": 631271650.8999988,
+      "devengado": 431644642.6799949,
+      "saldo": 908693560.3200052,
       "avance": 32.2
     },
     {
@@ -298,8 +298,8 @@
       "tipo_nombre": "ACTIVIDADES",
       "pim": 645429173.0,
       "certificado": 294101356.6599997,
-      "devengado": 207809055.8299992,
-      "saldo": 437620117.1700008,
+      "devengado": 207743485.8099992,
+      "saldo": 437685687.1900008,
       "avance": 32.2
     },
     {
@@ -308,8 +308,8 @@
       "tipo_nombre": "ACTIVIDADES",
       "pim": 1314304437.0,
       "certificado": 636603697.8599973,
-      "devengado": 421673067.60999227,
-      "saldo": 892631369.3900077,
+      "devengado": 421642127.80999225,
+      "saldo": 892662309.1900077,
       "avance": 32.1
     },
     {
@@ -317,9 +317,9 @@
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
       "pim": 2383083420.0,
-      "certificado": 1099252964.3400106,
-      "devengado": 760136133.8500017,
-      "saldo": 1622947286.1499982,
+      "certificado": 1099257728.3400106,
+      "devengado": 760010381.1200017,
+      "saldo": 1623073038.8799982,
       "avance": 31.9
     },
     {
@@ -328,8 +328,8 @@
       "tipo_nombre": "ACTIVIDADES",
       "pim": 1870529540.0,
       "certificado": 1256977675.789999,
-      "devengado": 596868829.5299988,
-      "saldo": 1273660710.4700012,
+      "devengado": 596879805.1299988,
+      "saldo": 1273649734.8700013,
       "avance": 31.9
     },
     {
@@ -337,9 +337,9 @@
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
       "pim": 2763327885.0,
-      "certificado": 2535558890.540014,
-      "devengado": 877472767.1900047,
-      "saldo": 1885855117.8099952,
+      "certificado": 2535560766.4400134,
+      "devengado": 877464548.3100047,
+      "saldo": 1885863336.6899953,
       "avance": 31.8
     },
     {
@@ -348,9 +348,9 @@
       "tipo_nombre": "ACTIVIDADES",
       "pim": 2649388408.0,
       "certificado": 1029028762.5999992,
-      "devengado": 822718956.1099991,
-      "saldo": 1826669451.8900008,
-      "avance": 31.1
+      "devengado": 822163156.759999,
+      "saldo": 1827225251.240001,
+      "avance": 31.0
     },
     {
       "pliego": "PIURA",
@@ -358,8 +358,8 @@
       "tipo_nombre": "PROYECTOS",
       "pim": 1155138422.0,
       "certificado": 969090244.6599997,
-      "devengado": 357224202.4,
-      "saldo": 797914219.6,
+      "devengado": 357117222.4,
+      "saldo": 798021199.6,
       "avance": 30.9
     },
     {
@@ -368,8 +368,8 @@
       "tipo_nombre": "ACTIVIDADES",
       "pim": 3440903904.0,
       "certificado": 2949267107.73001,
-      "devengado": 1049607701.2699969,
-      "saldo": 2391296202.7300034,
+      "devengado": 1049243003.0499969,
+      "saldo": 2391660900.950003,
       "avance": 30.5
     },
     {
@@ -378,8 +378,8 @@
       "tipo_nombre": "ACTIVIDADES",
       "pim": 439587131.0,
       "certificado": 184726446.93999973,
-      "devengado": 133713009.26999979,
-      "saldo": 305874121.7300002,
+      "devengado": 133627825.38999978,
+      "saldo": 305959305.61000025,
       "avance": 30.4
     },
     {
@@ -387,7 +387,7 @@
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
       "pim": 1580507782.0,
-      "certificado": 1279361127.0400007,
+      "certificado": 1279318987.0400007,
       "devengado": 477841686.69999915,
       "saldo": 1102666095.300001,
       "avance": 30.2
@@ -398,8 +398,8 @@
       "tipo_nombre": "PROYECTOS",
       "pim": 846305777.0,
       "certificado": 396211843.00999975,
-      "devengado": 249812499.29999986,
-      "saldo": 596493277.7000002,
+      "devengado": 249812466.29999986,
+      "saldo": 596493310.7000002,
       "avance": 29.5
     },
     {
@@ -408,8 +408,8 @@
       "tipo_nombre": "PROYECTOS",
       "pim": 344953254.0,
       "certificado": 221536750.76999986,
-      "devengado": 100193057.12000006,
-      "saldo": 244760196.87999994,
+      "devengado": 100191057.12000006,
+      "saldo": 244762196.87999994,
       "avance": 29.0
     },
     {
@@ -428,8 +428,8 @@
       "tipo_nombre": "PROYECTOS",
       "pim": 700815523.0,
       "certificado": 508970894.44999987,
-      "devengado": 174955141.11999997,
-      "saldo": 525860381.88,
+      "devengado": 174955141.11999995,
+      "saldo": 525860381.88000005,
       "avance": 25.0
     },
     {
@@ -468,8 +468,8 @@
       "tipo_nombre": "PROYECTOS",
       "pim": 1086742413.0,
       "certificado": 655914997.2100003,
-      "devengado": 232520171.92000023,
-      "saldo": 854222241.0799998,
+      "devengado": 232479841.22000024,
+      "saldo": 854262571.7799997,
       "avance": 21.4
     },
     {
@@ -488,8 +488,8 @@
       "tipo_nombre": "PROYECTOS",
       "pim": 822178862.0,
       "certificado": 713120129.61,
-      "devengado": 170105703.85999998,
-      "saldo": 652073158.14,
+      "devengado": 170105530.35999998,
+      "saldo": 652073331.64,
       "avance": 20.7
     },
     {
@@ -498,8 +498,8 @@
       "tipo_nombre": "PROYECTOS",
       "pim": 864101173.0,
       "certificado": 572934200.6599993,
-      "devengado": 167748390.60999975,
-      "saldo": 696352782.3900002,
+      "devengado": 167699493.20999974,
+      "saldo": 696401679.7900002,
       "avance": 19.4
     },
     {
@@ -528,8 +528,8 @@
       "tipo_nombre": "PROYECTOS",
       "pim": 450049876.0,
       "certificado": 274436879.00999993,
-      "devengado": 55656980.53000002,
-      "saldo": 394392895.46999997,
+      "devengado": 55707120.68000002,
+      "saldo": 394342755.32,
       "avance": 12.4
     },
     {
