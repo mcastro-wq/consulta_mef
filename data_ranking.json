@@ -1,5 +1,5 @@
 {
-  "ultima_actualizacion": "09/09/2026 09:22",
+  "ultima_actualizacion": "09/09/2026 10:53",
   "anio_fiscal": "2026",
   "data": [
     {
@@ -23,24 +23,24 @@
       "avance": 76.1
     },
     {
+      "pliego": "AYACUCHO",
+      "tipo_id": 2,
+      "tipo_nombre": "PROYECTOS",
+      "pim": 828577416.0,
+      "certificado": 803582340.37,
+      "devengado": 621167766.4299998,
+      "saldo": 207409649.57000017,
+      "avance": 75.0
+    },
+    {
       "pliego": "JUNIN",
       "tipo_id": 2,
       "tipo_nombre": "PROYECTOS",
       "pim": 1057299046.0,
-      "certificado": 951784310.8899997,
-      "devengado": 787740391.42,
-      "saldo": 269558654.58000004,
-      "avance": 74.5
-    },
-    {
-      "pliego": "AYACUCHO",
-      "tipo_id": 2,
-      "tipo_nombre": "PROYECTOS",
-      "pim": 831558416.0,
-      "certificado": 802221548.4699999,
-      "devengado": 616269786.6900003,
-      "saldo": 215288629.3099997,
-      "avance": 74.1
+      "certificado": 957357194.77,
+      "devengado": 786501464.2799999,
+      "saldo": 270797581.72000015,
+      "avance": 74.4
     },
     {
       "pliego": "MANCOMUNIDAD REGIONAL DE LOS ANDES",
@@ -48,18 +48,18 @@
       "tipo_nombre": "PROYECTOS",
       "pim": 3885944.0,
       "certificado": 3797172.58,
-      "devengado": 2811664.22,
-      "saldo": 1074279.7799999998,
-      "avance": 72.4
+      "devengado": 2877735.5800000005,
+      "saldo": 1008208.4199999995,
+      "avance": 74.1
     },
     {
       "pliego": "LORETO",
       "tipo_id": 2,
       "tipo_nombre": "PROYECTOS",
       "pim": 1082750983.0,
-      "certificado": 909175333.6099999,
-      "devengado": 779349478.5300002,
-      "saldo": 303401504.4699998,
+      "certificado": 909314543.5599998,
+      "devengado": 779867741.6900003,
+      "saldo": 302883241.3099997,
       "avance": 72.0
     },
     {
@@ -67,9 +67,9 @@
       "tipo_id": 2,
       "tipo_nombre": "PROYECTOS",
       "pim": 529609239.0,
-      "certificado": 503829258.6199999,
-      "devengado": 379560997.5699999,
-      "saldo": 150048241.43000013,
+      "certificado": 504348151.78,
+      "devengado": 379698422.4099999,
+      "saldo": 149910816.5900001,
       "avance": 71.7
     },
     {
@@ -77,189 +77,189 @@
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
       "pim": 1935135034.0,
-      "certificado": 1849212387.6699998,
-      "devengado": 1360892670.2400205,
-      "saldo": 574242363.7599795,
-      "avance": 70.3
+      "certificado": 1846634322.7099998,
+      "devengado": 1363299052.8100195,
+      "saldo": 571835981.1899805,
+      "avance": 70.4
     },
     {
       "pliego": "LORETO",
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
-      "pim": 2906474786.0,
-      "certificado": 2283221446.550024,
-      "devengado": 2029837100.7000175,
-      "saldo": 876637685.2999825,
-      "avance": 69.8
-    },
-    {
-      "pliego": "AREQUIPA",
-      "tipo_id": 2,
-      "tipo_nombre": "PROYECTOS",
-      "pim": 912165529.0,
-      "certificado": 829691717.6000009,
-      "devengado": 626823047.7300014,
-      "saldo": 285342481.26999855,
-      "avance": 68.7
+      "pim": 2906574446.0,
+      "certificado": 2286150097.450025,
+      "devengado": 2034713476.7900176,
+      "saldo": 871860969.2099824,
+      "avance": 70.0
     },
     {
       "pliego": "AMAZONAS",
       "tipo_id": 2,
       "tipo_nombre": "PROYECTOS",
       "pim": 492189844.0,
-      "certificado": 440757676.8400002,
-      "devengado": 337217409.0399997,
-      "saldo": 154972434.96000028,
-      "avance": 68.5
+      "certificado": 442278746.96000016,
+      "devengado": 338166346.8199997,
+      "saldo": 154023497.1800003,
+      "avance": 68.7
     },
     {
-      "pliego": "PASCO",
-      "tipo_id": 3,
-      "tipo_nombre": "ACTIVIDADES",
-      "pim": 813334991.0,
-      "certificado": 732604157.5500022,
-      "devengado": 548509428.9299971,
-      "saldo": 264825562.0700029,
-      "avance": 67.4
-    },
-    {
-      "pliego": "AMAZONAS",
-      "tipo_id": 3,
-      "tipo_nombre": "ACTIVIDADES",
-      "pim": 1269323235.0,
-      "certificado": 1213364901.520001,
-      "devengado": 853981579.8500003,
-      "saldo": 415341655.14999974,
-      "avance": 67.3
-    },
-    {
-      "pliego": "TACNA",
+      "pliego": "AREQUIPA",
       "tipo_id": 2,
       "tipo_nombre": "PROYECTOS",
-      "pim": 413724561.0,
-      "certificado": 346204534.7700004,
-      "devengado": 278123560.30999976,
-      "saldo": 135601000.69000024,
-      "avance": 67.2
+      "pim": 912165529.0,
+      "certificado": 830374748.2200009,
+      "devengado": 626930034.2100012,
+      "saldo": 285235494.78999877,
+      "avance": 68.7
     },
     {
       "pliego": "TUMBES",
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
       "pim": 661845942.0,
-      "certificado": 633095718.4,
-      "devengado": 443895328.5099983,
-      "saldo": 217950613.49000168,
-      "avance": 67.1
+      "certificado": 632890338.7,
+      "devengado": 446235338.879998,
+      "saldo": 215610603.12000197,
+      "avance": 67.4
+    },
+    {
+      "pliego": "AMAZONAS",
+      "tipo_id": 3,
+      "tipo_nombre": "ACTIVIDADES",
+      "pim": 1271469779.0,
+      "certificado": 1213297686.280001,
+      "devengado": 856135118.4699994,
+      "saldo": 415334660.53000057,
+      "avance": 67.3
+    },
+    {
+      "pliego": "PASCO",
+      "tipo_id": 3,
+      "tipo_nombre": "ACTIVIDADES",
+      "pim": 817112546.0,
+      "certificado": 735672031.9300021,
+      "devengado": 549380884.9599966,
+      "saldo": 267731661.04000342,
+      "avance": 67.2
+    },
+    {
+      "pliego": "TACNA",
+      "tipo_id": 2,
+      "tipo_nombre": "PROYECTOS",
+      "pim": 413724561.0,
+      "certificado": 346240004.7700004,
+      "devengado": 278141435.30999976,
+      "saldo": 135583125.69000024,
+      "avance": 67.2
     },
     {
       "pliego": "CAJAMARCA",
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
       "pim": 3357205743.0,
-      "certificado": 3168405905.009999,
-      "devengado": 2248809590.0300455,
-      "saldo": 1108396152.9699545,
-      "avance": 67.0
+      "certificado": 3167943464.2199984,
+      "devengado": 2253058271.890047,
+      "saldo": 1104147471.109953,
+      "avance": 67.1
     },
     {
       "pliego": "SAN MARTIN",
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
       "pim": 2055161203.0,
-      "certificado": 1996526428.0299988,
-      "devengado": 1376488973.960007,
-      "saldo": 678672229.039993,
-      "avance": 67.0
+      "certificado": 1997220542.099999,
+      "devengado": 1379194411.8500073,
+      "saldo": 675966791.1499927,
+      "avance": 67.1
     },
     {
       "pliego": "MUNICIPALIDAD METROPOLITANA DE LIMA",
       "tipo_id": 2,
       "tipo_nombre": "PROYECTOS",
       "pim": 58296055.0,
-      "certificado": 45306852.30000001,
-      "devengado": 38485559.98,
-      "saldo": 19810495.020000003,
-      "avance": 66.0
+      "certificado": 45314852.30000001,
+      "devengado": 38511559.980000004,
+      "saldo": 19784495.019999996,
+      "avance": 66.1
     },
     {
       "pliego": "HUANUCO",
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
       "pim": 1928480252.0,
-      "certificado": 1656932422.869999,
-      "devengado": 1270127676.4200077,
-      "saldo": 658352575.5799923,
+      "certificado": 1657327276.7099996,
+      "devengado": 1271643363.980008,
+      "saldo": 656836888.0199921,
       "avance": 65.9
     },
     {
       "pliego": "UCAYALI",
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
-      "pim": 1359315691.0,
-      "certificado": 972178251.4299982,
-      "devengado": 894860781.4599987,
-      "saldo": 464454909.5400013,
-      "avance": 65.8
+      "pim": 1359179859.0,
+      "certificado": 973764821.8899984,
+      "devengado": 895669326.5999994,
+      "saldo": 463510532.4000006,
+      "avance": 65.9
     },
     {
       "pliego": "ANCASH",
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
-      "pim": 2816413227.0,
-      "certificado": 1972006908.8000069,
-      "devengado": 1844678826.8100133,
-      "saldo": 971734400.1899867,
-      "avance": 65.5
+      "pim": 2816455227.0,
+      "certificado": 1975321082.370006,
+      "devengado": 1848742602.9100149,
+      "saldo": 967712624.0899851,
+      "avance": 65.6
     },
     {
       "pliego": "JUNIN",
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
-      "pim": 2757247864.0,
-      "certificado": 2090100464.5600317,
-      "devengado": 1802307458.4300425,
-      "saldo": 954940405.5699575,
-      "avance": 65.4
+      "pim": 2759693508.0,
+      "certificado": 2089874644.7800314,
+      "devengado": 1810033552.8200407,
+      "saldo": 949659955.1799593,
+      "avance": 65.6
     },
     {
       "pliego": "PIURA",
       "tipo_id": 2,
       "tipo_nombre": "PROYECTOS",
-      "pim": 1196799434.0,
-      "certificado": 1158479496.1000006,
-      "devengado": 780757325.3900007,
-      "saldo": 416042108.6099993,
-      "avance": 65.2
+      "pim": 1196590434.0,
+      "certificado": 1158834541.7500007,
+      "devengado": 784118725.5900002,
+      "saldo": 412471708.40999985,
+      "avance": 65.5
     },
     {
       "pliego": "LAMBAYEQUE",
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
-      "pim": 1951351420.0,
-      "certificado": 1906254995.9100006,
-      "devengado": 1270108065.0300043,
-      "saldo": 681243354.9699957,
-      "avance": 65.1
+      "pim": 1950505820.0,
+      "certificado": 1908945735.3000007,
+      "devengado": 1271445860.1000028,
+      "saldo": 679059959.8999972,
+      "avance": 65.2
     },
     {
       "pliego": "AYACUCHO",
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
-      "pim": 2003684142.0,
-      "certificado": 1488098814.350012,
-      "devengado": 1299541916.6800163,
-      "saldo": 704142225.3199837,
-      "avance": 64.9
+      "pim": 2006677142.0,
+      "certificado": 1487880394.5200114,
+      "devengado": 1300817732.870016,
+      "saldo": 705859409.1299839,
+      "avance": 64.8
     },
     {
       "pliego": "MUNICIPALIDAD METROPOLITANA DE LIMA",
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
       "pim": 29276838.0,
-      "certificado": 25999486.150000002,
-      "devengado": 18965165.550000016,
-      "saldo": 10311672.449999984,
+      "certificado": 25993919.150000006,
+      "devengado": 18965165.55000002,
+      "saldo": 10311672.44999998,
       "avance": 64.8
     },
     {
@@ -267,19 +267,19 @@
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
       "pim": 807734950.0,
-      "certificado": 759973189.9999999,
-      "devengado": 520199020.75999737,
-      "saldo": 287535929.24000263,
-      "avance": 64.4
+      "certificado": 760396200.7799999,
+      "devengado": 522792697.88999736,
+      "saldo": 284942252.11000264,
+      "avance": 64.7
     },
     {
       "pliego": "HUANCAVELICA",
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
-      "pim": 1328017109.0,
-      "certificado": 1037402438.2900157,
-      "devengado": 854086328.1100041,
-      "saldo": 473930780.88999593,
+      "pim": 1328284069.0,
+      "certificado": 1038367138.9900156,
+      "devengado": 854568985.890004,
+      "saldo": 473715083.10999596,
       "avance": 64.3
     },
     {
@@ -287,79 +287,79 @@
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
       "pim": 2706997198.0,
-      "certificado": 2633747228.0900016,
-      "devengado": 1735065557.4100008,
-      "saldo": 971931640.5899992,
-      "avance": 64.1
+      "certificado": 2610142034.2100005,
+      "devengado": 1737301349.9600022,
+      "saldo": 969695848.0399978,
+      "avance": 64.2
     },
     {
       "pliego": "APURIMAC",
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
-      "pim": 1370099715.0,
-      "certificado": 1013940927.1000024,
-      "devengado": 872341705.6199981,
-      "saldo": 497758009.3800019,
+      "pim": 1370153715.0,
+      "certificado": 1014276792.7600021,
+      "devengado": 873398054.0999984,
+      "saldo": 496755660.90000165,
       "avance": 63.7
     },
     {
       "pliego": "PIURA",
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
-      "pim": 3549088072.0,
-      "certificado": 2382515121.300012,
-      "devengado": 2250612219.610017,
-      "saldo": 1298475852.3899832,
-      "avance": 63.4
+      "pim": 3549297072.0,
+      "certificado": 2409961320.4900107,
+      "devengado": 2252505943.8000154,
+      "saldo": 1296791128.1999846,
+      "avance": 63.5
     },
     {
       "pliego": "MOQUEGUA",
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
-      "pim": 649980404.0,
-      "certificado": 496835757.19,
-      "devengado": 411349877.1799989,
-      "saldo": 238630526.82000113,
-      "avance": 63.3
+      "pim": 650685507.0,
+      "certificado": 497398652.56,
+      "devengado": 412330970.71999884,
+      "saldo": 238354536.28000116,
+      "avance": 63.4
     },
     {
       "pliego": "UCAYALI",
       "tipo_id": 2,
       "tipo_nombre": "PROYECTOS",
-      "pim": 692461822.0,
-      "certificado": 642945926.55,
-      "devengado": 438432752.2100002,
-      "saldo": 254029069.78999978,
-      "avance": 63.3
+      "pim": 692597654.0,
+      "certificado": 648375686.9600002,
+      "devengado": 438976210.9400002,
+      "saldo": 253621443.05999982,
+      "avance": 63.4
     },
     {
       "pliego": "LIMA",
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
-      "pim": 1980087155.0,
-      "certificado": 1601715668.3200114,
-      "devengado": 1249356572.2600079,
-      "saldo": 730730582.7399921,
+      "pim": 1982277646.0,
+      "certificado": 1599918993.8300104,
+      "devengado": 1250422361.2000098,
+      "saldo": 731855284.7999902,
       "avance": 63.1
     },
     {
       "pliego": "AREQUIPA",
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
-      "pim": 2433580939.0,
-      "certificado": 1897919459.380011,
-      "devengado": 1524082689.8500168,
-      "saldo": 909498249.1499832,
-      "avance": 62.6
+      "pim": 2434123995.0,
+      "certificado": 1901515952.400013,
+      "devengado": 1526913647.500016,
+      "saldo": 907210347.499984,
+      "avance": 62.7
     },
     {
       "pliego": "CUSCO",
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
-      "pim": 2798662917.0,
-      "certificado": 2660495911.3200088,
-      "devengado": 1745695059.460006,
-      "saldo": 1052967857.539994,
+      "pim": 2798862113.0,
+      "certificado": 2660384349.3900084,
+      "devengado": 1747098275.2000058,
+      "saldo": 1051763837.7999942,
       "avance": 62.4
     },
     {
@@ -367,19 +367,19 @@
       "tipo_id": 2,
       "tipo_nombre": "PROYECTOS",
       "pim": 610545609.0,
-      "certificado": 517397158.89,
-      "devengado": 377419719.68000054,
-      "saldo": 233125889.31999946,
-      "avance": 61.8
+      "certificado": 514621439.08,
+      "devengado": 379305110.6000004,
+      "saldo": 231240498.39999962,
+      "avance": 62.1
     },
     {
       "pliego": "LA PROVINCIA CONSTITUCIONAL DEL CALLAO",
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
-      "pim": 1685874138.0,
-      "certificado": 1563754089.3200004,
-      "devengado": 1031251702.030004,
-      "saldo": 654622435.969996,
+      "pim": 1686378491.0,
+      "certificado": 1564835915.3600008,
+      "devengado": 1032001772.1500038,
+      "saldo": 654376718.8499962,
       "avance": 61.2
     },
     {
@@ -387,29 +387,29 @@
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
       "pim": 447845742.0,
-      "certificado": 415086560.75999933,
-      "devengado": 272733125.31999993,
-      "saldo": 175112616.68000007,
-      "avance": 60.9
+      "certificado": 415235251.64999944,
+      "devengado": 273197937.3799998,
+      "saldo": 174647804.62000018,
+      "avance": 61.0
     },
     {
       "pliego": "LA LIBERTAD",
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
-      "pim": 3628558147.0,
-      "certificado": 3379697984.860011,
-      "devengado": 2192015535.2100554,
-      "saldo": 1436542611.7899446,
-      "avance": 60.4
+      "pim": 3638703248.0,
+      "certificado": 3377669978.85001,
+      "devengado": 2202879850.1100593,
+      "saldo": 1435823397.8899407,
+      "avance": 60.5
     },
     {
       "pliego": "MOQUEGUA",
       "tipo_id": 2,
       "tipo_nombre": "PROYECTOS",
       "pim": 298923798.0,
-      "certificado": 253545202.95000046,
-      "devengado": 172752592.6499998,
-      "saldo": 126171205.3500002,
+      "certificado": 254353667.10000047,
+      "devengado": 172901652.87999982,
+      "saldo": 126022145.12000018,
       "avance": 57.8
     },
     {
@@ -417,19 +417,19 @@
       "tipo_id": 2,
       "tipo_nombre": "PROYECTOS",
       "pim": 213736296.0,
-      "certificado": 190806076.84,
-      "devengado": 121733977.25999996,
-      "saldo": 92002318.74000004,
-      "avance": 57.0
+      "certificado": 190959233.83999997,
+      "devengado": 121992180.20999995,
+      "saldo": 91744115.79000005,
+      "avance": 57.1
     },
     {
       "pliego": "CUSCO",
       "tipo_id": 2,
       "tipo_nombre": "PROYECTOS",
       "pim": 1207533126.0,
-      "certificado": 1071653760.7100012,
-      "devengado": 683601545.8499993,
-      "saldo": 523931580.1500007,
+      "certificado": 1071983346.3700008,
+      "devengado": 683936961.7799993,
+      "saldo": 523596164.22000074,
       "avance": 56.6
     },
     {
@@ -437,119 +437,119 @@
       "tipo_id": 2,
       "tipo_nombre": "PROYECTOS",
       "pim": 527721613.0,
-      "certificado": 486042149.04,
-      "devengado": 285923563.4400002,
-      "saldo": 241798049.55999982,
+      "certificado": 489431708.0400001,
+      "devengado": 285974711.4400001,
+      "saldo": 241746901.55999988,
       "avance": 54.2
     },
     {
       "pliego": "CAJAMARCA",
       "tipo_id": 2,
       "tipo_nombre": "PROYECTOS",
-      "pim": 1073728374.0,
-      "certificado": 924163875.0600003,
-      "devengado": 576967971.8399997,
-      "saldo": 496760402.1600003,
-      "avance": 53.7
+      "pim": 1075728374.0,
+      "certificado": 928987532.3600005,
+      "devengado": 579785448.2899997,
+      "saldo": 495942925.7100003,
+      "avance": 53.9
     },
     {
       "pliego": "APURIMAC",
       "tipo_id": 2,
       "tipo_nombre": "PROYECTOS",
       "pim": 519810467.0,
-      "certificado": 403950394.68000025,
-      "devengado": 271132451.96000046,
-      "saldo": 248678015.03999954,
+      "certificado": 404511651.38000023,
+      "devengado": 271208227.54000044,
+      "saldo": 248602239.45999956,
       "avance": 52.2
     },
     {
       "pliego": "LAMBAYEQUE",
       "tipo_id": 2,
       "tipo_nombre": "PROYECTOS",
-      "pim": 754391269.0,
-      "certificado": 713529595.2099998,
-      "devengado": 379039874.1399999,
-      "saldo": 375351394.8600001,
-      "avance": 50.2
+      "pim": 755296869.0,
+      "certificado": 713236457.6299999,
+      "devengado": 379628907.6299999,
+      "saldo": 375667961.3700001,
+      "avance": 50.3
     },
     {
       "pliego": "PASCO",
       "tipo_id": 2,
       "tipo_nombre": "PROYECTOS",
       "pim": 854247255.0,
-      "certificado": 777793173.2700001,
-      "devengado": 395143352.4600002,
-      "saldo": 459103902.5399998,
-      "avance": 46.3
+      "certificado": 782197714.43,
+      "devengado": 398264805.57000023,
+      "saldo": 455982449.42999977,
+      "avance": 46.6
     },
     {
       "pliego": "PUNO",
       "tipo_id": 2,
       "tipo_nombre": "PROYECTOS",
       "pim": 983101884.0,
-      "certificado": 877176506.609998,
-      "devengado": 427063269.24000067,
-      "saldo": 556038614.7599993,
-      "avance": 43.4
+      "certificado": 878996233.549998,
+      "devengado": 427232352.83000064,
+      "saldo": 555869531.1699994,
+      "avance": 43.5
     },
     {
       "pliego": "HUANCAVELICA",
       "tipo_id": 2,
       "tipo_nombre": "PROYECTOS",
-      "pim": 297336845.0,
-      "certificado": 258286261.46,
-      "devengado": 123396197.11000003,
-      "saldo": 173940647.89,
-      "avance": 41.5
+      "pim": 297069885.0,
+      "certificado": 259204325.23,
+      "devengado": 123537452.14000002,
+      "saldo": 173532432.85999998,
+      "avance": 41.6
     },
     {
       "pliego": "HUANUCO",
       "tipo_id": 2,
       "tipo_nombre": "PROYECTOS",
       "pim": 453780505.0,
-      "certificado": 381222196.20000005,
-      "devengado": 184885205.53,
-      "saldo": 268895299.47,
-      "avance": 40.7
+      "certificado": 381189594.14,
+      "devengado": 185536305.13000003,
+      "saldo": 268244199.86999997,
+      "avance": 40.9
     },
     {
       "pliego": "LA LIBERTAD",
       "tipo_id": 2,
       "tipo_nombre": "PROYECTOS",
-      "pim": 963070697.0,
-      "certificado": 757330974.6899997,
-      "devengado": 380319113.25,
-      "saldo": 582751583.75,
-      "avance": 39.5
+      "pim": 952925596.0,
+      "certificado": 757815711.5899996,
+      "devengado": 381549970.33,
+      "saldo": 571375625.6700001,
+      "avance": 40.0
     },
     {
       "pliego": "ANCASH",
       "tipo_id": 2,
       "tipo_nombre": "PROYECTOS",
       "pim": 811659213.0,
-      "certificado": 722100203.4300003,
-      "devengado": 299702224.75000036,
-      "saldo": 511956988.24999964,
-      "avance": 36.9
+      "certificado": 732539877.8100003,
+      "devengado": 301723745.15000033,
+      "saldo": 509935467.84999967,
+      "avance": 37.2
     },
     {
       "pliego": "TUMBES",
       "tipo_id": 2,
       "tipo_nombre": "PROYECTOS",
       "pim": 147442796.0,
-      "certificado": 133676157.82,
-      "devengado": 49989208.21999996,
-      "saldo": 97453587.78000003,
-      "avance": 33.9
+      "certificado": 133697957.82,
+      "devengado": 53338548.89999998,
+      "saldo": 94104247.10000002,
+      "avance": 36.2
     },
     {
       "pliego": "LA PROVINCIA CONSTITUCIONAL DEL CALLAO",
       "tipo_id": 2,
       "tipo_nombre": "PROYECTOS",
       "pim": 331250992.0,
-      "certificado": 269640325.65,
-      "devengado": 73870790.02000001,
-      "saldo": 257380201.98,
+      "certificado": 268784080.9399999,
+      "devengado": 73927745.21000002,
+      "saldo": 257323246.78999996,
       "avance": 22.3
     },
     {
