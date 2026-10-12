@@ -1,5 +1,5 @@
 {
-  "ultima_actualizacion": "11/10/2026 23:05",
+  "ultima_actualizacion": "12/10/2026 10:35",
   "anio_fiscal": "2026",
   "data": [
     {
@@ -28,8 +28,8 @@
       "tipo_nombre": "PROYECTOS",
       "pim": 4152904.0,
       "certificado": 4087480.08,
-      "devengado": 3464527.4,
-      "saldo": 688376.6000000001,
+      "devengado": 3464527.4000000004,
+      "saldo": 688376.5999999996,
       "avance": 83.4
     },
     {
@@ -88,8 +88,8 @@
       "tipo_nombre": "ACTIVIDADES",
       "pim": 1271976970.0,
       "certificado": 1251712467.190001,
-      "devengado": 975781115.2500019,
-      "saldo": 296195854.7499981,
+      "devengado": 975740991.8400018,
+      "saldo": 296235978.1599982,
       "avance": 76.7
     },
     {
@@ -177,9 +177,9 @@
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
       "pim": 2957851038.0,
-      "certificado": 2301693990.4100375,
-      "devengado": 2192616103.4200535,
-      "saldo": 765234934.5799465,
+      "certificado": 2301739488.230037,
+      "devengado": 2192615949.9200535,
+      "saldo": 765235088.0799465,
       "avance": 74.1
     },
     {
@@ -197,7 +197,7 @@
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
       "pim": 1362300308.0,
-      "certificado": 1072114224.7900012,
+      "certificado": 1072114224.790001,
       "devengado": 999141714.9600005,
       "saldo": 363158593.0399995,
       "avance": 73.3
@@ -217,7 +217,7 @@
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
       "pim": 2714507188.0,
-      "certificado": 2652761099.450001,
+      "certificado": 2650836951.3700004,
       "devengado": 1986467866.9300158,
       "saldo": 728039321.0699842,
       "avance": 73.2
@@ -227,7 +227,7 @@
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
       "pim": 2768464980.0,
-      "certificado": 2399719135.2700706,
+      "certificado": 2399719135.270071,
       "devengado": 2024596214.8600566,
       "saldo": 743868765.1399434,
       "avance": 73.1
@@ -278,8 +278,8 @@
       "tipo_nombre": "ACTIVIDADES",
       "pim": 1982592528.0,
       "certificado": 1687777513.9100142,
-      "devengado": 1410209177.1000125,
-      "saldo": 572383350.8999875,
+      "devengado": 1410223309.1000125,
+      "saldo": 572369218.8999875,
       "avance": 71.1
     },
     {
@@ -297,7 +297,7 @@
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
       "pim": 3544653966.0,
-      "certificado": 2648607982.0200267,
+      "certificado": 2648607589.3500266,
       "devengado": 2514148967.360031,
       "saldo": 1030504998.6399689,
       "avance": 70.9
@@ -307,7 +307,7 @@
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
       "pim": 2793465012.0,
-      "certificado": 2691143638.130009,
+      "certificado": 2691110388.130009,
       "devengado": 1976533527.1400168,
       "saldo": 816931484.8599832,
       "avance": 70.8
@@ -337,7 +337,7 @@
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
       "pim": 655986086.0,
-      "certificado": 576200632.9299998,
+      "certificado": 576166900.8999999,
       "devengado": 458545328.6799991,
       "saldo": 197440757.3200009,
       "avance": 69.9
@@ -378,8 +378,8 @@
       "tipo_nombre": "ACTIVIDADES",
       "pim": 447607816.0,
       "certificado": 419483313.009999,
-      "devengado": 309081371.94000006,
-      "saldo": 138526444.05999994,
+      "devengado": 309075721.94,
+      "saldo": 138532094.06,
       "avance": 69.1
     },
     {
@@ -387,9 +387,9 @@
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
       "pim": 3650836731.0,
-      "certificado": 3443723690.0800123,
-      "devengado": 2499647763.7401047,
-      "saldo": 1151188967.2598953,
+      "certificado": 3443690284.6500125,
+      "devengado": 2499647763.740104,
+      "saldo": 1151188967.2598958,
       "avance": 68.5
     },
     {
@@ -517,7 +517,7 @@
       "tipo_id": 2,
       "tipo_nombre": "PROYECTOS",
       "pim": 451033741.0,
-      "certificado": 415149829.5000001,
+      "certificado": 415149829.5000002,
       "devengado": 227108491.30000016,
       "saldo": 223925249.69999984,
       "avance": 50.4
