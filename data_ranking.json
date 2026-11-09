@@ -1,5 +1,5 @@
 {
-  "ultima_actualizacion": "08/11/2026 23:29",
+  "ultima_actualizacion": "09/11/2026 10:05",
   "anio_fiscal": "2026",
   "data": [
     {
@@ -27,7 +27,7 @@
       "tipo_id": 2,
       "tipo_nombre": "PROYECTOS",
       "pim": 4152904.0,
-      "certificado": 4096827.86,
+      "certificado": 4096827.8599999994,
       "devengado": 3634827.4,
       "saldo": 518076.6000000001,
       "avance": 87.5
@@ -108,8 +108,8 @@
       "tipo_nombre": "PROYECTOS",
       "pim": 1193932810.0,
       "certificado": 1173333276.9800003,
-      "devengado": 984043116.26,
-      "saldo": 209889693.74,
+      "devengado": 984043016.26,
+      "saldo": 209889793.74,
       "avance": 82.4
     },
     {
@@ -118,8 +118,8 @@
       "tipo_nombre": "ACTIVIDADES",
       "pim": 2082649686.0,
       "certificado": 2063435782.8199987,
-      "devengado": 1711397739.6800258,
-      "saldo": 371251946.3199742,
+      "devengado": 1711397379.6800258,
+      "saldo": 371252306.3199742,
       "avance": 82.2
     },
     {
@@ -127,7 +127,7 @@
       "tipo_id": 2,
       "tipo_nombre": "PROYECTOS",
       "pim": 1100501153.0,
-      "certificado": 976425445.82,
+      "certificado": 976425445.8199999,
       "devengado": 903295350.7400006,
       "saldo": 197205802.2599994,
       "avance": 82.1
@@ -187,7 +187,7 @@
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
       "pim": 2780307728.0,
-      "certificado": 2490155172.670068,
+      "certificado": 2490147002.670068,
       "devengado": 2243959793.7800794,
       "saldo": 536347934.21992064,
       "avance": 80.7
@@ -207,7 +207,7 @@
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
       "pim": 2020052048.0,
-      "certificado": 1930526790.4700172,
+      "certificado": 1931071790.4700172,
       "devengado": 1615641812.5300303,
       "saldo": 404410235.46996975,
       "avance": 80.0
@@ -218,8 +218,8 @@
       "tipo_nombre": "ACTIVIDADES",
       "pim": 2717908342.0,
       "certificado": 2669388411.600001,
-      "devengado": 2171853367.7200346,
-      "saldo": 546054974.2799654,
+      "devengado": 2171871867.7200346,
+      "saldo": 546036474.2799654,
       "avance": 79.9
     },
     {
@@ -288,8 +288,8 @@
       "tipo_nombre": "ACTIVIDADES",
       "pim": 3043335910.0,
       "certificado": 2479892074.8800626,
-      "devengado": 2386803724.6500864,
-      "saldo": 656532185.3499136,
+      "devengado": 2386801224.6500864,
+      "saldo": 656534685.3499136,
       "avance": 78.4
     },
     {
@@ -297,7 +297,7 @@
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
       "pim": 2798297659.0,
-      "certificado": 2665432848.700011,
+      "certificado": 2665437916.700011,
       "devengado": 2187059518.7600245,
       "saldo": 611238140.2399755,
       "avance": 78.2
@@ -308,8 +308,8 @@
       "tipo_nombre": "PROYECTOS",
       "pim": 215044017.0,
       "certificado": 207291735.52999997,
-      "devengado": 167489519.79999986,
-      "saldo": 47554497.20000014,
+      "devengado": 167538947.3999999,
+      "saldo": 47505069.60000011,
       "avance": 77.9
     },
     {
@@ -338,8 +338,8 @@
       "tipo_nombre": "ACTIVIDADES",
       "pim": 448557392.0,
       "certificado": 424429462.89999896,
-      "devengado": 346820593.38999814,
-      "saldo": 101736798.61000186,
+      "devengado": 346847328.88999814,
+      "saldo": 101710063.11000186,
       "avance": 77.3
     },
     {
@@ -367,9 +367,9 @@
       "tipo_id": 3,
       "tipo_nombre": "ACTIVIDADES",
       "pim": 3669989832.0,
-      "certificado": 3436544428.040013,
-      "devengado": 2769811062.8401613,
-      "saldo": 900178769.1598387,
+      "certificado": 3436680228.040013,
+      "devengado": 2769809267.940161,
+      "saldo": 900180564.0598388,
       "avance": 75.5
     },
     {
@@ -418,8 +418,8 @@
       "tipo_nombre": "ACTIVIDADES",
       "pim": 1760800000.0,
       "certificado": 1635247221.6900005,
-      "devengado": 1284986588.280011,
-      "saldo": 475813411.71998906,
+      "devengado": 1284986588.2800112,
+      "saldo": 475813411.7199888,
       "avance": 73.0
     },
     {
